@@ -1,0 +1,827 @@
+{
+  "timestamp": "2026-10-16T01:40:40.478Z",
+  "total": 43,
+  "passed": 42,
+  "failed": 0,
+  "warnings": 1,
+  "results": [
+    {
+      "suite": "Layout",
+      "name": "Devotional Trips Page Title",
+      "status": "PASS",
+      "details": "Title: \"Devotional Trips & Spiritual Yatras | VibeMiles | Vibe Miles\"",
+      "viewport": "Desktop (1280x800)",
+      "url": "http://localhost:3000/devotional-trips"
+    },
+    {
+      "suite": "Layout",
+      "name": "Devotional Hero Badge",
+      "status": "PASS",
+      "details": "Badge: \"🛕\"",
+      "viewport": "Desktop (1280x800)"
+    },
+    {
+      "suite": "Layout",
+      "name": "Devotee Advisory Notice Card",
+      "status": "PASS",
+      "details": "Verified presence of Devotee Advisory and official Temple Trust notice",
+      "viewport": "Desktop (1280x800)"
+    },
+    {
+      "suite": "Brand Colours",
+      "name": "Devotional Trips Color Palette",
+      "status": "PASS",
+      "details": "Hero BG: lab(1.76974 1.32743 -9.28855), Teal Accent: lab(76.0109 -53.3483 -2.27907), Amber Advisory BG: oklab(0.279003 0.0538332 0.0550504 / 0.6)",
+      "viewport": "Desktop (1280x800)"
+    },
+    {
+      "suite": "Layout",
+      "name": "Foreign Trips Page Title",
+      "status": "PASS",
+      "details": "Title: \"Foreign Trips & International Holidays | VibeMiles | Vibe Miles\"",
+      "viewport": "Desktop (1280x800)",
+      "url": "http://localhost:3000/foreign-trips"
+    },
+    {
+      "suite": "Layout",
+      "name": "Foreign Hero Badge",
+      "status": "PASS",
+      "details": "Badge: \"✈️\"",
+      "viewport": "Desktop (1280x800)"
+    },
+    {
+      "suite": "Layout",
+      "name": "Visa & Passport Advisory Card",
+      "status": "PASS",
+      "details": "Verified presence of International Visa Disclosure and 6-month passport guideline",
+      "viewport": "Desktop (1280x800)"
+    },
+    {
+      "suite": "Layout",
+      "name": "Devotional Trips Page Title",
+      "status": "PASS",
+      "details": "Title: \"Devotional Trips & Spiritual Yatras | VibeMiles | Vibe Miles\"",
+      "viewport": "Mobile (375x667)",
+      "url": "http://localhost:3000/devotional-trips"
+    },
+    {
+      "suite": "Layout",
+      "name": "Devotional Hero Badge",
+      "status": "PASS",
+      "details": "Badge: \"🛕\"",
+      "viewport": "Mobile (375x667)"
+    },
+    {
+      "suite": "Layout",
+      "name": "Devotee Advisory Notice Card",
+      "status": "PASS",
+      "details": "Verified presence of Devotee Advisory and official Temple Trust notice",
+      "viewport": "Mobile (375x667)"
+    },
+    {
+      "suite": "Brand Colours",
+      "name": "Devotional Trips Color Palette",
+      "status": "PASS",
+      "details": "Hero BG: lab(1.76974 1.32743 -9.28855), Teal Accent: lab(76.0109 -53.3483 -2.27907), Amber Advisory BG: oklab(0.279003 0.0538332 0.0550504 / 0.6)",
+      "viewport": "Mobile (375x667)"
+    },
+    {
+      "suite": "Layout",
+      "name": "Foreign Trips Page Title",
+      "status": "PASS",
+      "details": "Title: \"Foreign Trips & International Holidays | VibeMiles | Vibe Miles\"",
+      "viewport": "Mobile (375x667)",
+      "url": "http://localhost:3000/foreign-trips"
+    },
+    {
+      "suite": "Layout",
+      "name": "Foreign Hero Badge",
+      "status": "PASS",
+      "details": "Badge: \"✈️\"",
+      "viewport": "Mobile (375x667)"
+    },
+    {
+      "suite": "Layout",
+      "name": "Visa & Passport Advisory Card",
+      "status": "PASS",
+      "details": "Verified presence of International Visa Disclosure and 6-month passport guideline",
+      "viewport": "Mobile (375x667)"
+    },
+    {
+      "suite": "Navigation",
+      "name": "Desktop Header Devotional Trips Link",
+      "status": "PASS",
+      "details": "Found \"Devotional Trips\" -> /devotional-trips",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Navigation",
+      "name": "Desktop Header Foreign Trips Link",
+      "status": "PASS",
+      "details": "Found \"Foreign Trips\" -> /foreign-trips",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Navigation",
+      "name": "Old Navigation Items Removed",
+      "status": "PASS",
+      "details": "Destinations present: false, Experiences present: false",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Navigation",
+      "name": "Desktop Header Click -> /devotional-trips",
+      "status": "PASS",
+      "details": "Navigated to: http://localhost:3000/devotional-trips",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Navigation",
+      "name": "Desktop Header Click -> /foreign-trips",
+      "status": "PASS",
+      "details": "Navigated to: http://localhost:3000/foreign-trips",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Navigation",
+      "name": "Footer Devotional Trips Link",
+      "status": "PASS",
+      "details": "Found \"Devotional Trips\" -> /devotional-trips",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Navigation",
+      "name": "Footer Foreign Trips Link",
+      "status": "PASS",
+      "details": "Found \"Foreign Trips\" -> /foreign-trips",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Navigation",
+      "name": "Homepage Hero Quick Filter Pills",
+      "status": "PASS",
+      "details": "Devotional Pill: true, Foreign Pill: true",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Navigation",
+      "name": "Mobile Drawer Devotional Trips Link",
+      "status": "PASS",
+      "details": "Found \"Devotional Trips\" -> /devotional-trips",
+      "viewport": "Mobile"
+    },
+    {
+      "suite": "Navigation",
+      "name": "Mobile Drawer Foreign Trips Link",
+      "status": "PASS",
+      "details": "Found \"Foreign Trips\" -> /foreign-trips",
+      "viewport": "Mobile"
+    },
+    {
+      "suite": "Filters",
+      "name": "Devotional Filter by Destination (Varanasi)",
+      "status": "PASS",
+      "details": "Found Varanasi package in filtered view: true",
+      "viewport": "Desktop",
+      "url": "http://localhost:3000/devotional-trips?destination=Varanasi"
+    },
+    {
+      "suite": "Filters",
+      "name": "Foreign Filter by Country (Dubai)",
+      "status": "PASS",
+      "details": "Found Dubai package in filtered view: true",
+      "viewport": "Desktop",
+      "url": "http://localhost:3000/foreign-trips?country=Dubai"
+    },
+    {
+      "suite": "Comparison Matrix",
+      "name": "Foreign Package Comparison Matrix Rendered",
+      "status": "PASS",
+      "details": "Comparison matrix visible: true",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Comparison Matrix",
+      "name": "Toggle Package Selection Pill",
+      "status": "PASS",
+      "details": "Toggled button: \"Bali\"",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Package Details",
+      "name": "Navigate to Package Detail Page",
+      "status": "PASS",
+      "details": "URL: /packages/6-day-bali-tropical-paradise-ubud-cultural-journey | Title: \"Vibe Miles — Explore India's Best Tour Packages & Experiences\"",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Redirects",
+      "name": "Legacy /destinations Redirect",
+      "status": "PASS",
+      "details": "Navigated /destinations -> Final URL: http://localhost:3000/devotional-trips",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Redirects",
+      "name": "Legacy /adventures Redirect",
+      "status": "PASS",
+      "details": "Navigated /adventures -> Final URL: http://localhost:3000/foreign-trips",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Destination Details",
+      "name": "Preserved /destinations/varanasi Route",
+      "status": "PASS",
+      "details": "Status: 200 | Heading: \"Varanasi\"",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Destination Details",
+      "name": "Preserved /destinations/dubai Route",
+      "status": "PASS",
+      "details": "Status: 200 | Heading: \"Dubai\"",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Provenance",
+      "name": "Devotional Packages Provenance (Varanasi, Tirupati, Haridwar)",
+      "status": "PASS",
+      "details": "Kashi: true, Tirupati: true, Haridwar: true",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Provenance",
+      "name": "Foreign Packages Provenance (Dubai, Bali, Thailand)",
+      "status": "PASS",
+      "details": "Dubai: true, Bali: true, Thailand: true",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Cautious Wording",
+      "name": "Temple Darshan Trust Guidance & Cautious Boundary",
+      "status": "PASS",
+      "details": "Trust Authority: true, TTD: true, No VIP Claims: true",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Cautious Wording",
+      "name": "Foreign Visa & Passport Disclosure Cautious Boundary",
+      "status": "PASS",
+      "details": "No Visa Issuance: true, 6-mo Passport: true, Airfare Disclosed: true",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Auth & Booking",
+      "name": "Login Page Accessible with Valid Form",
+      "status": "PASS",
+      "details": "Status: 200 | Form Present: true",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Auth & Booking",
+      "name": "Register Page Accessible with Valid Form",
+      "status": "PASS",
+      "details": "Status: 200 | Form Present: true",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Auth & Booking",
+      "name": "Booking Route Navigation & Auth Redirection",
+      "status": "PASS",
+      "details": "Requested /booking/test-package-id -> Arrived at: http://localhost:3000/booking/test-package-id",
+      "viewport": "Desktop"
+    },
+    {
+      "suite": "Diagnostics",
+      "name": "Zero React Hydration Mismatch Errors",
+      "status": "PASS",
+      "details": "Detected 0 hydration warnings/errors in clean browser session",
+      "viewport": "All Viewports"
+    },
+    {
+      "suite": "Diagnostics",
+      "name": "Zero Severe Unhandled Application Errors",
+      "status": "PASS",
+      "details": "Found 0 unexpected application errors (excluding normal unauthenticated 401s on /api/auth/me for guest visits)",
+      "viewport": "All Viewports"
+    },
+    {
+      "suite": "Diagnostics",
+      "name": "Zero Critical Network Request Failures",
+      "status": "WARN",
+      "details": "Recorded 98 failed network requests",
+      "viewport": "All Viewports"
+    }
+  ],
+  "consoleErrors": [
+    {
+      "url": "http://localhost:3000/foreign-trips",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?destination=Varanasi",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Dubai",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/destinations",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/adventures",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/destinations/varanasi",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/destinations/dubai",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/login",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/register",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    },
+    {
+      "url": "http://localhost:3000/booking/test-package-id",
+      "text": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+      "type": "error"
+    }
+  ],
+  "failedRequests": [
+    {
+      "url": "http://localhost:3000/devotional-trips?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/packages?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Dubai&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Bali&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Thailand&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=J93PFhl_U3TRt85D",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?destination=Tirupati&_rsc=ITbVuJbMY-2y1ZCq",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=ITbVuJbMY-2y1ZCq",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Bali&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/destinations/alleppey-kerala?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/destinations/bali-indonesia?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/packages?_rsc=xMTOVfpDFW51_WCw",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?_rsc=LmtXuKd7jBPQiCjd",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/packages?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/destinations/alleppey-kerala?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/destinations/bali-indonesia?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/packages?_rsc=xMTOVfpDFW51_WCw",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?_rsc=RpKEW-RIteEjg6QD",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/destinations/alleppey-kerala?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/destinations/bali-indonesia?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?destination=Varanasi&_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Bali&_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/packages?category=tour&_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?_rsc=5CB68i4pnAekjehf",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/packages?_rsc=J93PFhl_U3TRt85D",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?_rsc=J93PFhl_U3TRt85D",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=J93PFhl_U3TRt85D",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=J93PFhl_U3TRt85D",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?_rsc=dVgnq-dSdGCEKKuI",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?_rsc=D_i1-_unxQYxz9fT",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/packages?_rsc=MEoqxRjqvRAuP54c",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=19_QYaeMqBtKkn4w",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/packages?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?_rsc=6TIYsAGJwLyYopGr",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?_rsc=lZJfbSxdfG0-knqj",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=cojtKc2uug-ka2pl",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/packages?_rsc=vM0kaKNkq4m-2vy8",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=3949DqYTMNaTQqlc",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Bali&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Thailand&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Dubai&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/packages?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/packages?_rsc=vM0kaKNkq4m-2vy8",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?_rsc=fQNkGVoFwJoueTzi",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=3949DqYTMNaTQqlc",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=cojtKc2uug-ka2pl",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?_rsc=6TIYsAGJwLyYopGr",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Dubai&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=qSXMZGbeFmmMokEK",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=qSXMZGbeFmmMokEK",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/packages?_rsc=6fGoV0eaHj2jb-KZ",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/deals?_rsc=ZVN_vqk5kcAFBzBv",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=mSlN15uzZc-5jfqa",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?_rsc=22F5XdlbMlISBAeL",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?_rsc=5qN6MTGeZP5yJQwe",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=ITbVuJbMY-2y1ZCq",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?destination=Varanasi&_rsc=ITbVuJbMY-2y1ZCq",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?destination=Tirupati&_rsc=ITbVuJbMY-2y1ZCq",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?destination=Rishikesh&_rsc=ITbVuJbMY-2y1ZCq",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=Qw0SebW0TuHjxY3V",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Dubai&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Bali&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Thailand&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=j4QJY05FQ8B2pi6A",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=aAeUPJd7_zYdY_oD",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?destination=Varanasi&_rsc=ITbVuJbMY-2y1ZCq",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=ITbVuJbMY-2y1ZCq",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Dubai&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Bali&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Thailand&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=ITbVuJbMY-2y1ZCq",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?destination=Varanasi&_rsc=ITbVuJbMY-2y1ZCq",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?destination=Tirupati&_rsc=ITbVuJbMY-2y1ZCq",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/devotional-trips?destination=Rishikesh&_rsc=ITbVuJbMY-2y1ZCq",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Dubai&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/foreign-trips?country=Bali&_rsc=OolYBJ2oxm5nmtjg",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=fnlQwkaYVdVHSXex",
+      "failureText": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://localhost:3000/search?_rsc=hlIzI6h50NVniy_8",
+      "failureText": "net::ERR_ABORTED"
+    }
+  ]
+}

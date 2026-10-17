@@ -1,0 +1,259 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-primary: #0f766e;
+    --brand-primary-hover: #0d9488;
+    --brand-primary-light: #ccfbf1;
+    --brand-accent: #f59e0b;
+    --brand-accent-hover: #d97706;
+
+    --bg-page: #f8fafc;
+    --bg-surface: #ffffff;
+    --border-color: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+
+    --mobile-page-padding: 16px;
+    --mobile-section-gap: 20px;
+    --mobile-card-gap: 12px;
+    --mobile-card-radius: 16px;
+    --mobile-input-height: 46px;
+    --mobile-heading-size: 28px;
+    --mobile-section-title: 20px;
+    --mobile-body-size: 14px;
+    --mobile-label-size: 12px;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    font-family: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  a, button, input, select {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  @media (max-width: 767px) {
+    :root {
+      --mobile-page-padding: 16px;
+      --mobile-section-gap: 20px;
+      --mobile-card-gap: 12px;
+      --mobile-card-radius: 16px;
+      --mobile-input-height: 46px;
+      --mobile-heading-size: 28px;
+      --mobile-section-title: 20px;
+      --mobile-body-size: 14px;
+      --mobile-label-size: 12px;
+    }
+
+    body {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+}
+
+@media (max-width: 639px) {
+  .destination-card-rating > div:first-child {
+    display: none;
+  }
+
+  .vibemiles-public main h1,
+  .vibemiles-account main h1 {
+    font-size: clamp(26px, 7.2vw, 32px);
+    line-height: 1.15;
+  }
+
+  .vibemiles-public main h1.search-results-heading {
+    font-size: clamp(20px, 5.5vw, 24px);
+    line-height: 1.2;
+  }
+
+  .vibemiles-public main h2,
+  .vibemiles-account main h2 {
+    font-size: clamp(19px, 5.2vw, 22px);
+    line-height: 1.2;
+  }
+
+  .vibemiles-public main h3,
+  .vibemiles-account main h3 {
+    font-size: clamp(15px, 4.2vw, 17px);
+    line-height: 1.25;
+  }
+
+  .vibemiles-public main .package-card-compact h3 {
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  .vibemiles-public main > div,
+  .vibemiles-account main {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 359px) {
+  .vibemiles-public main h1,
+  .vibemiles-account main h1 {
+    font-size: clamp(25px, 7.6vw, 29px);
+  }
+
+  .vibemiles-public main h2,
+  .vibemiles-account main h2 {
+    font-size: clamp(18px, 5.8vw, 21px);
+  }
+}
+
+@media (max-width: 600px) {
+  .travel-catalog-hero {
+    padding: 16px 16px 14px;
+    border-radius: 18px;
+    gap: 10px;
+    min-height: 0;
+    height: auto;
+  }
+
+  .travel-catalog-hero-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 0;
+  }
+
+  .travel-catalog-eyebrow {
+    align-self: flex-start;
+    margin-bottom: 0;
+    padding-inline: 8px;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+  }
+
+  .travel-catalog-heading {
+    max-width: 100%;
+    width: 100%;
+    margin: 10px 0;
+    font-size: clamp(26px, 7vw, 28px);
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    word-break: normal;
+    overflow-wrap: break-word;
+    text-wrap: balance;
+  }
+
+  .travel-catalog-description {
+    max-width: 100%;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .travel-catalog-meta {
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+  }
+
+  .travel-catalog-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0;
+    margin-left: 0;
+    padding: 6px 8px;
+    font-size: 11px;
+    line-height: 1.1;
+  }
+
+  .travel-catalog-stat {
+    width: auto;
+    padding: 7px 9px;
+    border-radius: 12px;
+    min-height: 0;
+    align-items: center;
+  }
+
+  .travel-catalog-stat-value {
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  .travel-catalog-stat-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+  }
+}
+
+/* Custom Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.shadow-card {
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+}
+
+.shadow-card-hover {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shadow-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
