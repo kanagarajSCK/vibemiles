@@ -420,12 +420,16 @@ export interface RefundTier {
 export interface SearchFilters {
   q?: string;
   destination?: string;
+  destinationId?: string;
+  destinationSlug?: string;
   state?: string;
   city?: string;
   category?: PackageCategory;
   minPrice?: number;
   maxPrice?: number;
   travelDate?: string;
+  travelType?: string;
+  vibe?: string;
   minDays?: number;
   maxDays?: number;
   minDuration?: number;

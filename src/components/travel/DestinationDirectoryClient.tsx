@@ -3,9 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DestinationCard } from '@/components/cards/DestinationCard';
-import { DestinationAutocomplete } from '@/components/travel/DestinationAutocomplete';
+import { DestinationAutocomplete, type DestinationOption } from '@/components/travel/DestinationAutocomplete';
 import { ROUTES } from '@/constants';
-import { type IndiaLocation } from '@/lib/india-locations';
 import type { Destination } from '@/types';
 
 interface DestinationDirectoryClientProps {
@@ -19,8 +18,9 @@ export function DestinationDirectoryClient({
   const [searchValue, setSearchValue] = useState('');
   const destinations = initialDestinations;
 
-  const handleDestinationSelect = (destination: IndiaLocation) => {
+  const handleDestinationSelect = (destination: DestinationOption) => {
     const params = new URLSearchParams();
+    params.set('destination', destination.name);
     params.set('destinationId', destination.id);
     if (destination.slug) {
       params.set('destinationSlug', destination.slug);

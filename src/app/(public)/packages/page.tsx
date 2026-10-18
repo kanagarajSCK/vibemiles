@@ -1,15 +1,19 @@
 import React from 'react';
-import { packageService } from '@/services/package.service';
+import { getPublishedPackages } from '@/server/db/packages';
 import { PackageCard } from '@/components/cards/PackageCard';
 import { PackagesFilters } from '@/components/travel/PackagesFilters';
 import { ROUTES } from '@/constants';
 import { PackageCategory, SortOption } from '@/types';
+
+export const revalidate = 60; // 60s cache on server
 
 export default async function PackagesPage({
   searchParams,
 }: {
   searchParams: Promise<{
     destination?: string;
+    destinationId?: string;
+    destinationSlug?: string;
     q?: string;
     category?: string;
     sort?: string;
@@ -23,24 +27,33 @@ export default async function PackagesPage({
   }>;
 }) {
   const params = await searchParams;
-  const packages = await packageService.getPackages(
-    {
-      q: params.q,
-      destination: params.destination,
-      category: params.category as PackageCategory,
-      minPrice: params.minPrice ? Number(params.minPrice) : undefined,
-      maxPrice: params.maxPrice ? Number(params.maxPrice) : undefined,
-      duration: params.duration ? Number(params.duration) : undefined,
-      minDuration: params.minDuration ? Number(params.minDuration) : undefined,
-      maxDuration: params.maxDuration ? Number(params.maxDuration) : undefined,
-      take: 24,
-    },
-    (params.sort as SortOption) || 'recommended'
-  );
+  const packages = await getPublishedPackages({
+    q: params.q,
+    destination: params.destination,
+    destinationId: params.destinationId,
+    destinationSlug: params.destinationSlug,
+    category: params.category as PackageCategory,
+    minPrice: params.minPrice ? Number(params.minPrice) : undefined,
+    maxPrice: params.maxPrice ? Number(params.maxPrice) : undefined,
+    duration: params.duration ? Number(params.duration) : undefined,
+    minDuration: params.minDuration ? Number(params.minDuration) : undefined,
+    maxDuration: params.maxDuration ? Number(params.maxDuration) : undefined,
+    travelType: params.travelType,
+    vibe: params.vibe,
+    take: 24,
+    sort: (params.sort as SortOption) || 'recommended',
+  });
 
   const activeFiltersCount = [
-    params.q, params.destination, params.category, params.travelType, params.vibe,
-    params.minPrice, params.maxPrice, params.duration,
+    params.q,
+    params.destination,
+    params.destinationId,
+    params.category,
+    params.travelType,
+    params.vibe,
+    params.minPrice,
+    params.maxPrice,
+    params.duration,
   ].filter(Boolean).length;
 
   return (
@@ -79,10 +92,11 @@ export default async function PackagesPage({
 
       {/* Main Grid + Sidebar Filter */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-4 lg:gap-8">
-        {/* Sidebar Filters — client component for travelType */}
+        {/* Sidebar Filters */}
         <aside className="lg:col-span-1 space-y-4 lg:space-y-6">
           <PackagesFilters
             defaultDestination={params.destination}
+            defaultDestinationId={params.destinationId}
             defaultCategory={params.category}
             defaultSort={params.sort}
             defaultMinPrice={params.minPrice}
@@ -113,7 +127,7 @@ export default async function PackagesPage({
                 </span>
               )}
               {params.destination && (
-                <span className="inline-flex items-center rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-xs font-semibold text-slate-700">
+                <span className="inline-flex items-center rounded-full bg-teal-50 border border-teal-200 px-2.5 py-0.5 text-xs font-semibold text-teal-800">
                   📍 {params.destination}
                 </span>
               )}
@@ -130,7 +144,11 @@ export default async function PackagesPage({
             <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
               <p className="text-3xl mb-3">🔍</p>
               <h3 className="text-lg font-bold text-slate-900">No packages found</h3>
-              <p className="text-sm text-slate-500 mt-1">Try adjusting your filters or search keyword.</p>
+              <p className="text-sm text-slate-500 mt-1">
+                {params.destination
+                  ? `No verified tour packages currently available in "${params.destination}".`
+                  : 'Try adjusting your filters or search keyword.'}
+              </p>
               <a href={ROUTES.PACKAGES} className="inline-flex mt-4 text-sm font-semibold text-teal-700 hover:underline">
                 Reset all filters →
               </a>

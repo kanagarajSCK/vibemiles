@@ -2,15 +2,17 @@
 
 import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { TravelTypeSelector, type TravelTypeId } from './TravelTypeSelector';
+import { DestinationAutocomplete, type DestinationOption } from './DestinationAutocomplete';
 import { PACKAGE_CATEGORIES, SORT_OPTIONS, ROUTES } from '@/constants';
 
 interface PackagesFiltersProps {
   defaultDestination?: string;
+  defaultDestinationId?: string;
   defaultCategory?: string;
   defaultSort?: string;
   defaultMinPrice?: string;
@@ -21,6 +23,7 @@ interface PackagesFiltersProps {
 
 export const PackagesFilters: React.FC<PackagesFiltersProps> = ({
   defaultDestination = '',
+  defaultDestinationId = '',
   defaultCategory = '',
   defaultSort = 'recommended',
   defaultMinPrice = '',
@@ -31,6 +34,8 @@ export const PackagesFilters: React.FC<PackagesFiltersProps> = ({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [destination, setDestination] = useState(defaultDestination);
+  const [destinationId, setDestinationId] = useState(defaultDestinationId);
+  const [selectedDestination, setSelectedDestination] = useState<DestinationOption | null>(null);
   const [category, setCategory] = useState(defaultCategory);
   const [sort, setSort] = useState(defaultSort);
   const [minPrice, setMinPrice] = useState(defaultMinPrice);
@@ -44,7 +49,15 @@ export const PackagesFilters: React.FC<PackagesFiltersProps> = ({
     e.preventDefault();
     setMobileOpen(false);
     const params = new URLSearchParams();
-    if (destination) params.set('destination', destination);
+    if (destination.trim()) {
+      params.set('destination', destination.trim());
+      if (destinationId) {
+        params.set('destinationId', destinationId);
+      }
+      if (selectedDestination?.slug) {
+        params.set('destinationSlug', selectedDestination.slug);
+      }
+    }
     if (category) params.set('category', category);
     if (sort) params.set('sort', sort);
     if (minPrice) params.set('minPrice', minPrice);
@@ -58,6 +71,8 @@ export const PackagesFilters: React.FC<PackagesFiltersProps> = ({
 
   const handleReset = () => {
     setDestination('');
+    setDestinationId('');
+    setSelectedDestination(null);
     setCategory('');
     setSort('recommended');
     setMinPrice('');
@@ -85,17 +100,26 @@ export const PackagesFilters: React.FC<PackagesFiltersProps> = ({
         </button>
       </div>
 
-      {/* Keyword Search */}
-      <Input
-        name="destination"
-        label="Destination / City"
-        labelClassName="text-[11px]"
-        placeholder="e.g. Manali, Kerala"
-        value={destination}
-        onChange={(e) => setDestination(e.target.value)}
-        leftIcon={<Search className="w-4 h-4" />}
-        className="min-h-11.5 rounded-lg border-slate-200 bg-slate-50 text-[15px] shadow-none focus:bg-white"
-      />
+      {/* Destination Autocomplete */}
+      <div className="space-y-1.5">
+        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+          Destination / City
+        </label>
+        <DestinationAutocomplete
+          value={destination}
+          onChange={(val) => {
+            setDestination(val);
+            setSelectedDestination(null);
+            setDestinationId('');
+          }}
+          onSelect={(dest) => {
+            setDestination(dest.name);
+            setSelectedDestination(dest);
+            setDestinationId(dest.id);
+          }}
+          placeholder="e.g. Manali, Goa, Mangaluru"
+        />
+      </div>
 
       {/* Price Range */}
       <div className="grid grid-cols-2 gap-2">

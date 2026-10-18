@@ -196,19 +196,84 @@ export function buildPublishedPackagesWhere(options?: GetPackagesOptions): Prism
     });
   }
 
-  // Destination filter
-  if (options?.destination && options.destination.trim()) {
-    const dest = options.destination.trim();
+  // Destination filter — supports destinationId, destinationSlug, or textual destination (including city/state composite)
+  if (options?.destinationId && options.destinationId.trim()) {
+    const destId = options.destinationId.trim();
+    if (destId.startsWith('cm') || destId.length >= 20) {
+      andConditions.push({
+        OR: [
+          { destinationId: destId },
+          { destination: { id: destId } },
+        ],
+      });
+    } else if (options?.destination && options.destination.trim()) {
+      const rawDest = options.destination.trim();
+      const parts = rawDest.split(',').map((p) => p.trim()).filter(Boolean);
+      const primary = parts[0] || rawDest;
+      andConditions.push({
+        OR: [
+          { destination: { name: { contains: primary, mode: 'insensitive' } } },
+          { destination: { state: { contains: primary, mode: 'insensitive' } } },
+          { destination: { country: { contains: primary, mode: 'insensitive' } } },
+          { destination: { slug: { contains: primary.toLowerCase().replace(/\s+/g, '-'), mode: 'insensitive' } } },
+          { name: { contains: primary, mode: 'insensitive' } },
+          { city: { contains: primary, mode: 'insensitive' } },
+          { state: { contains: primary, mode: 'insensitive' } },
+        ],
+      });
+    } else {
+      andConditions.push({
+        OR: [
+          { destinationId: destId },
+          { destination: { id: destId } },
+        ],
+      });
+    }
+  } else if (options?.destinationSlug && options.destinationSlug.trim()) {
+    const slug = options.destinationSlug.trim();
     andConditions.push({
-      OR: [
-        { destination: { name: { contains: dest, mode: 'insensitive' } } },
-        { destination: { state: { contains: dest, mode: 'insensitive' } } },
-        { destination: { slug: { contains: dest, mode: 'insensitive' } } },
-        { name: { contains: dest, mode: 'insensitive' } },
-        { city: { contains: dest, mode: 'insensitive' } },
-        { state: { contains: dest, mode: 'insensitive' } },
-      ],
+      destination: {
+        slug: { equals: slug, mode: 'insensitive' },
+      },
     });
+  } else if (options?.destination && options.destination.trim()) {
+    const rawDest = options.destination.trim();
+    const parts = rawDest.split(',').map((p) => p.trim()).filter(Boolean);
+    const primary = parts[0] || rawDest;
+    const secondary = parts.length > 1 ? parts[1] : undefined;
+
+    const destOrConditions: Prisma.PackageWhereInput[] = [
+      { destination: { name: { contains: primary, mode: 'insensitive' } } },
+      { destination: { state: { contains: primary, mode: 'insensitive' } } },
+      { destination: { country: { contains: primary, mode: 'insensitive' } } },
+      { destination: { slug: { contains: primary.toLowerCase().replace(/\s+/g, '-'), mode: 'insensitive' } } },
+      { name: { contains: primary, mode: 'insensitive' } },
+      { city: { contains: primary, mode: 'insensitive' } },
+      { state: { contains: primary, mode: 'insensitive' } },
+    ];
+
+    if (secondary) {
+      destOrConditions.push({
+        AND: [
+          {
+            OR: [
+              { destination: { name: { contains: primary, mode: 'insensitive' } } },
+              { city: { contains: primary, mode: 'insensitive' } },
+              { name: { contains: primary, mode: 'insensitive' } },
+            ],
+          },
+          {
+            OR: [
+              { destination: { state: { contains: secondary, mode: 'insensitive' } } },
+              { destination: { country: { contains: secondary, mode: 'insensitive' } } },
+              { state: { contains: secondary, mode: 'insensitive' } },
+            ],
+          },
+        ],
+      });
+    }
+
+    andConditions.push({ OR: destOrConditions });
   }
 
   // State filter
@@ -266,6 +331,28 @@ export function buildPublishedPackagesWhere(options?: GetPackagesOptions): Prism
   if (options?.isFeatured !== undefined) {
     andConditions.push({
       isFeatured: options.isFeatured,
+    });
+  }
+
+  // Travel type filter
+  if (options?.travelType && options.travelType.trim()) {
+    const tt = options.travelType.trim().toLowerCase();
+    andConditions.push({
+      OR: [
+        { tags: { has: tt } },
+        { description: { contains: tt, mode: 'insensitive' } },
+      ],
+    });
+  }
+
+  // Trip vibe filter
+  if (options?.vibe && options.vibe.trim()) {
+    const vb = options.vibe.trim().toLowerCase();
+    andConditions.push({
+      OR: [
+        { tags: { has: vb } },
+        { description: { contains: vb, mode: 'insensitive' } },
+      ],
     });
   }
 

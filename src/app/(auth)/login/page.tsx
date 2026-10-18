@@ -14,7 +14,7 @@ import { sanitizeRedirectPath, isValidInternalPath } from '@/lib/redirect';
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextParam = searchParams.get('next');
+  const nextParam = searchParams.get('next') || searchParams.get('redirect') || searchParams.get('returnUrl');
   const safeNext = sanitizeRedirectPath(nextParam, '');
 
   const { login, user, isAuthenticated, isLoading: authLoading } = useAuth();

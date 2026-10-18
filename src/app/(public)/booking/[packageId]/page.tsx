@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import {
   UserCheck,
   PackagePlus,
@@ -25,9 +25,13 @@ import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import { LoadingState } from '@/components/ui/LoadingState';
 
-export default function BookingWizardPage() {
+function BookingWizardContent() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
+  const queryDate = searchParams?.get('date');
+  const queryAdults = searchParams?.get('adults');
+
   const { user, isAuthenticated } = useAuth();
   const packageId = params.packageId as string;
 
@@ -38,14 +42,21 @@ export default function BookingWizardPage() {
 
   // Form State
   const [travelDate, setTravelDate] = useState<string>('');
-  const [adults, setAdults] = useState<number>(2);
+  const initialAdults =
+    queryAdults && !isNaN(parseInt(queryAdults, 10)) ? Math.max(1, parseInt(queryAdults, 10)) : 2;
+  const [adults, setAdults] = useState<number>(initialAdults);
   const [children, setChildren] = useState<number>(0);
   const [travelers, setTravelers] = useState<
     Array<{ firstName: string; lastName: string; age: number; gender: string; idNumber: string }>
-  >([
-    { firstName: 'Rahul', lastName: 'Sharma', age: 30, gender: 'male', idNumber: '123456789012' },
-    { firstName: 'Priya', lastName: 'Sharma', age: 28, gender: 'female', idNumber: '987654321098' },
-  ]);
+  >(() =>
+    Array.from({ length: initialAdults }, (_, i) => ({
+      firstName: i === 0 ? 'Rahul' : 'Priya',
+      lastName: 'Sharma',
+      age: 30 - i * 2,
+      gender: i === 0 ? 'male' : 'female',
+      idNumber: i === 0 ? '123456789012' : '987654321098',
+    }))
+  );
 
   // Optional Add-ons state
   const [selectedAddons, setSelectedAddons] = useState<string[]>(['Insurance']);
@@ -65,12 +76,34 @@ export default function BookingWizardPage() {
       const data = await packageService.getPackageBySlug(packageId);
       if (data) {
         setPkg(data);
-        setTravelDate(data.availableDates[0]?.date || new Date().toISOString().split('T')[0]);
+        if (queryDate) {
+          setTravelDate(queryDate);
+        } else {
+          setTravelDate(data.availableDates?.[0]?.date || new Date().toISOString().split('T')[0]);
+        }
       }
       setLoading(false);
     }
     load();
-  }, [packageId]);
+  }, [packageId, queryDate]);
+
+  useEffect(() => {
+    setTravelers((prev) => {
+      const targetCount = adults + children;
+      if (prev.length === targetCount) return prev;
+      if (prev.length < targetCount) {
+        const extra = Array.from({ length: targetCount - prev.length }, () => ({
+          firstName: '',
+          lastName: '',
+          age: 25,
+          gender: 'other' as const,
+          idNumber: '',
+        }));
+        return [...prev, ...extra];
+      }
+      return prev.slice(0, targetCount);
+    });
+  }, [adults, children]);
 
   if (loading || !pkg) {
     return <LoadingState label="Preparing your booking wizard..." />;
@@ -131,7 +164,8 @@ export default function BookingWizardPage() {
     setSubmitError('');
 
     if (!isAuthenticated || !user) {
-      router.push(`/login?redirect=/booking/${encodeURIComponent(packageId)}`);
+      const returnPath = `/booking/${encodeURIComponent(packageId)}?date=${encodeURIComponent(travelDate)}&adults=${adults}`;
+      router.push(`/login?next=${encodeURIComponent(returnPath)}`);
       return;
     }
 
@@ -556,5 +590,13 @@ export default function BookingWizardPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function BookingWizardPage() {
+  return (
+    <React.Suspense fallback={<LoadingState label="Preparing your booking wizard..." />}>
+      <BookingWizardContent />
+    </React.Suspense>
   );
 }

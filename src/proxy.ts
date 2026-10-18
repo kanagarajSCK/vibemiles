@@ -5,18 +5,38 @@ import { verifySessionToken, SESSION_COOKIE_NAME } from '@/server/auth/token';
 import { validateDbSession } from '@/server/auth/session';
 import { isValidInternalPath, sanitizeRedirectPath } from '@/lib/redirect';
 
-// ─── Public Pages & APIs (Demo & Informational Only) ───────────
-// Anyone can view the homepage demo and informational pages without logging in.
-const PUBLIC_PAGES = new Set([
-  '/', // Public Homepage Demo
-  '/about',
-  '/contact',
-  '/faq',
-  '/terms',
-  '/privacy',
-  '/cancellation-policy',
-  '/unauthorized',
-]);
+// ─── Public Pages & APIs ───────────────────────────────────────
+// Unauthenticated guests can freely explore the marketplace, destinations, stays, packages, trips, etc.
+function isPublicPage(pathname: string): boolean {
+  if (
+    pathname === '/' ||
+    pathname === '/destinations' ||
+    pathname.startsWith('/destinations/') ||
+    pathname === '/stays' ||
+    pathname.startsWith('/stays/') ||
+    pathname === '/packages' ||
+    pathname.startsWith('/packages/') ||
+    pathname === '/devotional-trips' ||
+    pathname === '/foreign-trips' ||
+    pathname === '/adventures' ||
+    pathname.startsWith('/adventures/') ||
+    pathname === '/food' ||
+    pathname.startsWith('/food/') ||
+    pathname === '/deals' ||
+    pathname === '/search' ||
+    pathname === '/assistant' ||
+    pathname === '/about' ||
+    pathname === '/contact' ||
+    pathname === '/faq' ||
+    pathname === '/terms' ||
+    pathname === '/privacy' ||
+    pathname === '/cancellation-policy' ||
+    pathname === '/unauthorized'
+  ) {
+    return true;
+  }
+  return false;
+}
 
 // Auth pages for logging in and registering
 const AUTH_PAGES = new Set([
@@ -30,15 +50,38 @@ const AUTH_PAGES = new Set([
 ]);
 
 // Public API routes exempt from mandatory authentication
-const PUBLIC_APIS = [
-  '/api/auth/login',
-  '/api/auth/register',
-  '/api/auth/logout',
-  '/api/auth/me',
-  '/api/locations/search',
-  '/api/weather',
-  '/api/webhooks/razorpay',
-];
+function isPublicApi(pathname: string, method: string): boolean {
+  // Always allowed auth/search/utility/webhook routes
+  if (
+    pathname === '/api/auth/login' ||
+    pathname === '/api/auth/register' ||
+    pathname === '/api/auth/logout' ||
+    pathname === '/api/auth/me' ||
+    pathname === '/api/locations/search' ||
+    pathname === '/api/weather' ||
+    pathname === '/api/assistant/chat' ||
+    pathname === '/api/webhooks/razorpay'
+  ) {
+    return true;
+  }
+
+  // Public catalog reads (GET only)
+  if (method === 'GET') {
+    if (
+      pathname === '/api/packages' ||
+      pathname.startsWith('/api/packages/') ||
+      pathname === '/api/destinations' ||
+      pathname.startsWith('/api/destinations/') ||
+      pathname === '/api/categories' ||
+      pathname.startsWith('/api/categories/') ||
+      pathname === '/api/reviews'
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 function getDashboard(role: UserRole): string {
   if (role === 'admin') return '/admin/dashboard';
@@ -98,16 +141,17 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 4. Explicit Public Routes (Homepage Demo & Legal/Informational)
-  if (PUBLIC_PAGES.has(pathname)) {
+  // 4. Public Page Routes
+  if (isPublicPage(pathname)) {
     return NextResponse.next();
   }
 
-  if (PUBLIC_APIS.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))) {
+  // 4.1 Public API Routes
+  if (isPublicApi(pathname, request.method)) {
     return NextResponse.next();
   }
 
-  // 5. Mandatory Login for All Other Features (Marketplace, Search, Bookings, Account, Admin, etc.)
+  // 5. Mandatory Login for Protected Features (Bookings, Account, Admin, Provider, etc.)
   if (!isAuthenticated || !session) {
     // 5.1 API Routes: Return HTTP 401 Unauthorized
     if (pathname.startsWith('/api/')) {

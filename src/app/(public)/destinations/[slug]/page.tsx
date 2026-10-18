@@ -2,7 +2,8 @@ import React from 'react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { MapPin, Calendar, Thermometer, Sparkles, CheckCircle2 } from 'lucide-react';
-import { packageService } from '@/services/package.service';
+import { getDestinationBySlug } from '@/server/db/destinations';
+import { getPublishedPackages } from '@/server/db/packages';
 import { PackageCard } from '@/components/cards/PackageCard';
 import { RatingStars } from '@/components/ui/RatingStars';
 import { DestinationWeather } from '@/components/weather';
@@ -13,13 +14,17 @@ export default async function DestinationDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const resolvedParams = await params;
-  const destination = await packageService.getDestinationBySlug(resolvedParams.slug);
+  const destination = await getDestinationBySlug(resolvedParams.slug);
 
   if (!destination) {
     notFound();
   }
 
-  const packages = await packageService.getPackages({ destination: destination.name });
+  const packages = await getPublishedPackages({
+    destinationId: destination.id,
+    destinationSlug: destination.slug,
+    destination: destination.name,
+  });
 
   return (
     <div className="space-y-8 pb-10 sm:space-y-12 sm:pb-16">

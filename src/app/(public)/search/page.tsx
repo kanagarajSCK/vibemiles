@@ -1,10 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { packageService } from '@/services/package.service';
+import { getPublishedPackages } from '@/server/db/packages';
 import { PackageCard } from '@/components/cards/PackageCard';
 import { SearchForm } from '@/components/travel/SearchForm';
 import { PACKAGE_CATEGORIES } from '@/constants';
+import type { PackageCategory } from '@/types';
 
 export default async function SearchPage({
   searchParams,
@@ -17,9 +18,9 @@ export default async function SearchPage({
     ({ value }) => value === params.category?.trim().toLowerCase()
   )?.value;
 
-  const packages = await packageService.getPackages({
+  const packages = await getPublishedPackages({
     q: searchTerm || undefined,
-    category,
+    category: category as PackageCategory | undefined,
     take: 24,
   });
   const categoryLabel = PACKAGE_CATEGORIES.find(({ value }) => value === category)?.label;

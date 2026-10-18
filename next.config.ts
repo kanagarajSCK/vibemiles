@@ -17,11 +17,6 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: '/destinations',
-        destination: '/devotional-trips',
-        permanent: false,
-      },
-      {
         source: '/adventures',
         destination: '/foreign-trips',
         permanent: false,

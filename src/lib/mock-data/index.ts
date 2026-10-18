@@ -220,6 +220,27 @@ export const MOCK_DESTINATIONS: Destination[] = [
     reviewCount: 950,
     tags: ['Beach', 'Nightlife', 'Water Sports', 'Party'],
   },
+  {
+    id: 'dest-5',
+    slug: 'mangaluru-karnataka',
+    name: 'Mangaluru',
+    state: 'Karnataka',
+    country: 'India',
+    description: 'Port city known for pristine Arabian Sea beaches, historic temples, vibrant coastal cuisine, and lush coconut groves.',
+    heroImage: 'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=1200&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=800&q=80',
+    ],
+    bestTimeToVisit: 'October to March',
+    averageTemperature: '24°C - 32°C',
+    topActivities: ['Panambur Beach Sunset', 'Kudroli Gokarnath Temple', 'Mangalorean Seafood Trail', 'Pilikula Nisargadhama'],
+    isPopular: false,
+    isTrending: false,
+    packageCount: 0,
+    rating: 4.6,
+    reviewCount: 0,
+    tags: ['Beaches', 'Temples', 'Coastal', 'Culture'],
+  },
 ];
 
 // ─── PACKAGES ─────────────────────────────────────────────────

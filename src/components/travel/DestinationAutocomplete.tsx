@@ -1,24 +1,48 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Loader2, MapPin } from 'lucide-react';
-import { type IndiaLocation as DestinationSuggestion } from '@/lib/india-locations';
+import React, { useEffect, useRef, useState, useId } from 'react';
+import { Loader2, MapPin, Search } from 'lucide-react';
+
+export interface DestinationOption {
+  id: string;
+  name: string;
+  slug?: string;
+  state: string;
+  stateCode?: string;
+  country: string;
+  countryCode?: string;
+  type?: string;
+  heroImage?: string;
+  packageCount?: number;
+  rating?: number;
+  tags?: string[];
+}
 
 interface DestinationAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
-  onSelect: (destination: DestinationSuggestion) => void;
+  onSelect?: (destination: DestinationOption) => void;
+  placeholder?: string;
+  className?: string;
+  inputClassName?: string;
+  name?: string;
+  id?: string;
+  disabled?: boolean;
+  required?: boolean;
 }
 
 function highlightMatch(name: string, query: string) {
-  const matchStart = name.toLocaleLowerCase().indexOf(query.trim().toLocaleLowerCase());
-  if (matchStart < 0 || !query.trim()) return name;
+  const q = query.trim().toLocaleLowerCase();
+  const matchStart = name.toLocaleLowerCase().indexOf(q);
+  if (matchStart < 0 || !q) return name;
 
-  const matchEnd = matchStart + query.trim().length;
+  const matchEnd = matchStart + q.length;
   return (
     <>
       {name.slice(0, matchStart)}
-      <strong className="font-extrabold text-teal-800">{name.slice(matchStart, matchEnd)}</strong>
+      <strong className="font-extrabold text-teal-800 underline decoration-teal-400 decoration-2">
+        {name.slice(matchStart, matchEnd)}
+      </strong>
       {name.slice(matchEnd)}
     </>
   );
@@ -28,14 +52,26 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
   value,
   onChange,
   onSelect,
+  placeholder = 'Where to? (e.g. Manali, Goa, Mangaluru)',
+  className = '',
+  inputClassName = '',
+  name = 'destination',
+  id,
+  disabled = false,
+  required = false,
 }) => {
+  const generatedId = useId();
+  const inputId = id || `destination-input-${generatedId}`;
+  const listboxId = `destination-listbox-${generatedId}`;
+
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const [suggestions, setSuggestions] = useState<DestinationSuggestion[]>([]);
+  const [suggestions, setSuggestions] = useState<DestinationOption[]>([]);
 
+  // Close dropdown on outside click or pointer down
   useEffect(() => {
     const handleOutsidePointer = (event: PointerEvent) => {
       if (!wrapperRef.current?.contains(event.target as Node)) {
@@ -48,21 +84,31 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
     return () => document.removeEventListener('pointerdown', handleOutsidePointer);
   }, []);
 
+  // Debounced search with AbortController
   useEffect(() => {
     const query = value.trim();
-    if (query.length < 2 || !isOpen) return;
+    if (query.length < 1 || !isOpen) {
+      setSuggestions([]);
+      setIsSearching(false);
+      return;
+    }
 
     const controller = new AbortController();
+    setIsSearching(true);
+
     const timeoutId = window.setTimeout(async () => {
       try {
-        setIsSearching(true);
-        const res = await fetch(`/api/locations/search?q=${encodeURIComponent(query)}&limit=12`, {
+        const res = await fetch(`/api/locations/search?q=${encodeURIComponent(query)}&limit=10`, {
           signal: controller.signal,
           headers: { Accept: 'application/json' },
         });
+
         if (res.ok) {
-           const payload = await res.json();
-           setSuggestions(payload.results || []);
+          const payload = await res.json();
+          const results: DestinationOption[] = Array.isArray(payload.results) ? payload.results : [];
+          setSuggestions(results);
+        } else {
+          setSuggestions([]);
         }
       } catch (err: unknown) {
         if (err instanceof Error && err.name !== 'AbortError') {
@@ -72,7 +118,7 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
         setIsSearching(false);
         setHighlightedIndex(-1);
       }
-    }, 250);
+    }, 200);
 
     return () => {
       controller.abort();
@@ -81,8 +127,12 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
   }, [value, isOpen]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!isOpen || value.trim().length < 2) {
-      if (event.key === 'ArrowDown' && value.trim().length >= 2) setIsOpen(true);
+    if (!isOpen || suggestions.length === 0) {
+      if (event.key === 'ArrowDown' && suggestions.length > 0) {
+        event.preventDefault();
+        setIsOpen(true);
+        setHighlightedIndex(0);
+      }
       return;
     }
 
@@ -92,13 +142,13 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
     } else if (event.key === 'ArrowUp') {
       event.preventDefault();
       setHighlightedIndex((current) => Math.max(current - 1, 0));
-    } else if (event.key === 'Enter' && highlightedIndex >= 0) {
-      event.preventDefault();
-      const selected = suggestions[highlightedIndex];
-      if (selected) {
-        onChange(selected.name);
-        onSelect(selected);
-        setIsOpen(false);
+    } else if (event.key === 'Enter') {
+      if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
+        event.preventDefault();
+        const selected = suggestions[highlightedIndex];
+        if (selected) {
+          handleSelect(selected);
+        }
       }
     } else if (event.key === 'Escape') {
       event.preventDefault();
@@ -108,100 +158,149 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
     }
   };
 
-  const handleSelect = (destination: DestinationSuggestion) => {
+  const handleSelect = (destination: DestinationOption) => {
     onChange(destination.name);
-    onSelect(destination);
+    if (onSelect) {
+      onSelect(destination);
+    }
     setIsOpen(false);
     setIsSearching(false);
     setHighlightedIndex(-1);
     inputRef.current?.focus();
   };
 
-  const showDropdown = isOpen && value.trim().length >= 2;
+  const showDropdown = isOpen && value.trim().length >= 1;
 
   return (
-    <div ref={wrapperRef} className="relative">
-      <input
-        ref={inputRef}
-        type="text"
-        name="destination"
-        value={value}
-        onChange={(event) => {
-          const nextValue = event.target.value;
-          onChange(nextValue);
-          setSuggestions([]);
-          setHighlightedIndex(-1);
-          setIsSearching(nextValue.trim().length >= 2);
-          setIsOpen(true);
-        }}
-        onFocus={() => {
-          if (value.trim().length >= 2) {
-            setIsSearching(true);
-            setIsOpen(true);
+    <div ref={wrapperRef} className={`relative ${className}`}>
+      <div className="relative flex items-center">
+        <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <input
+          ref={inputRef}
+          id={inputId}
+          type="text"
+          name={name}
+          value={value}
+          disabled={disabled}
+          required={required}
+          autoComplete="off"
+          onChange={(event) => {
+            const nextValue = event.target.value;
+            onChange(nextValue);
+            setHighlightedIndex(-1);
+            if (nextValue.trim().length >= 1) {
+              setIsOpen(true);
+            } else {
+              setIsOpen(false);
+              setSuggestions([]);
+            }
+          }}
+          onFocus={() => {
+            if (value.trim().length >= 1) {
+              setIsOpen(true);
+            }
+          }}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={showDropdown}
+          aria-controls={listboxId}
+          aria-activedescendant={
+            highlightedIndex >= 0 ? `${inputId}-option-${highlightedIndex}` : undefined
           }
-        }}
-        onKeyDown={handleKeyDown}
-        placeholder="Where to? (e.g. Manali, Goa)"
-        role="combobox"
-        aria-autocomplete="list"
-        aria-expanded={showDropdown}
-        aria-controls="destination-suggestions"
-        aria-activedescendant={highlightedIndex >= 0 ? `destination-option-${highlightedIndex}` : undefined}
-        className="min-h-11 w-full min-w-0 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-[15px] text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:bg-white focus:outline-none sm:min-h-0 sm:py-2 sm:text-sm"
-      />
+          className={`min-h-11 w-full min-w-0 rounded-lg border border-slate-200 bg-slate-50 pl-9.5 pr-8 py-2.5 text-[15px] text-slate-900 placeholder-slate-400 transition-all focus:border-teal-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-600/20 disabled:cursor-not-allowed disabled:bg-slate-100 sm:min-h-0 sm:py-2 sm:text-sm ${inputClassName}`}
+        />
+        {isSearching && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            <Loader2 className="h-4 w-4 animate-spin text-teal-600" aria-label="Searching destinations..." />
+          </div>
+        )}
+      </div>
 
       {showDropdown && (
         <div
-          id="destination-suggestions"
+          id={listboxId}
           role="listbox"
           aria-label="Destination suggestions"
-          className="absolute left-0 right-0 top-full z-50 mt-2 max-h-80 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 text-left shadow-xl"
+          className="absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 text-left shadow-xl animate-in fade-in-50 zoom-in-95 duration-100"
         >
           <div className="flex items-center justify-between px-3 pb-1.5 pt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
             <span>Destinations</span>
-            {isSearching && <Loader2 className="h-3.5 w-3.5 animate-spin text-teal-600" aria-label="Loading destinations" />}
+            {isSearching && (
+              <span className="flex items-center gap-1 text-teal-600">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                <span>Searching</span>
+              </span>
+            )}
           </div>
 
           {!isSearching && suggestions.length === 0 && (
-            <p className="px-3 py-5 text-center text-sm text-slate-500">No destinations found</p>
+            <div className="px-3 py-6 text-center text-sm text-slate-500">
+              <p className="font-semibold text-slate-700">No destinations found</p>
+              <p className="mt-1 text-xs text-slate-400">
+                Try searching for a different city or state name
+              </p>
+            </div>
           )}
 
-          {suggestions.map((suggestion, index) => (
-            <button
-              key={suggestion.id}
-              id={`destination-option-${index}`}
-              type="button"
-              role="option"
-              aria-selected={highlightedIndex === index}
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => handleSelect(suggestion)}
-              className={`flex min-h-14 w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
-                highlightedIndex === index ? 'bg-teal-50' : 'hover:bg-slate-50'
-              }`}
-            >
-              {suggestion.heroImage ? (
-                <img
-                  src={suggestion.heroImage}
-                  alt=""
-                  aria-hidden="true"
-                  className="h-10 w-10 shrink-0 rounded-lg object-cover"
-                />
-              ) : (
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-teal-50">
-                  <MapPin className="h-4 w-4 text-teal-700" />
-                </span>
-              )}
-              <span className="min-w-0">
-                <span className="block truncate text-sm font-bold text-slate-900">
-                  {highlightMatch(suggestion.name, value)}
-                </span>
-                <span className="block truncate text-xs text-slate-500">
-                  {suggestion.state}, {suggestion.country}
-                </span>
-              </span>
-              <MapPin className="ml-auto h-4 w-4 shrink-0 text-teal-600" aria-hidden="true" />
-            </button>
-          ))}
+          {suggestions.map((suggestion, index) => {
+            const isHighlighted = highlightedIndex === index;
+            const tourCount = suggestion.packageCount ?? 0;
+
+            return (
+              <button
+                key={suggestion.id}
+                id={`${inputId}-option-${index}`}
+                type="button"
+                role="option"
+                aria-selected={isHighlighted}
+                onPointerDown={(event) => {
+                  event.preventDefault();
+                  handleSelect(suggestion);
+                }}
+                onMouseEnter={() => setHighlightedIndex(index)}
+                className={`group flex min-h-12 w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
+                  isHighlighted ? 'bg-teal-50 text-teal-950' : 'hover:bg-slate-50 text-slate-800'
+                }`}
+              >
+                {suggestion.heroImage ? (
+                  <img
+                    src={suggestion.heroImage}
+                    alt=""
+                    aria-hidden="true"
+                    className="h-10 w-10 shrink-0 rounded-lg object-cover border border-slate-100"
+                  />
+                ) : (
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-700">
+                    <MapPin className="h-4 w-4" />
+                  </span>
+                )}
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate text-sm font-bold text-slate-900">
+                      {highlightMatch(suggestion.name, value)}
+                    </span>
+                    {tourCount > 0 ? (
+                      <span className="shrink-0 rounded-full bg-teal-100/70 px-2 py-0.5 text-[10px] font-semibold text-teal-800">
+                        {tourCount} {tourCount === 1 ? 'tour' : 'tours'}
+                      </span>
+                    ) : (
+                      <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-400">
+                        0 tours
+                      </span>
+                    )}
+                  </div>
+                  <span className="block truncate text-xs text-slate-500">
+                    {suggestion.state ? `${suggestion.state}, ` : ''}{suggestion.country}
+                  </span>
+                </div>
+
+                <MapPin className={`h-4 w-4 shrink-0 transition-opacity ${isHighlighted ? 'text-teal-600 opacity-100' : 'text-slate-300 opacity-0 group-hover:opacity-100'}`} aria-hidden="true" />
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

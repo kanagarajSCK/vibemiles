@@ -23,6 +23,10 @@ class PackageService {
       const params = new URLSearchParams();
       if (filters?.q) params.set('q', filters.q);
       if (filters?.destination) params.set('destination', filters.destination);
+      if (filters?.destinationId) params.set('destinationId', filters.destinationId);
+      if (filters?.destinationSlug) params.set('destinationSlug', filters.destinationSlug);
+      if (filters?.travelType) params.set('travelType', filters.travelType);
+      if (filters?.vibe) params.set('vibe', filters.vibe);
       if (filters?.state) params.set('state', filters.state);
       if (filters?.city) params.set('city', filters.city);
       if (filters?.category) params.set('category', filters.category);
@@ -64,6 +68,10 @@ class PackageService {
       const params = new URLSearchParams();
       if (filters?.q) params.set('q', filters.q);
       if (filters?.destination) params.set('destination', filters.destination);
+      if (filters?.destinationId) params.set('destinationId', filters.destinationId);
+      if (filters?.destinationSlug) params.set('destinationSlug', filters.destinationSlug);
+      if (filters?.travelType) params.set('travelType', filters.travelType);
+      if (filters?.vibe) params.set('vibe', filters.vibe);
       if (filters?.category) params.set('category', filters.category);
       if (filters?.minPrice !== undefined) params.set('minPrice', String(filters.minPrice));
       if (filters?.maxPrice !== undefined) params.set('maxPrice', String(filters.maxPrice));

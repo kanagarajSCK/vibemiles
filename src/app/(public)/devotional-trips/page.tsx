@@ -4,7 +4,8 @@ import Link from 'next/link';
 import {
   Sparkles, Clock, ShieldCheck, Info,
 } from 'lucide-react';
-import { packageService } from '@/services/package.service';
+import { getPublishedPackages } from '@/server/db/packages';
+import { getDestinations } from '@/server/db/destinations';
 import { PackageCard } from '@/components/cards/PackageCard';
 import { DestinationCard } from '@/components/cards/DestinationCard';
 import type { SortOption } from '@/types';
@@ -31,17 +32,15 @@ export default async function DevotionalTripsPage({ searchParams }: DevotionalTr
 
   // Fetch all packages and sacred destinations in parallel
   const [allPackages, destinations] = await Promise.all([
-    packageService.getPackages(
-      {
-        destination: params.destination,
-        minPrice: params.minPrice ? Number(params.minPrice) : undefined,
-        maxPrice: params.maxPrice ? Number(params.maxPrice) : undefined,
-        duration: params.duration ? Number(params.duration) : undefined,
-        take: 30,
-      },
-      (params.sort as SortOption) || 'recommended'
-    ),
-    packageService.getDestinations(),
+    getPublishedPackages({
+      destination: params.destination,
+      minPrice: params.minPrice ? Number(params.minPrice) : undefined,
+      maxPrice: params.maxPrice ? Number(params.maxPrice) : undefined,
+      duration: params.duration ? Number(params.duration) : undefined,
+      take: 30,
+      sort: (params.sort as SortOption) || 'recommended',
+    }),
+    getDestinations(),
   ]);
 
   // Filter for devotional & spiritual packages

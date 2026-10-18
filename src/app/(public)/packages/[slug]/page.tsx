@@ -23,6 +23,7 @@ import { RatingStars } from '@/components/ui/RatingStars';
 import { Button } from '@/components/ui/Button';
 import { ROUTES } from '@/constants';
 import { DestinationWeather } from '@/components/weather';
+import { PackageBookingSidebar } from '@/components/travel/PackageBookingSidebar';
 import { PackageReviewsSection, PackageReviewsSkeleton } from '@/components/travel/PackageReviewsSection';
 
 export default async function PackageDetailPage({
@@ -288,77 +289,7 @@ export default async function PackageDetailPage({
 
         {/* Right Column - Sticky Booking Widget */}
         <aside className="lg:col-span-1">
-          <div className="sticky top-24 rounded-3xl border border-slate-200 bg-white p-6 shadow-xl space-y-6">
-            <div className="border-b border-slate-100 pb-4 space-y-1">
-              {pkg.discountPercent > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-400 line-through">{formatCurrency(pkg.basePrice)}</span>
-                  <Badge variant="warning" size="sm">{pkg.discountPercent}% OFF</Badge>
-                </div>
-              )}
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-extrabold text-teal-800">{formatCurrency(pkg.finalPrice)}</span>
-                <span className="text-sm font-medium text-slate-500">/ traveler</span>
-              </div>
-            </div>
-
-            {/* Dates & Traveler Selector */}
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <label className="block text-xs font-bold text-slate-700">Select Travel Date</label>
-                <select className="w-full rounded-xl border border-slate-300 p-3 text-sm font-medium text-slate-900 focus:border-teal-600 focus:outline-none">
-                  {pkg.availableDates.length > 0 ? (
-                    pkg.availableDates.map((dateObj) => (
-                      <option key={dateObj.date} value={dateObj.date}>
-                        {formatDate(dateObj.date)}
-                      </option>
-                    ))
-                  ) : (
-                    <option value="">Flexible Dates / Inquire with Host</option>
-                  )}
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className="block text-xs font-bold text-slate-700">Number of Adults</label>
-                <select className="w-full rounded-xl border border-slate-300 p-3 text-sm font-medium text-slate-900 focus:border-teal-600 focus:outline-none">
-                  <option value="1">1 Adult</option>
-                  <option value="2">2 Adults</option>
-                  <option value="3">3 Adults</option>
-                  <option value="4">4 Adults</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Destination Weather Widget */}
-            <DestinationWeather city={pkg.destinationName} state={pkg.state} compact />
-
-            {/* Price breakdown summary */}
-            <div className="rounded-xl bg-slate-50 p-4 text-xs space-y-2 text-slate-600">
-              <div className="flex justify-between">
-                <span>Base Price (1 Adult)</span>
-                <span>{formatCurrency(pkg.finalPrice)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Taxes & Service Fees (5% GST)</span>
-                <span>{formatCurrency(Math.round(pkg.finalPrice * 0.05))}</span>
-              </div>
-              <div className="border-t border-slate-200 pt-2 flex justify-between font-bold text-sm text-slate-900">
-                <span>Total Amount</span>
-                <span className="text-teal-800">{formatCurrency(Math.round(pkg.finalPrice * 1.05))}</span>
-              </div>
-            </div>
-
-            <Link href={`/booking/${pkg.id}`}>
-              <Button variant="accent" size="lg" className="w-full font-bold shadow-lg" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                Proceed to Booking
-              </Button>
-            </Link>
-
-            <p className="text-center text-xs text-slate-400">
-              ⚡ Instant Confirmation & Lock-in Price Guarantee
-            </p>
-          </div>
+          <PackageBookingSidebar pkg={pkg} />
         </aside>
       </div>
     </div>

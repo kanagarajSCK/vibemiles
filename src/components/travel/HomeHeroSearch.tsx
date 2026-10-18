@@ -6,8 +6,7 @@ import { Search, MapPin, Calendar, Users, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { PACKAGE_CATEGORIES, ROUTES } from '@/constants';
 import { TravelTypeSelector, TRAVEL_TYPES, type TravelTypeId } from '@/components/travel/TravelTypeSelector';
-import { DestinationAutocomplete } from '@/components/travel/DestinationAutocomplete';
-import { type IndiaLocation as DestinationSuggestion } from '@/lib/india-locations';
+import { DestinationAutocomplete, type DestinationOption } from '@/components/travel/DestinationAutocomplete';
 
 export function HomeHeroSearch() {
   const router = useRouter();
@@ -15,7 +14,7 @@ export function HomeHeroSearch() {
 
   // Search state
   const [destination, setDestination] = useState('');
-  const [selectedDestination, setSelectedDestination] = useState<DestinationSuggestion | null>(null);
+  const [selectedDestination, setSelectedDestination] = useState<DestinationOption | null>(null);
   const [category, setCategory] = useState('');
   const [travelDate, setTravelDate] = useState('2026-10-01');
   const [travelType, setTravelType] = useState<TravelTypeId | ''>('');

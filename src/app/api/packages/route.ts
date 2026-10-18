@@ -11,6 +11,10 @@ export async function GET(request: NextRequest) {
 
     const q = searchParams.get('q') || searchParams.get('search') || searchParams.get('query') || undefined;
     const destination = searchParams.get('destination') || undefined;
+    const destinationId = searchParams.get('destinationId') || undefined;
+    const destinationSlug = searchParams.get('destinationSlug') || undefined;
+    const travelType = searchParams.get('travelType') || undefined;
+    const vibe = searchParams.get('vibe') || undefined;
     const state = searchParams.get('state') || undefined;
     const city = searchParams.get('city') || undefined;
     const category = searchParams.get('category') || undefined;
@@ -58,6 +62,10 @@ export async function GET(request: NextRequest) {
     const { packages, total } = await getPublishedPackagesWithCount({
       q,
       destination,
+      destinationId,
+      destinationSlug,
+      travelType,
+      vibe,
       state,
       city,
       category: category as PackageCategory | undefined,
