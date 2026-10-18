@@ -118,9 +118,9 @@ export default async function HomePage() {
               </Link>
             </div>
             {featuredPackages.length > 0 ? (
-              <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {featuredPackages.map((pkg) => (
-                  <PackageCard key={pkg.id} packageData={pkg} compact />
+                  <PackageCard key={pkg.id} packageData={pkg} />
                 ))}
               </div>
             ) : (
