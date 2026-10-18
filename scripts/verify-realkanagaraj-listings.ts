@@ -4,7 +4,7 @@ import { searchPackages, getPublishedPackages } from '../src/server/db/packages'
 
 async function verifyAll() {
   console.log('========================================================');
-  console.log('VERIFYING REALKANAGARAJ LISTINGS & SEARCH FUNCTIONALITY');
+  console.log('VERIFYING REALKANAGARAJ 17 LISTINGS & SEARCH FUNCTIONALITY');
   console.log('========================================================');
 
   // 1. Verify User Credentials
@@ -43,8 +43,8 @@ async function verifyAll() {
   console.log(`[PROFILE] Verification Status: ${user.providerProfile.verificationStatus}`);
   console.log(`[PROFILE] Total Packages in Database: ${user.providerProfile.packages.length}`);
 
-  if (user.providerProfile.packages.length < 10) {
-    throw new Error(`Expected at least 10 packages, found ${user.providerProfile.packages.length}`);
+  if (user.providerProfile.packages.length < 17) {
+    throw new Error(`Expected at least 17 packages, found ${user.providerProfile.packages.length}`);
   }
 
   // 2. Verify all packages are APPROVED and PUBLISHED
@@ -54,7 +54,7 @@ async function verifyAll() {
   if (nonPublished.length > 0) {
     throw new Error(`${nonPublished.length} packages are not published/approved!`);
   }
-  console.log('✓ All 12 packages are PUBLISHED, APPROVED and ACTIVE.');
+  console.log(`✓ All ${user.providerProfile.packages.length} packages are PUBLISHED, APPROVED and ACTIVE.`);
 
   // 3. Verify completeness of package content (Images, Itinerary, Inclusions, Dates)
   for (const pkg of user.providerProfile.packages) {
@@ -67,7 +67,11 @@ async function verifyAll() {
 
   // 4. Test Search by Destination
   console.log('\n--- TESTING DESTINATION SEARCH QUERIES ---');
-  const testDestinations = ['Manali', 'Goa', 'Alleppey', 'Jaipur', 'Varanasi', 'Rishikesh', 'Sonamarg', 'Tirupati', 'Dubai', 'Bali'];
+  const testDestinations = [
+    'Manali', 'Goa', 'Alleppey', 'Jaipur', 'Varanasi',
+    'Rishikesh', 'Sonamarg', 'Tirupati', 'Dubai', 'Bali',
+    'Bangkok', 'Phuket', 'Munnar', 'Rameswaram', 'Ladakh', 'Ooty'
+  ];
 
   for (const dest of testDestinations) {
     const keywordResults = await searchPackages(dest);
@@ -81,7 +85,7 @@ async function verifyAll() {
 
   // 5. Test Search by Category
   console.log('\n--- TESTING CATEGORY SEARCH QUERIES ---');
-  const testCategories = ['tour-packages', 'devotional-trips', 'foreign-trips', 'adventures'];
+  const testCategories = ['tour-packages', 'devotional-trips', 'foreign-trips', 'adventures', 'food'];
 
   for (const catSlug of testCategories) {
     const catResults = await getPublishedPackages({ category: catSlug as any });
@@ -92,7 +96,7 @@ async function verifyAll() {
   }
 
   console.log('\n========================================================');
-  console.log('ALL VERIFICATIONS PASSED PERFECTLY!');
+  console.log(`ALL 17 PACKAGES & SEARCH VERIFICATIONS PASSED PERFECTLY!`);
   console.log('========================================================');
 }
 
