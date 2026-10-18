@@ -30,38 +30,48 @@ export interface SanitizedProviderDocument {
   updatedAt: string;
 }
 
+const REQUIRED_DOC_TYPES: DocumentType[] = [
+  DocumentType.BUSINESS_REGISTRATION,
+  DocumentType.GOVERNMENT_ID,
+  DocumentType.ADDRESS_PROOF,
+];
+
 /**
  * Recomputes the overall verification status of a provider profile
  * based strictly on real uploaded document records.
+ * 
+ * Rules:
+ * - 0 documents uploaded => UNVERIFIED
+ * - Any document REJECTED => REJECTED (with rejection reason)
+ * - All 3 required documents (BUSINESS_REGISTRATION, GOVERNMENT_ID, ADDRESS_PROOF)
+ *   present AND verified by an admin => VERIFIED
+ * - Any document PENDING or incomplete required documents => PENDING
+ * - Never auto-verifies or retains VERIFIED status if required documents are missing or pending.
  */
 export async function recomputeProviderVerificationStatus(providerId: string): Promise<VerificationStatus> {
-  const provider = await prisma.providerProfile.findUnique({
-    where: { id: providerId },
-    select: { verificationStatus: true, rejectionReason: true },
-  });
-
   const documents = await prisma.providerDocument.findMany({
     where: { providerId },
   });
 
   if (documents.length === 0) {
-    const finalStatus = provider?.verificationStatus === VerificationStatus.VERIFIED
-      ? VerificationStatus.VERIFIED
-      : VerificationStatus.UNVERIFIED;
-
     await prisma.providerProfile.update({
       where: { id: providerId },
       data: {
-        verificationStatus: finalStatus,
+        verificationStatus: VerificationStatus.UNVERIFIED,
         rejectionReason: null,
       },
     });
-    return finalStatus;
+    return VerificationStatus.UNVERIFIED;
   }
 
   const hasAnyRejected = documents.some((d) => d.status === DocumentStatus.REJECTED);
   const hasAnyPending = documents.some((d) => d.status === DocumentStatus.PENDING);
-  const allSubmittedVerified = documents.every((d) => d.status === DocumentStatus.VERIFIED);
+
+  // Check if all 3 required document types exist and are admin-approved (VERIFIED)
+  const verifiedDocTypes = new Set(
+    documents.filter((d) => d.status === DocumentStatus.VERIFIED).map((d) => d.type)
+  );
+  const hasAllRequiredVerified = REQUIRED_DOC_TYPES.every((type) => verifiedDocTypes.has(type));
 
   let newStatus: VerificationStatus = VerificationStatus.UNVERIFIED;
   let rejectionReason: string | null = null;
@@ -69,14 +79,12 @@ export async function recomputeProviderVerificationStatus(providerId: string): P
   if (hasAnyRejected) {
     newStatus = VerificationStatus.REJECTED;
     const rejectedDoc = documents.find((d) => d.status === DocumentStatus.REJECTED);
-    rejectionReason = rejectedDoc?.rejectionReason || 'One or more required documents were rejected.';
-  } else if (allSubmittedVerified && documents.length > 0) {
-    // All submitted documents have been approved by admin
-    newStatus = VerificationStatus.VERIFIED;
-  } else if (provider?.verificationStatus === VerificationStatus.VERIFIED && !hasAnyRejected) {
-    // Retain existing admin approval unless a document was rejected
+    rejectionReason = rejectedDoc?.rejectionReason || 'One or more required verification documents were rejected by the admin team.';
+  } else if (hasAllRequiredVerified) {
+    // Only verified when all 3 required documents are approved by an admin
     newStatus = VerificationStatus.VERIFIED;
   } else if (hasAnyPending || documents.length > 0) {
+    // Documents are uploaded or pending review, but not all 3 are verified yet
     newStatus = VerificationStatus.PENDING;
   } else {
     newStatus = VerificationStatus.UNVERIFIED;

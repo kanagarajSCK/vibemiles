@@ -57,8 +57,15 @@ export default function AdminProvidersPage() {
     loadProviders();
   }, [loadProviders]);
 
-  async function handleVerify(provider: AdminProviderItem, status: 'VERIFIED' | 'REJECTED') {
+  async function handleVerify(provider: any, status: 'VERIFIED' | 'REJECTED') {
     const isReject = status === 'REJECTED';
+    const docsCount = provider.documentsCount ?? provider.documents?.length ?? 0;
+
+    if (!isReject && docsCount < 3) {
+      alert(`Cannot approve provider KYC: All 3 statutory documents (Business Registration, Government ID, Address Proof) must be uploaded by the operator before verification approval. Currently only ${docsCount} document(s) uploaded.`);
+      return;
+    }
+
     const reason = prompt(
       isReject
         ? `Enter required reason for rejecting KYC for ${provider.businessName}:`
@@ -223,7 +230,7 @@ export default function AdminProvidersPage() {
             <div key={p.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4 hover:border-slate-300 transition-colors">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Badge
                       variant={
                         p.verificationStatus === 'VERIFIED'
@@ -237,6 +244,23 @@ export default function AdminProvidersPage() {
                     </Badge>
                     {!p.isActive && <Badge variant="neutral">SUSPENDED</Badge>}
                     <span className="text-xs text-slate-500 font-semibold">{p.businessCategory}</span>
+
+                    {/* Document Status Badge */}
+                    {p.documentsCount === 0 ? (
+                      <Badge variant="neutral" size="sm">0 / 3 Docs Uploaded</Badge>
+                    ) : p.pendingDocsCount > 0 ? (
+                      <Badge variant="warning" size="sm">
+                        {p.documentsCount}/3 Docs ({p.pendingDocsCount} Pending Review)
+                      </Badge>
+                    ) : p.verifiedDocsCount === 3 ? (
+                      <Badge variant="success" size="sm">
+                        All 3 Docs Verified
+                      </Badge>
+                    ) : (
+                      <Badge variant="neutral" size="sm">
+                        {p.documentsCount}/3 Docs ({p.verifiedDocsCount} Verified)
+                      </Badge>
+                    )}
                   </div>
                   <h3 className="font-bold text-slate-900 text-base mt-1">{p.businessName}</h3>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -252,12 +276,22 @@ export default function AdminProvidersPage() {
 
                 <div className="flex flex-wrap items-center gap-2">
                   <Button
+                    variant={p.pendingDocsCount > 0 ? 'primary' : 'outline'}
+                    size="sm"
+                    className={p.pendingDocsCount > 0 ? 'bg-amber-600 hover:bg-amber-700 text-white' : ''}
+                    leftIcon={<FileText className="w-3.5 h-3.5" />}
+                    onClick={() => handleViewDetails(p.id)}
+                  >
+                    Review Docs ({p.documentsCount || 0})
+                  </Button>
+
+                  <Button
                     variant="ghost"
                     size="sm"
                     leftIcon={<Eye className="w-3.5 h-3.5" />}
                     onClick={() => handleViewDetails(p.id)}
                   >
-                    Inspect KYC & Ledger
+                    KYC & Ledger
                   </Button>
 
                   {p.verificationStatus === 'PENDING' && (
@@ -275,9 +309,10 @@ export default function AdminProvidersPage() {
                       <Button
                         variant="primary"
                         size="sm"
-                        disabled={actionLoading === p.id}
+                        disabled={actionLoading === p.id || (p.documentsCount < 3)}
                         leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
                         onClick={() => handleVerify(p, 'VERIFIED')}
+                        title={p.documentsCount < 3 ? 'Cannot approve: All 3 documents required' : 'Approve KYC'}
                       >
                         Approve KYC
                       </Button>
@@ -374,9 +409,21 @@ export default function AdminProvidersPage() {
                       <Button
                         variant="primary"
                         size="sm"
-                        disabled={actionLoading === providerDetails.id}
+                        disabled={
+                          actionLoading === providerDetails.id ||
+                          !['BUSINESS_REGISTRATION', 'GOVERNMENT_ID', 'ADDRESS_PROOF'].every((reqType) =>
+                            (providerDetails.documents || []).some((d: any) => d.type === reqType)
+                          )
+                        }
                         leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
                         onClick={() => handleVerify(providerDetails, 'VERIFIED')}
+                        title={
+                          !['BUSINESS_REGISTRATION', 'GOVERNMENT_ID', 'ADDRESS_PROOF'].every((reqType) =>
+                            (providerDetails.documents || []).some((d: any) => d.type === reqType)
+                          )
+                            ? 'All 3 required documents must be uploaded before approval'
+                            : 'Approve All KYC'
+                        }
                       >
                         Approve All KYC
                       </Button>
@@ -425,84 +472,115 @@ export default function AdminProvidersPage() {
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                      <FileText className="w-4 h-4 text-teal-700" /> Submitted Verification Documents ({providerDetails.documents?.length || 0})
+                      <FileText className="w-4 h-4 text-teal-700" /> Statutory Verification Documents ({providerDetails.documents?.length || 0} / 3 Uploaded)
                     </h3>
                   </div>
 
-                  {(!providerDetails.documents || providerDetails.documents.length === 0) ? (
-                    <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4 text-center">
-                      <p className="text-xs text-slate-500 italic">No verification documents have been uploaded by this operator yet.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {providerDetails.documents.map((doc: any) => {
-                        const typeLabels: Record<string, string> = {
-                          BUSINESS_REGISTRATION: 'Business Registration Certificate',
-                          GOVERNMENT_ID: 'Government Issued ID',
-                          ADDRESS_PROOF: 'Official Address Proof',
-                        };
-                        const label = typeLabels[doc.type] || doc.type;
+                  <div className="space-y-3">
+                    {[
+                      {
+                        type: 'BUSINESS_REGISTRATION',
+                        label: 'Business Registration Certificate',
+                        desc: 'GST registration, MSME certificate, or Certificate of Incorporation.',
+                      },
+                      {
+                        type: 'GOVERNMENT_ID',
+                        label: 'Government Issued ID',
+                        desc: 'Aadhaar, Passport, Voter ID, or Driving License of authorized signatory.',
+                      },
+                      {
+                        type: 'ADDRESS_PROOF',
+                        label: 'Official Address Proof',
+                        desc: 'Electricity bill, Lease agreement, or Bank statement with business address.',
+                      },
+                    ].map((spec) => {
+                      const doc = providerDetails.documents?.find((d: any) => d.type === spec.type);
+
+                      if (!doc) {
                         return (
-                          <div key={doc.id} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                            <div className="space-y-1 min-w-0">
+                          <div
+                            key={spec.type}
+                            className="p-3.5 rounded-xl border border-dashed border-amber-300 bg-amber-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                          >
+                            <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <span className="font-bold text-slate-900">{label}</span>
-                                <Badge
-                                  variant={
-                                    doc.status === 'VERIFIED'
-                                      ? 'success'
-                                      : doc.status === 'REJECTED'
-                                      ? 'error'
-                                      : 'warning'
-                                  }
-                                  size="sm"
-                                >
-                                  {doc.status}
+                                <span className="font-bold text-slate-800">{spec.label}</span>
+                                <Badge variant="warning" size="sm">
+                                  MISSING
                                 </Badge>
                               </div>
-                              <p className="text-[11px] text-slate-500 truncate">
-                                {doc.fileName} · {formatBytes(doc.fileSize)} · Uploaded {formatDate(doc.uploadedAt)}
-                              </p>
-                              {doc.rejectionReason && (
-                                <p className="text-[11px] text-rose-600 font-medium">
-                                  Rejection Reason: {doc.rejectionReason}
-                                </p>
-                              )}
+                              <p className="text-[11px] text-amber-800/80">{spec.desc}</p>
                             </div>
-
-                            <div className="flex items-center gap-2 shrink-0">
-                              <a
-                                href={`/api/admin/documents/${doc.id}/download`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 font-semibold text-[11px] transition-colors"
-                              >
-                                <Download className="w-3.5 h-3.5" /> Download
-                              </a>
-                              {doc.status !== 'VERIFIED' && (
-                                <button
-                                  disabled={actionLoading === doc.id}
-                                  onClick={() => handleReviewDocument(doc.id, 'VERIFIED')}
-                                  className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] transition-colors disabled:opacity-50"
-                                >
-                                  Approve
-                                </button>
-                              )}
-                              {doc.status !== 'REJECTED' && (
-                                <button
-                                  disabled={actionLoading === doc.id}
-                                  onClick={() => handleReviewDocument(doc.id, 'REJECTED')}
-                                  className="px-2.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold text-[11px] transition-colors disabled:opacity-50"
-                                >
-                                  Reject
-                                </button>
-                              )}
-                            </div>
+                            <span className="text-[11px] font-semibold text-amber-700 italic shrink-0">
+                              Awaiting Operator Upload
+                            </span>
                           </div>
                         );
-                      })}
-                    </div>
-                  )}
+                      }
+
+                      return (
+                        <div
+                          key={doc.id}
+                          className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                        >
+                          <div className="space-y-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-slate-900">{spec.label}</span>
+                              <Badge
+                                variant={
+                                  doc.status === 'VERIFIED'
+                                    ? 'success'
+                                    : doc.status === 'REJECTED'
+                                    ? 'error'
+                                    : 'warning'
+                                }
+                                size="sm"
+                              >
+                                {doc.status}
+                              </Badge>
+                            </div>
+                            <p className="text-[11px] text-slate-500 truncate">
+                              {doc.fileName} · {formatBytes(doc.fileSize)} · Uploaded {formatDate(doc.uploadedAt)}
+                            </p>
+                            {doc.rejectionReason && (
+                              <p className="text-[11px] text-rose-600 font-medium">
+                                Rejection Reason: {doc.rejectionReason}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <a
+                              href={`/api/admin/documents/${doc.id}/download`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 font-semibold text-[11px] transition-colors"
+                            >
+                              <Download className="w-3.5 h-3.5" /> View / Download
+                            </a>
+                            {doc.status !== 'VERIFIED' && (
+                              <button
+                                disabled={actionLoading === doc.id}
+                                onClick={() => handleReviewDocument(doc.id, 'VERIFIED')}
+                                className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] transition-colors disabled:opacity-50"
+                              >
+                                Approve
+                              </button>
+                            )}
+                            {doc.status !== 'REJECTED' && (
+                              <button
+                                disabled={actionLoading === doc.id}
+                                onClick={() => handleReviewDocument(doc.id, 'REJECTED')}
+                                className="px-2.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-semibold text-[11px] transition-colors disabled:opacity-50"
+                              >
+                                Reject
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* Recent Settlement Records */}

@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { ROUTES, INDIAN_STATES } from '@/constants';
 import { packageService } from '@/services/package.service';
+import { CoverImageUploader } from '@/components/travel/CoverImageUploader';
 
 // ─── Constants (module-level, never recreated) ─────────────────
 const LISTING_TYPES = [
@@ -232,6 +233,7 @@ function NewPackageForm() {
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const [checkingVerification, setCheckingVerification] = useState(true);
 
@@ -349,8 +351,14 @@ function NewPackageForm() {
   }, [form.basePrice, form.discountPercent]);
 
   const handleSubmit = useCallback(async () => {
-    if (verificationStatus && verificationStatus !== 'VERIFIED') {
-      setError('KYC Verification Required: Your business profile must be verified before submitting listings.');
+    if (verificationStatus !== 'VERIFIED') {
+      setError('KYC Verification Required: Your business profile must be verified by admin before submitting listings.');
+      return;
+    }
+    if (!form.imageUrl || !form.imageUrl.trim()) {
+      setImageError('A cover image is required. Please upload an image.');
+      setError('Cover image is required. Please upload an image in Step 1 before submitting.');
+      setStep(1);
       return;
     }
     setSubmitting(true);
@@ -536,12 +544,15 @@ function NewPackageForm() {
         </div>
       )}
 
-      <Input
-        label="Cover Image URL (optional)"
-        placeholder="https://images.unsplash.com/photo-..."
+      <CoverImageUploader
         value={form.imageUrl}
-        onChange={(e) => set('imageUrl', e.target.value)}
-        helperText="Hosted image URL (Unsplash, CDN, etc). If left blank, a curated high-definition travel image will be assigned."
+        onChange={(url) => {
+          set('imageUrl', url);
+          if (url) setImageError(null);
+        }}
+        required={true}
+        error={imageError}
+        onError={setImageError}
       />
 
       <div>
@@ -558,7 +569,20 @@ function NewPackageForm() {
       </div>
 
       <div className="flex justify-end pt-2">
-        <Button type="button" variant="primary" size="md" onClick={() => setStep(2)} rightIcon={<ArrowRight className="w-4 h-4" />}>
+        <Button
+          type="button"
+          variant="primary"
+          size="md"
+          onClick={() => {
+            if (!form.imageUrl || !form.imageUrl.trim()) {
+              setImageError('A cover image is required. Please upload an image before proceeding.');
+              return;
+            }
+            setImageError(null);
+            setStep(2);
+          }}
+          rightIcon={<ArrowRight className="w-4 h-4" />}
+        >
           Continue to Pricing
         </Button>
       </div>
@@ -728,6 +752,16 @@ function NewPackageForm() {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
         <h2 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Review & Submit for Approval</h2>
+
+        {form.imageUrl && (
+          <div className="relative h-44 w-full rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={form.imageUrl} alt="Cover Preview" className="h-full w-full object-cover" />
+            <div className="absolute top-2 left-2 bg-slate-900/80 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-sm shadow">
+              Cover Image
+            </div>
+          </div>
+        )}
 
         <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-0 divide-y divide-slate-100">
           {rows.map(({ label, value }) => (

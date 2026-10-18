@@ -99,6 +99,19 @@ export interface AdminProviderItem {
   reviewCount: number;
   totalPackages: number;
   totalBookings: number;
+  documentsCount: number;
+  pendingDocsCount: number;
+  verifiedDocsCount: number;
+  rejectedDocsCount: number;
+  hasPendingDocuments: boolean;
+  documents?: {
+    id: string;
+    type: string;
+    status: string;
+    fileName: string;
+    fileSize: number;
+    uploadedAt: string;
+  }[];
   rejectionReason: string | null;
   suspensionReason: string | null;
   joinedAt: string;

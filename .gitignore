@@ -44,4 +44,7 @@ next-env.d.ts
 # local uploads
 /storage/secure_documents/*
 !/storage/secure_documents/.gitkeep
+/public/uploads/packages/*
+!/public/uploads/packages/.gitkeep
+
 

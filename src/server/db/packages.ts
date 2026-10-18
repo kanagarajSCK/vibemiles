@@ -910,16 +910,27 @@ export async function createPackage(
   const finalPrice = Math.round(basePrice - (basePrice * discountPercent) / 100);
 
   const durationDays = Math.max(1, Number(input.durationDays) || 1);
-  const durationNights = Math.max(0, Number(input.durationNights) ?? Math.max(0, durationDays - 1));
+  const parsedNights =
+    input.durationNights !== undefined && input.durationNights !== null
+      ? Number(input.durationNights)
+      : NaN;
+  const durationNights =
+    !Number.isNaN(parsedNights) && parsedNights >= 0
+      ? parsedNights
+      : Math.max(0, durationDays - 1);
   const maxGroupSize = Math.max(1, Number(input.maxGroupSize) || 10);
 
   let baseSlug = slugify(input.name.trim());
   if (!baseSlug) baseSlug = 'package';
   const slug = `${baseSlug}-${Math.random().toString(36).substring(2, 7)}`;
 
-  // Filter valid image URLs (must be valid http/https URLs)
+  // Filter valid image URLs (must be valid http/https URLs, /uploads/ paths, or data URIs)
   const validImages = (input.images || []).filter(
-    (u) => typeof u === 'string' && /^https?:\/\//i.test(u.trim())
+    (u) =>
+      typeof u === 'string' &&
+      (/^https?:\/\//i.test(u.trim()) ||
+        /^\/uploads\//i.test(u.trim()) ||
+        /^data:image\//i.test(u.trim()))
   );
   const imageUrls =
     validImages.length > 0
@@ -1152,9 +1163,12 @@ export async function updatePackage(
         destinationId,
         state: input.state || existing.state,
         city: input.city !== undefined ? input.city : existing.city,
-        durationDays: input.durationDays ? Math.max(1, Number(input.durationDays)) : existing.durationDays,
+        durationDays:
+          input.durationDays !== undefined && !Number.isNaN(Number(input.durationDays))
+            ? Math.max(1, Number(input.durationDays))
+            : existing.durationDays,
         durationNights:
-          input.durationNights !== undefined
+          input.durationNights !== undefined && !Number.isNaN(Number(input.durationNights))
             ? Math.max(0, Number(input.durationNights))
             : existing.durationNights,
         maxGroupSize: input.maxGroupSize ? Math.max(1, Number(input.maxGroupSize)) : existing.maxGroupSize,
@@ -1176,7 +1190,11 @@ export async function updatePackage(
     // Update images if provided
     if (input.images !== undefined) {
       const validImages = (input.images || []).filter(
-        (u) => typeof u === 'string' && /^https?:\/\//i.test(u.trim())
+        (u) =>
+          typeof u === 'string' &&
+          (/^https?:\/\//i.test(u.trim()) ||
+            /^\/uploads\//i.test(u.trim()) ||
+            /^data:image\//i.test(u.trim()))
       );
       const imageUrls =
         validImages.length > 0

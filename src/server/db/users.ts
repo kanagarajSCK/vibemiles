@@ -201,7 +201,7 @@ export async function createProviderUser(params: CreateProviderParams) {
         city: params.city?.trim() || 'Bengaluru',
         state: params.state?.trim() || 'Karnataka',
         pincode: params.pincode?.trim() || '560001',
-        verificationStatus: VerificationStatus.PENDING, // Never automatically verified!
+        verificationStatus: VerificationStatus.UNVERIFIED, // Starts UNVERIFIED until verification documents are uploaded
         isActive: true,
       },
     });

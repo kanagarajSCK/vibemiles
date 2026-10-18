@@ -8,6 +8,7 @@ import {
   BookingStatus,
   PaymentStatus,
   NotificationType,
+  DocumentType,
   DocumentStatus,
   Prisma,
 } from '@prisma/client';
@@ -740,37 +741,67 @@ export async function getAdminProviders(params: GetAdminProvidersParams = {}) {
             status: true,
           },
         },
+        documents: {
+          select: {
+            id: true,
+            type: true,
+            status: true,
+            fileName: true,
+            fileSize: true,
+            uploadedAt: true,
+          },
+        },
         _count: {
           select: {
             packages: true,
             bookings: true,
+            documents: true,
           },
         },
       },
     }),
   ]);
 
-  const items = providers.map((p) => ({
-    id: p.id,
-    userId: p.userId,
-    businessName: p.businessName,
-    ownerName: p.ownerName,
-    businessCategory: p.businessCategory,
-    city: p.city,
-    state: p.state,
-    email: p.user.email,
-    phone: p.user.phone,
-    userStatus: p.user.status,
-    verificationStatus: p.verificationStatus,
-    isActive: p.isActive,
-    rating: p.rating,
-    reviewCount: p.reviewCount,
-    totalPackages: p._count.packages,
-    totalBookings: p._count.bookings,
-    rejectionReason: p.rejectionReason,
-    suspensionReason: p.suspensionReason,
-    joinedAt: p.joinedAt.toISOString(),
-  }));
+  const items = providers.map((p) => {
+    const pendingDocs = p.documents.filter((d) => d.status === DocumentStatus.PENDING);
+    const verifiedDocs = p.documents.filter((d) => d.status === DocumentStatus.VERIFIED);
+    const rejectedDocs = p.documents.filter((d) => d.status === DocumentStatus.REJECTED);
+
+    return {
+      id: p.id,
+      userId: p.userId,
+      businessName: p.businessName,
+      ownerName: p.ownerName,
+      businessCategory: p.businessCategory,
+      city: p.city,
+      state: p.state,
+      email: p.user.email,
+      phone: p.user.phone,
+      userStatus: p.user.status,
+      verificationStatus: p.verificationStatus,
+      isActive: p.isActive,
+      rating: p.rating,
+      reviewCount: p.reviewCount,
+      totalPackages: p._count.packages,
+      totalBookings: p._count.bookings,
+      documentsCount: p.documents.length,
+      pendingDocsCount: pendingDocs.length,
+      verifiedDocsCount: verifiedDocs.length,
+      rejectedDocsCount: rejectedDocs.length,
+      hasPendingDocuments: pendingDocs.length > 0,
+      documents: p.documents.map((d) => ({
+        id: d.id,
+        type: d.type,
+        status: d.status,
+        fileName: d.fileName,
+        fileSize: d.fileSize,
+        uploadedAt: d.uploadedAt.toISOString(),
+      })),
+      rejectionReason: p.rejectionReason,
+      suspensionReason: p.suspensionReason,
+      joinedAt: p.joinedAt.toISOString(),
+    };
+  });
 
   return {
     items,
@@ -902,11 +933,27 @@ export async function reviewProviderVerificationInDb(params: {
 
   const provider = await prisma.providerProfile.findUnique({
     where: { id: providerId },
-    include: { user: true },
+    include: { user: true, documents: true },
   });
 
   if (!provider) {
     throw new Error('Provider not found.');
+  }
+
+  if (status === VerificationStatus.VERIFIED) {
+    const requiredTypes: DocumentType[] = [
+      DocumentType.BUSINESS_REGISTRATION,
+      DocumentType.GOVERNMENT_ID,
+      DocumentType.ADDRESS_PROOF,
+    ];
+    const uploadedTypes = new Set(provider.documents.map((d) => d.type));
+    const missingTypes = requiredTypes.filter((t) => !uploadedTypes.has(t));
+    if (missingTypes.length > 0) {
+      const missingLabels = missingTypes.map((t) => t.replace(/_/g, ' ')).join(', ');
+      throw new Error(
+        `Cannot approve KYC verification: Missing required documents (${missingLabels}). All 3 statutory documents (Business Registration, Government ID, Address Proof) must be uploaded by the operator before verification.`
+      );
+    }
   }
 
   const updated = await prisma.providerProfile.update({
