@@ -293,11 +293,25 @@ export function buildPublishedPackagesWhere(options?: GetPackagesOptions): Prism
     });
   }
 
-  // Category filter
+  // Category filter (supports canonical slugs and descriptive aliases)
   if (options?.category) {
+    const rawCat = options.category.toLowerCase().trim();
+    const catAliases: Record<string, string> = {
+      'tour-packages': 'tour',
+      'tour-package': 'tour',
+      'devotional-trips': 'devotional',
+      'devotional-trip': 'devotional',
+      'foreign-trips': 'foreign',
+      'foreign-trip': 'foreign',
+      'adventures': 'adventure',
+      'food-experiences': 'food',
+      'cab-services': 'cab',
+      'local-guides': 'guide',
+    };
+    const targetSlug = catAliases[rawCat] || rawCat;
     andConditions.push({
       category: {
-        slug: { equals: options.category.toLowerCase(), mode: 'insensitive' },
+        slug: { equals: targetSlug, mode: 'insensitive' },
       },
     });
   }
