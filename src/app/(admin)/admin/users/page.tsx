@@ -57,6 +57,7 @@ export default function AdminUsersPage() {
 
   // Filters & Search
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<'ALL' | 'CUSTOMER' | 'PROVIDER' | 'ADMIN'>('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'SUSPENDED' | 'INACTIVE'>('ALL');
   const [page, setPage] = useState(1);
@@ -80,6 +81,15 @@ export default function AdminUsersPage() {
   const [deleteReason, setDeleteReason] = useState('');
   const [deleteConfirmationInput, setDeleteConfirmationInput] = useState('');
 
+  // Debounce search to prevent excessive database hits on every keystroke
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+
   const fetchUsers = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
@@ -87,7 +97,7 @@ export default function AdminUsersPage() {
 
     try {
       const data = await adminService.getUsers({
-        search: search.trim() || undefined,
+        search: debouncedSearch.trim() || undefined,
         role: roleFilter === 'ALL' ? undefined : roleFilter,
         status: statusFilter === 'ALL' ? undefined : statusFilter,
         page,
@@ -104,7 +114,7 @@ export default function AdminUsersPage() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [search, roleFilter, statusFilter, page]);
+  }, [debouncedSearch, roleFilter, statusFilter, page]);
 
   useEffect(() => {
     fetchUsers();
@@ -144,17 +154,30 @@ export default function AdminUsersPage() {
     }
   }
 
-  // Prepare Delete Modal with Financial Impact Analysis
+  // Prepare Delete Modal with Financial Impact Analysis (Instant UX)
   async function openDeleteModal(user: AdminUserItem) {
+    const hasFinancial =
+      ((user.customerProfile?.bookingCount || 0) + (user.providerProfile?.bookingsCount || 0)) > 0;
+
     setDeleteModalUser(user);
     setDeleteReason('');
     setDeleteConfirmationInput('');
     setIsPermanentDelete(true);
+    setDeleteUserDetails({
+      financialSummary: {
+        hasFinancialRecords: hasFinancial,
+        customerBookingsCount: user.customerProfile?.bookingCount || 0,
+        providerBookingsCount: user.providerProfile?.bookingsCount || 0,
+      },
+    });
+
     try {
       const res = await adminService.getUserDetails(user.id);
-      setDeleteUserDetails(res.data);
+      if (res?.data) {
+        setDeleteUserDetails(res.data);
+      }
     } catch {
-      setDeleteUserDetails(null);
+      // Keep optimistic details
     }
   }
 

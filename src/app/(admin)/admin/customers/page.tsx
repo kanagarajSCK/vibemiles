@@ -12,6 +12,7 @@ export default function AdminCustomersPage() {
   const [customers, setCustomers] = useState<AdminCustomerItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -23,11 +24,20 @@ export default function AdminCustomersPage() {
   const [customerDetails, setCustomerDetails] = useState<any | null>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const loadCustomers = useCallback(async () => {
     setLoading(true);
     try {
       const res = await adminService.getCustomers({
-        search: search.trim() || undefined,
+        search: debouncedSearch.trim() || undefined,
         status: statusFilter === 'ALL' ? undefined : statusFilter,
         page,
         limit: 15,
@@ -40,7 +50,7 @@ export default function AdminCustomersPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, page]);
+  }, [debouncedSearch, statusFilter, page]);
 
   useEffect(() => {
     loadCustomers();

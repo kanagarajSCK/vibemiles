@@ -15,11 +15,21 @@ export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('ALL');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Inspection Modal
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
@@ -28,7 +38,7 @@ export default function AdminBookingsPage() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (search.trim()) params.set('search', search.trim());
+      if (debouncedSearch.trim()) params.set('search', debouncedSearch.trim());
       if (statusFilter !== 'ALL') params.set('status', statusFilter);
       if (paymentStatusFilter !== 'ALL') params.set('paymentStatus', paymentStatusFilter);
       params.set('page', page.toString());
@@ -52,7 +62,7 @@ export default function AdminBookingsPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, paymentStatusFilter, page]);
+  }, [debouncedSearch, statusFilter, paymentStatusFilter, page]);
 
   useEffect(() => {
     fetchBookings();

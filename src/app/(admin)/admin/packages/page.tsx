@@ -27,8 +27,17 @@ export default function AdminPackagesPage() {
   // Filters
   const [filter, setFilter] = useState<'ALL' | 'PENDING_REVIEW' | 'PUBLISHED' | 'REJECTED' | 'ARCHIVED' | 'DRAFT'>('ALL');
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedDestination, setSelectedDestination] = useState<string>('');
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // Inline action states
   const [rejectingId, setRejectingId] = useState<string | null>(null);
@@ -80,7 +89,7 @@ export default function AdminPackagesPage() {
     try {
       const data = await packageService.getAdminPackages({
         status: filter === 'ALL' ? undefined : filter,
-        search: search.trim() || undefined,
+        search: debouncedSearch.trim() || undefined,
         categoryId: selectedCategory || undefined,
         destinationId: selectedDestination || undefined,
       });
@@ -91,7 +100,7 @@ export default function AdminPackagesPage() {
     } finally {
       setLoading(false);
     }
-  }, [filter, search, selectedCategory, selectedDestination]);
+  }, [filter, debouncedSearch, selectedCategory, selectedDestination]);
 
   useEffect(() => {
     fetchPackages();

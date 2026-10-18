@@ -23,6 +23,7 @@ export default function AdminProvidersPage() {
   const [providers, setProviders] = useState<AdminProviderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [verificationFilter, setVerificationFilter] = useState<string>('ALL');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -34,11 +35,20 @@ export default function AdminProvidersPage() {
   const [providerDetails, setProviderDetails] = useState<any | null>(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
 
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const loadProviders = useCallback(async () => {
     setLoading(true);
     try {
       const res = await adminService.getProviders({
-        search: search.trim() || undefined,
+        search: debouncedSearch.trim() || undefined,
         verificationStatus: verificationFilter === 'ALL' ? undefined : verificationFilter,
         page,
         limit: 15,
@@ -51,7 +61,7 @@ export default function AdminProvidersPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, verificationFilter, page]);
+  }, [debouncedSearch, verificationFilter, page]);
 
   useEffect(() => {
     loadProviders();

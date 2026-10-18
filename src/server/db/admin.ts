@@ -2064,94 +2064,99 @@ export async function deleteUserInDb(params: {
   if (hasFinancialRecords) {
     // Cannot perform hard delete because financial and legal retention mandates keeping booking/payment history!
     // Instead, perform irreversible PII Anonymization or Deactivation
-    const result = await prisma.$transaction(async (tx) => {
-      // Invalidate sessions immediately
-      await tx.session.deleteMany({ where: { userId } });
+    const result = await prisma.$transaction(
+      async (tx) => {
+        // Invalidate sessions immediately
+        await tx.session.deleteMany({ where: { userId } });
 
-      if (permanent) {
-        // Anonymize User PII
-        const anonymizedEmail = `anonymized_${userId.slice(-6)}_${Date.now()}@deleted.vibemiles.local`;
-        await tx.user.update({
-          where: { id: userId },
-          data: {
-            email: anonymizedEmail,
-            phone: null,
-            passwordHash: null,
-            status: UserStatus.INACTIVE,
-          },
-        });
+        if (permanent) {
+          // Anonymize User PII
+          const anonymizedEmail = `anonymized_${userId.slice(-6)}_${Date.now()}@deleted.vibemiles.local`;
+          await Promise.all([
+            tx.user.update({
+              where: { id: userId },
+              data: {
+                email: anonymizedEmail,
+                phone: null,
+                passwordHash: null,
+                status: UserStatus.INACTIVE,
+              },
+            }),
+            targetUser.customerProfile
+              ? tx.customerProfile.update({
+                  where: { id: targetUser.customerProfile.id },
+                  data: {
+                    fullName: 'Deactivated Traveler',
+                    avatar: null,
+                    emergencyContact: null,
+                    city: null,
+                    state: null,
+                    isBlocked: true,
+                    suspensionReason: `Account permanently removed upon user/admin request. Historical bookings preserved for accounting: ${reason}`,
+                  },
+                })
+              : Promise.resolve(),
+            targetUser.providerProfile
+              ? tx.providerProfile.update({
+                  where: { id: targetUser.providerProfile.id },
+                  data: {
+                    businessName: 'Deactivated Tour Operator',
+                    ownerName: 'Deactivated Operator',
+                    description: null,
+                    logo: null,
+                    gallery: [],
+                    addressLine1: null,
+                    panNumber: null,
+                    gstNumber: null,
+                    bankAccountHolder: null,
+                    bankAccountNumber: null,
+                    bankIfsc: null,
+                    bankName: null,
+                    bankBranch: null,
+                    isActive: false,
+                    verificationStatus: VerificationStatus.REJECTED,
+                    suspensionReason: `Account permanently deleted upon request. Financial ledgers retained: ${reason}`,
+                  },
+                })
+              : Promise.resolve(),
+            targetUser.providerProfile
+              ? tx.providerDocument.deleteMany({ where: { providerId: targetUser.providerProfile.id } })
+              : Promise.resolve(),
+          ]);
 
-        if (targetUser.customerProfile) {
-          await tx.customerProfile.update({
-            where: { id: targetUser.customerProfile.id },
-            data: {
-              fullName: 'Deactivated Traveler',
-              avatar: null,
-              emergencyContact: null,
-              city: null,
-              state: null,
-              isBlocked: true,
-              suspensionReason: `Account permanently removed upon user/admin request. Historical bookings preserved for accounting: ${reason}`,
-            },
-          });
+          return {
+            action: 'ANONYMIZED_FOR_RETENTION' as const,
+            message: `User has ${customerBookings + providerBookings} historical booking/settlement records required for financial & legal retention. Personal identity information (PII), credentials, phone, and documents were irreversibly anonymized and access terminated.`,
+          };
+        } else {
+          // Soft delete / deactivation
+          await Promise.all([
+            tx.user.update({
+              where: { id: userId },
+              data: { status: UserStatus.INACTIVE },
+            }),
+            targetUser.customerProfile
+              ? tx.customerProfile.update({
+                  where: { id: targetUser.customerProfile.id },
+                  data: { isBlocked: true, suspensionReason: reason.trim() },
+                })
+              : Promise.resolve(),
+            targetUser.providerProfile
+              ? tx.providerProfile.update({
+                  where: { id: targetUser.providerProfile.id },
+                  data: { isActive: false, suspensionReason: reason.trim() },
+                })
+              : Promise.resolve(),
+          ]);
+
+          return {
+            action: 'DEACTIVATED' as const,
+            message: 'User account has been deactivated and access revoked. Historical records remain preserved.',
+          };
         }
-
-        if (targetUser.providerProfile) {
-          await tx.providerProfile.update({
-            where: { id: targetUser.providerProfile.id },
-            data: {
-              businessName: 'Deactivated Tour Operator',
-              ownerName: 'Deactivated Operator',
-              description: null,
-              logo: null,
-              gallery: [],
-              addressLine1: null,
-              panNumber: null,
-              gstNumber: null,
-              bankAccountHolder: null,
-              bankAccountNumber: null,
-              bankIfsc: null,
-              bankName: null,
-              bankBranch: null,
-              isActive: false,
-              verificationStatus: VerificationStatus.REJECTED,
-              suspensionReason: `Account permanently deleted upon request. Financial ledgers retained: ${reason}`,
-            },
-          });
-          // Remove provider KYC documents to protect identity
-          await tx.providerDocument.deleteMany({ where: { providerId: targetUser.providerProfile.id } });
-        }
-
-        return {
-          action: 'ANONYMIZED_FOR_RETENTION' as const,
-          message: `User has ${customerBookings + providerBookings} historical booking/settlement records required for financial & legal retention. Personal identity information (PII), credentials, phone, and documents were irreversibly anonymized and access terminated.`,
-        };
-      } else {
-        // Soft delete / deactivation
-        await tx.user.update({
-          where: { id: userId },
-          data: { status: UserStatus.INACTIVE },
-        });
-
-        if (targetUser.customerProfile) {
-          await tx.customerProfile.update({
-            where: { id: targetUser.customerProfile.id },
-            data: { isBlocked: true, suspensionReason: reason.trim() },
-          });
-        }
-        if (targetUser.providerProfile) {
-          await tx.providerProfile.update({
-            where: { id: targetUser.providerProfile.id },
-            data: { isActive: false, suspensionReason: reason.trim() },
-          });
-        }
-
-        return {
-          action: 'DEACTIVATED' as const,
-          message: 'User account has been deactivated and access revoked. Historical records remain preserved.',
-        };
-      }
-    });
+      },
+      { maxWait: 15000, timeout: 30000 }
+    );
 
     await recordAuditLog({
       actorId: adminUser.id,
@@ -2178,20 +2183,52 @@ export async function deleteUserInDb(params: {
 
   // User has NO financial records (0 bookings, 0 settlements):
   if (permanent) {
-    // Safe hard delete: cascades to profile, documents, sessions, notifications
-    await prisma.$transaction(async (tx) => {
-      // In case provider has packages with 0 bookings:
-      if (targetUser.providerProfile) {
-        const pkgs = await tx.package.findMany({
-          where: { providerId: targetUser.providerProfile.id },
-          select: { id: true },
-        });
-        for (const p of pkgs) {
-          await tx.package.delete({ where: { id: p.id } });
+    // Safe hard delete: bulk-delete related records cleanly, then delete user
+    await prisma.$transaction(
+      async (tx) => {
+        // 1. If provider, delete all packages and their child relations in bulk
+        if (targetUser.providerProfile) {
+          const providerId = targetUser.providerProfile.id;
+          const pkgList = await tx.package.findMany({
+            where: { providerId },
+            select: { id: true },
+          });
+          const pkgIds = pkgList.map((p) => p.id);
+
+          if (pkgIds.length > 0) {
+            await Promise.all([
+              tx.packageImage.deleteMany({ where: { packageId: { in: pkgIds } } }),
+              tx.itineraryDay.deleteMany({ where: { packageId: { in: pkgIds } } }),
+              tx.packageInclusion.deleteMany({ where: { packageId: { in: pkgIds } } }),
+              tx.packageAvailability.deleteMany({ where: { packageId: { in: pkgIds } } }),
+              tx.review.deleteMany({ where: { packageId: { in: pkgIds } } }),
+            ]);
+            await tx.package.deleteMany({ where: { id: { in: pkgIds } } });
+          }
+
+          // Delete provider documents & settlements
+          await Promise.all([
+            tx.providerDocument.deleteMany({ where: { providerId } }),
+            tx.settlementLedger.deleteMany({ where: { providerId } }),
+          ]);
         }
-      }
-      await tx.user.delete({ where: { id: userId } });
-    });
+
+        // 2. If customer, delete customer reviews (since Review has no cascade on CustomerProfile)
+        if (targetUser.customerProfile) {
+          await tx.review.deleteMany({ where: { customerId: targetUser.customerProfile.id } });
+        }
+
+        // 3. Delete user sessions and notifications
+        await Promise.all([
+          tx.session.deleteMany({ where: { userId } }),
+          tx.notification.deleteMany({ where: { userId } }),
+        ]);
+
+        // 4. Delete the user (cascades to customerProfile / providerProfile)
+        await tx.user.delete({ where: { id: userId } });
+      },
+      { maxWait: 15000, timeout: 30000 }
+    );
 
     await recordAuditLog({
       actorId: adminUser.id,
@@ -2217,13 +2254,30 @@ export async function deleteUserInDb(params: {
     };
   } else {
     // Soft delete / deactivation
-    await prisma.$transaction(async (tx) => {
-      await tx.session.deleteMany({ where: { userId } });
-      await tx.user.update({
-        where: { id: userId },
-        data: { status: UserStatus.INACTIVE },
-      });
-    });
+    await prisma.$transaction(
+      async (tx) => {
+        await Promise.all([
+          tx.session.deleteMany({ where: { userId } }),
+          tx.user.update({
+            where: { id: userId },
+            data: { status: UserStatus.INACTIVE },
+          }),
+          targetUser.customerProfile
+            ? tx.customerProfile.update({
+                where: { id: targetUser.customerProfile.id },
+                data: { isBlocked: true, suspensionReason: reason.trim() },
+              })
+            : Promise.resolve(),
+          targetUser.providerProfile
+            ? tx.providerProfile.update({
+                where: { id: targetUser.providerProfile.id },
+                data: { isActive: false, suspensionReason: reason.trim() },
+              })
+            : Promise.resolve(),
+        ]);
+      },
+      { maxWait: 15000, timeout: 30000 }
+    );
 
     await recordAuditLog({
       actorId: adminUser.id,
