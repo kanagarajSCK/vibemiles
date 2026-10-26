@@ -55,9 +55,18 @@ export async function GET(request: NextRequest) {
 
     const normalizedQ = q.toLowerCase();
 
-    // Query real PostgreSQL destination records
+    // Query real PostgreSQL destination records with active tours, excluding demo
     const destinations = await prisma.destination.findMany({
       where: {
+        AND: [
+          { packageCount: { gt: 0 } },
+          {
+            NOT: [
+              { name: { contains: 'demo', mode: 'insensitive' } },
+              { slug: { contains: 'demo', mode: 'insensitive' } },
+            ],
+          },
+        ],
         OR: [
           { name: { contains: q, mode: 'insensitive' } },
           { state: { contains: q, mode: 'insensitive' } },
@@ -136,6 +145,10 @@ export async function GET(request: NextRequest) {
 
       const normalizedQ = q.toLowerCase();
       const matches = MOCK_DESTINATIONS.filter((d) => {
+        const hasTours = (d.packageCount ?? 0) > 0;
+        const isDemo = d.name.toLowerCase().includes('demo') || d.slug.toLowerCase().includes('demo');
+        if (!hasTours || isDemo) return false;
+
         return (
           d.name.toLowerCase().includes(normalizedQ) ||
           d.state.toLowerCase().includes(normalizedQ) ||

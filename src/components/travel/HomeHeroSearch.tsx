@@ -63,7 +63,7 @@ export function HomeHeroSearch() {
       <form onSubmit={handleSearch}>
         <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4">
           {/* Destination */}
-          <div className="space-y-1">
+          <div className="space-y-1 relative z-30">
             <label className="flex items-center gap-1 text-xs font-semibold uppercase leading-3 tracking-wider text-slate-600 sm:leading-normal">
               <MapPin className="w-3.5 h-3.5 text-teal-600" /> Destination
             </label>

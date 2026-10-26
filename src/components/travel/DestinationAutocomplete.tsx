@@ -223,7 +223,7 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
           id={listboxId}
           role="listbox"
           aria-label="Destination suggestions"
-          className="absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 text-left shadow-xl animate-in fade-in-50 zoom-in-95 duration-100"
+          className="absolute left-0 top-full z-50 mt-1.5 w-full min-w-full sm:min-w-[360px] md:min-w-[400px] max-w-[min(440px,calc(100vw-2rem))] max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 text-left shadow-2xl animate-in fade-in-50 zoom-in-95 duration-100"
         >
           <div className="flex items-center justify-between px-3 pb-1.5 pt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
             <span>Destinations</span>
@@ -260,7 +260,7 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
                   handleSelect(suggestion);
                 }}
                 onMouseEnter={() => setHighlightedIndex(index)}
-                className={`group flex min-h-12 w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
+                className={`group flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors ${
                   isHighlighted ? 'bg-teal-50 text-teal-950' : 'hover:bg-slate-50 text-slate-800'
                 }`}
               >
@@ -279,20 +279,20 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="truncate text-sm font-bold text-slate-900">
+                    <span className="text-sm font-bold text-slate-900 leading-snug break-words">
                       {highlightMatch(suggestion.name, value)}
                     </span>
                     {tourCount > 0 ? (
-                      <span className="shrink-0 rounded-full bg-teal-100/70 px-2 py-0.5 text-[10px] font-semibold text-teal-800">
+                      <span className="shrink-0 whitespace-nowrap rounded-full bg-teal-100/70 px-2 py-0.5 text-[10px] font-semibold text-teal-800">
                         {tourCount} {tourCount === 1 ? 'tour' : 'tours'}
                       </span>
                     ) : (
-                      <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-400">
+                      <span className="shrink-0 whitespace-nowrap rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-400">
                         0 tours
                       </span>
                     )}
                   </div>
-                  <span className="block truncate text-xs text-slate-500">
+                  <span className="block text-xs text-slate-500 leading-normal mt-0.5 break-words">
                     {suggestion.state ? `${suggestion.state}, ` : ''}{suggestion.country}
                   </span>
                 </div>

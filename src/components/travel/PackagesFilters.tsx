@@ -101,7 +101,7 @@ export const PackagesFilters: React.FC<PackagesFiltersProps> = ({
       </div>
 
       {/* Destination Autocomplete */}
-      <div className="space-y-1.5">
+      <div className="space-y-1.5 relative z-30">
         <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
           Destination / City
         </label>

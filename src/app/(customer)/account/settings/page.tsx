@@ -5,7 +5,7 @@ import { Settings, Shield, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
-export function AccountSettingsPage() {
+export default function AccountSettingsPage() {
   return (
     <div className="space-y-6">
       <div className="border-b border-slate-200 pb-4">
@@ -27,5 +27,3 @@ export function AccountSettingsPage() {
     </div>
   );
 }
-
-export default AccountSettingsPage;
