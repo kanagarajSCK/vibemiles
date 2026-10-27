@@ -16,6 +16,13 @@ export interface DestinationOption {
   packageCount?: number;
   rating?: number;
   tags?: string[];
+  nearbyDestinations?: Array<{
+    name: string;
+    state: string;
+    slug?: string;
+    packageCount?: number;
+    highlight?: string;
+  }>;
 }
 
 interface DestinationAutocompleteProps {
@@ -287,7 +294,7 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
                         {tourCount} {tourCount === 1 ? 'tour' : 'tours'}
                       </span>
                     ) : (
-                      <span className="shrink-0 whitespace-nowrap rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-400">
+                      <span className="shrink-0 whitespace-nowrap rounded-full bg-amber-50 border border-amber-200/80 px-2 py-0.5 text-[10px] font-medium text-amber-700">
                         0 tours
                       </span>
                     )}
@@ -295,6 +302,11 @@ export const DestinationAutocomplete: React.FC<DestinationAutocompleteProps> = (
                   <span className="block text-xs text-slate-500 leading-normal mt-0.5 break-words">
                     {suggestion.state ? `${suggestion.state}, ` : ''}{suggestion.country}
                   </span>
+                  {tourCount === 0 && suggestion.nearbyDestinations && suggestion.nearbyDestinations.length > 0 && (
+                    <span className="block text-[11px] font-medium text-teal-700 leading-tight mt-0.5 truncate">
+                      Nearby: {suggestion.nearbyDestinations.slice(0, 3).map((n) => n.name).join(', ')}
+                    </span>
+                  )}
                 </div>
 
                 <MapPin className={`h-4 w-4 shrink-0 transition-opacity ${isHighlighted ? 'text-teal-600 opacity-100' : 'text-slate-300 opacity-0 group-hover:opacity-100'}`} aria-hidden="true" />

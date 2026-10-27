@@ -199,7 +199,8 @@ export function buildPublishedPackagesWhere(options?: GetPackagesOptions): Prism
   // Destination filter — supports destinationId, destinationSlug, or textual destination (including city/state composite)
   if (options?.destinationId && options.destinationId.trim()) {
     const destId = options.destinationId.trim();
-    if (destId.startsWith('cm') || destId.length >= 20) {
+    const isDbCuid = (destId.startsWith('cm') || destId.startsWith('cl')) && !destId.startsWith('loc-') && !destId.startsWith('dest-');
+    if (isDbCuid) {
       andConditions.push({
         OR: [
           { destinationId: destId },

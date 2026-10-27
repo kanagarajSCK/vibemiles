@@ -4,6 +4,7 @@ import { PackageCard } from '@/components/cards/PackageCard';
 import { PackagesFilters } from '@/components/travel/PackagesFilters';
 import { ROUTES } from '@/constants';
 import { PackageCategory, SortOption } from '@/types';
+import { getNearbyDestinations, type NearbyDestinationSuggestion } from '@/lib/india-locations';
 
 export const revalidate = 60; // 60s cache on server
 
@@ -44,6 +45,49 @@ export default async function PackagesPage({
     sort: (params.sort as SortOption) || 'recommended',
   });
 
+  const searchedLocation = (params.destination || params.q || '').trim();
+  const nearbySuggestions: NearbyDestinationSuggestion[] = searchedLocation
+    ? getNearbyDestinations(searchedLocation)
+    : [];
+
+  let recommendedPackages: typeof packages = [];
+  if (packages.length === 0) {
+    if (nearbySuggestions.length > 0) {
+      for (const nearby of nearbySuggestions.slice(0, 3)) {
+        try {
+          const pkgs = await getPublishedPackages({
+            destination: nearby.name,
+            take: 3,
+          });
+          if (pkgs.length > 0) {
+            recommendedPackages.push(...pkgs);
+          }
+        } catch {
+          // ignore error for fallback
+        }
+      }
+    }
+
+    if (recommendedPackages.length === 0) {
+      try {
+        recommendedPackages = await getPublishedPackages({
+          take: 6,
+          sort: 'recommended',
+        });
+      } catch {
+        recommendedPackages = [];
+      }
+    }
+
+    // Deduplicate
+    const seen = new Set<string>();
+    recommendedPackages = recommendedPackages.filter((p) => {
+      if (seen.has(p.id)) return false;
+      seen.add(p.id);
+      return true;
+    }).slice(0, 6);
+  }
+
   const activeFiltersCount = [
     params.q,
     params.destination,
@@ -82,8 +126,12 @@ export default async function PackagesPage({
                 </span>
               )}
               <div className="travel-catalog-stat flex items-center gap-2 rounded-xl border border-white/10 bg-white/10 px-2.5 py-1.5 backdrop-blur-md">
-                <span className="travel-catalog-stat-value block text-[1.5rem] font-black leading-none text-teal-300">{packages.length}</span>
-                <span className="travel-catalog-stat-label text-[10px] font-medium uppercase tracking-[0.12em] text-slate-300">Active Packages</span>
+                <span className="travel-catalog-stat-value block text-[1.5rem] font-black leading-none text-teal-300">
+                  {packages.length}
+                </span>
+                <span className="travel-catalog-stat-label text-[10px] font-medium uppercase tracking-[0.12em] text-slate-300">
+                  Active Packages
+                </span>
               </div>
             </div>
           </div>
@@ -141,17 +189,96 @@ export default async function PackagesPage({
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
-              <p className="text-3xl mb-3">🔍</p>
-              <h3 className="text-lg font-bold text-slate-900">No packages found</h3>
-              <p className="text-sm text-slate-500 mt-1">
-                {params.destination
-                  ? `No verified tour packages currently available in "${params.destination}".`
-                  : 'Try adjusting your filters or search keyword.'}
-              </p>
-              <a href={ROUTES.PACKAGES} className="inline-flex mt-4 text-sm font-semibold text-teal-700 hover:underline">
-                Reset all filters →
-              </a>
+            <div className="space-y-6">
+              {/* Not Available Notice & Nearby Suggestions */}
+              <div className="rounded-2xl border border-amber-200 bg-linear-to-br from-amber-50/80 via-white to-amber-50/40 p-6 shadow-sm md:p-8">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 border border-amber-300 px-3 py-1 text-xs font-bold text-amber-900">
+                      <span>📍</span>
+                      <span>Location Currently Not Available</span>
+                    </div>
+                    <h3 className="text-xl font-extrabold text-slate-900 sm:text-2xl">
+                      {searchedLocation
+                        ? `Tours currently not available in "${searchedLocation}"`
+                        : 'No packages found matching your criteria'}
+                    </h3>
+                    <p className="text-sm text-slate-600 max-w-2xl leading-relaxed">
+                      {searchedLocation
+                        ? `We do not have active tour packages in "${searchedLocation}" right now. However, you can explore wonderful verified holiday packages in nearby and popular destinations:`
+                        : 'Try adjusting your filters or search keywords to find available tour packages.'}
+                    </p>
+                  </div>
+                  <a
+                    href={ROUTES.PACKAGES}
+                    className="inline-flex shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 shadow-xs transition hover:bg-slate-50 hover:text-teal-700"
+                  >
+                    Reset all filters
+                  </a>
+                </div>
+
+                {nearbySuggestions.length > 0 && (
+                  <div className="mt-6 border-t border-amber-200/60 pt-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Suggested Nearby Destinations
+                      </span>
+                      <span className="text-[11px] text-teal-700 font-medium">Click to view tours</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2.5">
+                      {nearbySuggestions.map((dest) => (
+                        <a
+                          key={dest.name}
+                          href={`${ROUTES.PACKAGES}?destination=${encodeURIComponent(dest.name)}`}
+                          className="group flex items-center gap-2 rounded-xl border border-teal-200/90 bg-white px-3.5 py-2 text-left shadow-xs transition hover:border-teal-500 hover:bg-teal-50/70 hover:shadow-sm"
+                        >
+                          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-100/80 text-teal-800 text-xs font-bold">
+                            📍
+                          </span>
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-bold text-slate-900 group-hover:text-teal-900">
+                                {dest.name}
+                              </span>
+                              {dest.packageCount && dest.packageCount > 0 ? (
+                                <span className="rounded-full bg-teal-100 px-1.5 py-0.2 text-[9px] font-bold text-teal-800">
+                                  {dest.packageCount} {dest.packageCount === 1 ? 'tour' : 'tours'}
+                                </span>
+                              ) : null}
+                            </div>
+                            <span className="block text-[10px] text-slate-400 leading-tight">
+                              {dest.highlight || dest.state}
+                            </span>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Recommended Packages Grid */}
+              {recommendedPackages.length > 0 && (
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-lg font-bold text-slate-900">
+                        {searchedLocation
+                          ? `Recommended Tours Near ${searchedLocation}`
+                          : 'Explore Popular Tour Packages'}
+                      </h4>
+                      <p className="text-xs text-slate-500">
+                        Handpicked verified packages available for booking
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    {recommendedPackages.map((pkg) => (
+                      <PackageCard key={pkg.id} packageData={pkg} compact />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </main>
