@@ -1141,10 +1141,9 @@ function NewPackageForm() {
 
       {/* Optional Vehicle Cover Photo */}
       <div className="space-y-1.5 pt-2">
-        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
-          VEHICLE PHOTO (OPTIONAL)
-        </label>
         <CoverImageUploader
+          label="Vehicle Photo (Optional)"
+          required={false}
           value={form.imageUrl}
           onChange={(url: string) => set('imageUrl', url)}
           onError={(msg: string | null) => setImageError(msg)}
@@ -1619,10 +1618,9 @@ function NewPackageForm() {
 
         {/* 7. PROPERTY IMAGES */}
         <div className="space-y-1.5">
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
-            PROPERTY IMAGES *
-          </label>
           <CoverImageUploader
+            label="Property Cover Image"
+            required={true}
             value={form.imageUrl}
             onChange={(url: string) => {
               set('imageUrl', url);
@@ -2105,12 +2103,14 @@ function NewPackageForm() {
 
       {/* 7. PROPERTY IMAGES */}
       <div className="space-y-1.5">
-        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
-          PROPERTY IMAGES
-        </label>
         <CoverImageUploader
+          label="Property Cover Image"
+          required={true}
           value={form.imageUrl}
-          onChange={(url: string) => set('imageUrl', url)}
+          onChange={(url: string) => {
+            set('imageUrl', url);
+            setImageError(null);
+          }}
           onError={(msg: string | null) => setImageError(msg)}
         />
       </div>
@@ -2666,10 +2666,9 @@ function NewPackageForm() {
 
         {/* Cover Image Upload */}
         <div className="space-y-1.5">
-          <label className="block text-[12px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-            Cover Image <span className="text-rose-500">*</span>
-          </label>
           <CoverImageUploader
+            label="Cover Image"
+            required={true}
             value={form.imageUrl}
             onChange={(url: string) => {
               set('imageUrl', url);
@@ -2677,9 +2676,6 @@ function NewPackageForm() {
             }}
             onError={(msg: string | null) => setImageError(msg)}
           />
-          {imageError && (
-            <p className="text-xs text-rose-500 font-medium mt-1">{imageError}</p>
-          )}
         </div>
 
         {/* Description */}

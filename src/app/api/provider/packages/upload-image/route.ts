@@ -65,13 +65,28 @@ export async function POST(req: NextRequest) {
     const randomSuffix = Math.random().toString(36).substring(2, 8);
     const uniqueFileName = `pkg_${auth.user.id}_${timestamp}_${randomSuffix}${safeExt}`;
 
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'packages');
-    await fs.mkdir(uploadDir, { recursive: true });
+    let publicUrl: string;
 
-    const filePath = path.join(uploadDir, uniqueFileName);
-    await fs.writeFile(filePath, buffer);
+    // Detect serverless environments (Vercel, AWS Lambda) where process.cwd() is read-only
+    const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
 
-    const publicUrl = `/uploads/packages/${uniqueFileName}`;
+    if (!isServerless) {
+      try {
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'packages');
+        await fs.mkdir(uploadDir, { recursive: true });
+        const filePath = path.join(uploadDir, uniqueFileName);
+        await fs.writeFile(filePath, buffer);
+        publicUrl = `/uploads/packages/${uniqueFileName}`;
+      } catch (fsErr) {
+        // Fallback gracefully to base64 Data URL if filesystem write is blocked or fails
+        console.warn('Local filesystem write failed, using data URL fallback:', fsErr);
+        publicUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
+      }
+    } else {
+      // In serverless runtimes (Vercel / Lambda), local disk is read-only.
+      // Use standard high-efficiency base64 Data URL that is directly accepted by DB and Next.js Image.
+      publicUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
+    }
 
     return NextResponse.json({
       success: true,

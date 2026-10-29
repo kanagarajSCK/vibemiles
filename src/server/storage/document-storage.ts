@@ -1,9 +1,18 @@
 import fs from 'fs/promises';
 import fsSync from 'fs';
 import path from 'path';
+import os from 'os';
+
+// Detect serverless environment (Vercel, AWS Lambda)
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
 
 // Root directory for secure documents (outside of public/ web root)
-const STORAGE_ROOT = path.join(process.cwd(), 'storage', 'secure_documents');
+// On Vercel / Lambda, /var/task is read-only, so os.tmpdir() is used as the writable root.
+const STORAGE_ROOT =
+  process.env.STORAGE_PATH ||
+  (isServerless
+    ? path.join(os.tmpdir(), 'vibemiles_storage', 'secure_documents')
+    : path.join(process.cwd(), 'storage', 'secure_documents'));
 
 export const ALLOWED_MIME_TYPES = [
   'application/pdf',
@@ -62,7 +71,17 @@ export function validateMagicBytes(buffer: Buffer, mimeType: string): boolean {
  * Ensures the target storage folder exists.
  */
 async function ensureDir(dirPath: string): Promise<void> {
-  await fs.mkdir(dirPath, { recursive: true });
+  try {
+    await fs.mkdir(dirPath, { recursive: true });
+  } catch (err) {
+    // If writing to process.cwd() failed with read-only filesystem, fallback to os.tmpdir()
+    if (!dirPath.startsWith(os.tmpdir())) {
+      const fallbackDir = path.join(os.tmpdir(), 'vibemiles_storage', 'secure_documents');
+      await fs.mkdir(fallbackDir, { recursive: true });
+    } else {
+      throw err;
+    }
+  }
 }
 
 /**
@@ -124,13 +143,29 @@ export async function saveDocumentFile(params: {
  * Reads a document buffer from secure storage.
  */
 export async function readDocumentFile(filePath: string): Promise<Buffer> {
-  const resolvedPath = path.isAbsolute(filePath)
+  let resolvedPath = path.isAbsolute(filePath)
     ? filePath
     : path.join(/*turbopackIgnore: true*/ process.cwd(), filePath);
 
-  // Security check: Ensure path does not escape STORAGE_ROOT
+  if (!fsSync.existsSync(resolvedPath) && !path.isAbsolute(filePath)) {
+    const tmpCandidate = path.join(STORAGE_ROOT, path.basename(filePath));
+    if (fsSync.existsSync(tmpCandidate)) {
+      resolvedPath = tmpCandidate;
+    }
+  }
+
+  // Security check: Ensure path does not escape STORAGE_ROOT or process.cwd()
   const normalizedPath = path.normalize(resolvedPath);
-  if (!normalizedPath.startsWith(path.normalize(STORAGE_ROOT))) {
+  const normalizedRoot = path.normalize(STORAGE_ROOT);
+  const normalizedCwd = path.normalize(process.cwd());
+  const normalizedTmp = path.normalize(os.tmpdir());
+
+  const isSafe =
+    normalizedPath.startsWith(normalizedRoot) ||
+    normalizedPath.startsWith(normalizedCwd) ||
+    normalizedPath.startsWith(normalizedTmp);
+
+  if (!isSafe) {
     throw new Error('Access denied: Invalid file storage location.');
   }
 
@@ -142,12 +177,28 @@ export async function readDocumentFile(filePath: string): Promise<Buffer> {
  */
 export async function deleteDocumentFile(filePath: string): Promise<boolean> {
   try {
-    const resolvedPath = path.isAbsolute(filePath)
+    let resolvedPath = path.isAbsolute(filePath)
       ? filePath
       : path.join(/*turbopackIgnore: true*/ process.cwd(), filePath);
 
+    if (!fsSync.existsSync(resolvedPath) && !path.isAbsolute(filePath)) {
+      const tmpCandidate = path.join(STORAGE_ROOT, path.basename(filePath));
+      if (fsSync.existsSync(tmpCandidate)) {
+        resolvedPath = tmpCandidate;
+      }
+    }
+
     const normalizedPath = path.normalize(resolvedPath);
-    if (!normalizedPath.startsWith(path.normalize(STORAGE_ROOT))) {
+    const normalizedRoot = path.normalize(STORAGE_ROOT);
+    const normalizedCwd = path.normalize(process.cwd());
+    const normalizedTmp = path.normalize(os.tmpdir());
+
+    const isSafe =
+      normalizedPath.startsWith(normalizedRoot) ||
+      normalizedPath.startsWith(normalizedCwd) ||
+      normalizedPath.startsWith(normalizedTmp);
+
+    if (!isSafe) {
       return false;
     }
 
