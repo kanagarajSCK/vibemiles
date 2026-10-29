@@ -7,6 +7,7 @@ import { createNotificationInDb } from './notifications';
 import { recordAuditLog } from './admin';
 import { MOCK_PACKAGES } from '@/lib/mock-data';
 import { slugify } from '@/lib/utils';
+import { getCategoryDefaultCoverImage } from '@/constants';
 
 export interface GetPackagesOptions extends SearchFilters {
   ids?: string[];
@@ -970,10 +971,11 @@ export async function createPackage(
         /^\/uploads\//i.test(u.trim()) ||
         /^data:image\//i.test(u.trim()))
   );
+  const categorySlug = category?.slug || input.categorySlug || 'tour';
   const imageUrls =
     validImages.length > 0
       ? validImages
-      : ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'];
+      : [getCategoryDefaultCoverImage(categorySlug)];
 
   const initialStatus =
     input.status === 'PENDING_REVIEW' ? ListingStatus.PENDING_REVIEW : ListingStatus.DRAFT;
@@ -1234,10 +1236,11 @@ export async function updatePackage(
             /^\/uploads\//i.test(u.trim()) ||
             /^data:image\//i.test(u.trim()))
       );
+      const targetCatSlug = existing.category?.slug || input.categorySlug || 'tour';
       const imageUrls =
         validImages.length > 0
           ? validImages
-          : ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'];
+          : [getCategoryDefaultCoverImage(targetCatSlug)];
 
       await tx.packageImage.deleteMany({ where: { packageId } });
       await tx.packageImage.createMany({

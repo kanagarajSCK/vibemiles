@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { ROUTES, INDIAN_STATES } from '@/constants';
+import { ROUTES, INDIAN_STATES, getCategoryDefaultCoverImage } from '@/constants';
 import { packageService } from '@/services/package.service';
 import { CoverImageUploader } from '@/components/travel/CoverImageUploader';
 
@@ -230,6 +230,7 @@ interface FormData {
   basePrice: string;
   discountPercent: string;
   // Media
+  images: string[];
   imageUrl: string;
   // Itinerary
   itinerary: ItineraryDay[];
@@ -328,6 +329,7 @@ const INITIAL_FORM: FormData = {
   amenities: '',
   basePrice: '10000',
   discountPercent: '0',
+  images: [],
   imageUrl: '',
   itinerary: [
     { day: 1, title: 'Arrival & Check-in', description: '' },
@@ -661,7 +663,12 @@ function NewPackageForm() {
         amenities: '',
         basePrice: String(pkg.basePrice || 10000),
         discountPercent: String(pkg.discountPercent || 0),
-        imageUrl: pkg.images?.[0] || '',
+        images: Array.isArray(pkg.images) && pkg.images.length > 0
+          ? pkg.images
+          : (pkg as unknown as { imageUrl?: string }).imageUrl
+          ? [(pkg as unknown as { imageUrl?: string }).imageUrl!]
+          : [],
+        imageUrl: pkg.images?.[0] || (pkg as unknown as { imageUrl?: string }).imageUrl || '',
         itinerary: pkg.itinerary && pkg.itinerary.length > 0
           ? pkg.itinerary.map((i) => ({ day: i.day, title: i.title, description: i.description }))
           : INITIAL_FORM.itinerary,
@@ -819,7 +826,12 @@ function NewPackageForm() {
       let payload: Record<string, unknown>;
 
       if (isCab) {
-        const defaultCabImage = form.imageUrl.trim() || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80';
+        const defaultCabImage = getCategoryDefaultCoverImage('cab');
+        const cabImages = form.images.length > 0
+          ? form.images
+          : form.imageUrl.trim()
+          ? [form.imageUrl.trim()]
+          : [defaultCabImage];
         payload = {
           name: form.title.trim(),
           description: form.description.trim() || `${form.cabServiceType} Cab Service with verified ${form.vehicleType} (${form.vehicleModel || 'AC Cab'}). ${form.driverIncluded === 'Yes' ? 'Professional Driver included.' : ''} ${form.acType} vehicle from ${form.pickupLocation || 'Pickup location'} to ${form.dropLocation || 'Drop location'}.`,
@@ -831,7 +843,7 @@ function NewPackageForm() {
           maxGroupSize: Number(form.seatingCapacity) || 4,
           basePrice: Number(form.baseFare) || 1000,
           discountPercent: 0,
-          images: [defaultCabImage],
+          images: cabImages,
           highlights: [
             `Service Type: ${form.cabServiceType}`,
             `Vehicle: ${form.vehicleType}${form.vehicleModel ? ` (${form.vehicleModel})` : ''}`,
@@ -865,7 +877,13 @@ function NewPackageForm() {
           submitForReview: true,
         };
       } else if (isVilla) {
-        const defaultVillaImage = form.imageUrl.trim() || 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1200&q=80';
+        const villaCategory = form.listingType === 'homestay' ? 'homestay' : 'villa';
+        const defaultVillaImage = getCategoryDefaultCoverImage(villaCategory);
+        const villaImages = form.images.length > 0
+          ? form.images
+          : form.imageUrl.trim()
+          ? [form.imageUrl.trim()]
+          : [defaultVillaImage];
         const baseNightPrice = Number(form.villaPricePerNight) || Number(form.basePrice) || 12000;
         const discount = Number(form.villaDiscountPercent) || 0;
         payload = {
@@ -879,7 +897,7 @@ function NewPackageForm() {
           maxGroupSize: Number(form.maximumGuests) || 10,
           basePrice: baseNightPrice,
           discountPercent: discount,
-          images: [defaultVillaImage],
+          images: villaImages,
           highlights: [
             `Property Type: ${form.villaPropertyType}`,
             `Capacity: Up to ${form.maximumGuests} Guests`,
@@ -910,7 +928,12 @@ function NewPackageForm() {
           submitForReview: true,
         };
       } else if (isHostel) {
-        const defaultHostelImage = form.imageUrl.trim() || 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=80';
+        const defaultHostelImage = getCategoryDefaultCoverImage('hostel');
+        const hostelImages = form.images.length > 0
+          ? form.images
+          : form.imageUrl.trim()
+          ? [form.imageUrl.trim()]
+          : [defaultHostelImage];
         const lowestPrice = Math.min(...form.hostelRooms.map(r => Number(r.pricePerNight) || 799));
         const maxBeds = Math.max(...form.hostelRooms.map(r => Number(r.totalBeds) || 6));
         payload = {
@@ -924,7 +947,7 @@ function NewPackageForm() {
           maxGroupSize: maxBeds || 12,
           basePrice: lowestPrice || 799,
           discountPercent: 0,
-          images: [defaultHostelImage],
+          images: hostelImages,
           highlights: [
             `Property Type: ${form.hostelPropertyType}`,
             `Room Types: ${form.hostelRooms.map(r => `${r.roomName || 'Dorm'} (${r.gender}) - ₹${r.pricePerNight}/night`).join(' · ')}`,
@@ -956,13 +979,12 @@ function NewPackageForm() {
           submitForReview: true,
         };
       } else {
-        if (!form.imageUrl || !form.imageUrl.trim()) {
-          setImageError('A cover image is required. Please upload an image in Step 1 before submitting.');
-          setError('Cover image is required. Please upload an image in Step 1 before submitting.');
-          setStep(1);
-          setSubmitting(false);
-          return;
-        }
+        const defaultCatImage = getCategoryDefaultCoverImage(form.category);
+        const packageImages = form.images.length > 0
+          ? form.images
+          : form.imageUrl.trim()
+          ? [form.imageUrl.trim()]
+          : [defaultCatImage];
 
         payload = {
           name: form.title.trim(),
@@ -975,7 +997,7 @@ function NewPackageForm() {
           maxGroupSize: Number(form.maxGroupSize) || 10,
           basePrice: Number(form.basePrice) || 0,
           discountPercent: Number(form.discountPercent) || 0,
-          images: form.imageUrl.trim() ? [form.imageUrl.trim()] : undefined,
+          images: packageImages,
           itinerary: form.itinerary,
           inclusions: form.inclusions.split('\n').map((s) => s.trim()).filter(Boolean),
           exclusions: form.exclusions.split('\n').map((s) => s.trim()).filter(Boolean),
@@ -1142,10 +1164,20 @@ function NewPackageForm() {
       {/* Optional Vehicle Cover Photo */}
       <div className="space-y-1.5 pt-2">
         <CoverImageUploader
-          label="Vehicle Photo (Optional)"
+          label="Vehicle Photos (Optional)"
+          category="cab"
           required={false}
+          images={form.images}
           value={form.imageUrl}
-          onChange={(url: string) => set('imageUrl', url)}
+          onChange={(val, all) => {
+            const list = Array.isArray(val) ? val : all || [val].filter(Boolean);
+            setForm((prev) => ({
+              ...prev,
+              images: list,
+              imageUrl: list[0] || '',
+            }));
+            setImageError(null);
+          }}
           onError={(msg: string | null) => setImageError(msg)}
         />
       </div>
@@ -1619,11 +1651,18 @@ function NewPackageForm() {
         {/* 7. PROPERTY IMAGES */}
         <div className="space-y-1.5">
           <CoverImageUploader
-            label="Property Cover Image"
+            label="Property Images & Cover Photo"
+            category={form.listingType === 'homestay' ? 'homestay' : 'villa'}
             required={true}
+            images={form.images}
             value={form.imageUrl}
-            onChange={(url: string) => {
-              set('imageUrl', url);
+            onChange={(val, all) => {
+              const list = Array.isArray(val) ? val : all || [val].filter(Boolean);
+              setForm((prev) => ({
+                ...prev,
+                images: list,
+                imageUrl: list[0] || '',
+              }));
               setImageError(null);
             }}
             onError={(msg: string | null) => setImageError(msg)}
@@ -1905,6 +1944,36 @@ function NewPackageForm() {
           Review & Submit Property
         </h2>
 
+        {/* Cover & Gallery Preview */}
+        {(form.imageUrl || form.images.length > 0) && (
+          <div className="space-y-2">
+            <div className="relative h-56 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-900">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={form.images[0] || form.imageUrl}
+                alt="Property cover preview"
+                className="h-full w-full object-cover"
+              />
+              <span className="absolute top-2.5 left-2.5 rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-bold text-white shadow-md">
+                ★ Primary Cover
+              </span>
+            </div>
+            {form.images.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto py-1">
+                {form.images.slice(1).map((url, i) => (
+                  <div key={i} className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg border border-slate-200">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt={`Property gallery ${i + 2}`} className="h-full w-full object-cover" />
+                  </div>
+                ))}
+                <span className="text-xs text-slate-500 font-medium pl-1">
+                  +{form.images.length - 1} property photo{form.images.length - 1 > 1 ? 's' : ''}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* 1. Property Details */}
         <div className="rounded-xl border border-slate-200 p-4 space-y-3">
           <p className="text-xs font-bold uppercase tracking-wider text-teal-800">
@@ -2104,11 +2173,18 @@ function NewPackageForm() {
       {/* 7. PROPERTY IMAGES */}
       <div className="space-y-1.5">
         <CoverImageUploader
-          label="Property Cover Image"
+          label="Property & Dormitory Images"
+          category="hostel"
           required={true}
+          images={form.images}
           value={form.imageUrl}
-          onChange={(url: string) => {
-            set('imageUrl', url);
+          onChange={(val, all) => {
+            const list = Array.isArray(val) ? val : all || [val].filter(Boolean);
+            setForm((prev) => ({
+              ...prev,
+              images: list,
+              imageUrl: list[0] || '',
+            }));
             setImageError(null);
           }}
           onError={(msg: string | null) => setImageError(msg)}
@@ -2460,6 +2536,36 @@ function NewPackageForm() {
           Review & Submit Hostel Listing
         </h2>
 
+        {/* Cover & Gallery Preview */}
+        {(form.imageUrl || form.images.length > 0) && (
+          <div className="space-y-2">
+            <div className="relative h-56 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-900">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={form.images[0] || form.imageUrl}
+                alt="Hostel cover preview"
+                className="h-full w-full object-cover"
+              />
+              <span className="absolute top-2.5 left-2.5 rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-bold text-white shadow-md">
+                ★ Primary Cover
+              </span>
+            </div>
+            {form.images.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto py-1">
+                {form.images.slice(1).map((url, i) => (
+                  <div key={i} className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg border border-slate-200">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt={`Hostel gallery ${i + 2}`} className="h-full w-full object-cover" />
+                  </div>
+                ))}
+                <span className="text-xs text-slate-500 font-medium pl-1">
+                  +{form.images.length - 1} dorm/hostel photo{form.images.length - 1 > 1 ? 's' : ''}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* 1. Hostel Information Summary */}
         <div className="rounded-xl border border-slate-200 p-4 space-y-3">
           <p className="text-xs font-bold uppercase tracking-wider text-teal-800">
@@ -2664,14 +2770,21 @@ function NewPackageForm() {
           />
         </div>
 
-        {/* Cover Image Upload */}
+        {/* Cover & Gallery Images Upload */}
         <div className="space-y-1.5">
           <CoverImageUploader
-            label="Cover Image"
+            label="Listing Cover & Gallery Photos"
+            category={form.category}
             required={true}
+            images={form.images}
             value={form.imageUrl}
-            onChange={(url: string) => {
-              set('imageUrl', url);
+            onChange={(val, all) => {
+              const list = Array.isArray(val) ? val : all || [val].filter(Boolean);
+              setForm((prev) => ({
+                ...prev,
+                images: list,
+                imageUrl: list[0] || '',
+              }));
               setImageError(null);
             }}
             onError={(msg: string | null) => setImageError(msg)}
@@ -2704,9 +2817,13 @@ function NewPackageForm() {
                 setError(`${isFood ? 'Experience' : isAdventure ? 'Activity' : isGuide ? 'Guide Service' : 'Package'} Title is required`);
                 return;
               }
-              if (!form.imageUrl) {
-                setImageError('Cover image is required before proceeding.');
-                return;
+              if (!form.imageUrl && form.images.length === 0) {
+                const defaultImage = getCategoryDefaultCoverImage(form.category);
+                setForm((prev) => ({
+                  ...prev,
+                  images: [defaultImage],
+                  imageUrl: defaultImage,
+                }));
               }
               setError(null);
               setStep(2);
@@ -3006,15 +3123,33 @@ function NewPackageForm() {
           Review & Submit {isFood ? 'Food Experience' : isAdventure ? 'Adventure Activity' : isGuide ? 'Guide Service' : 'Package'}
         </h2>
 
-        {/* Cover Image Preview */}
-        {form.imageUrl && (
-          <div className="relative h-48 w-full overflow-hidden rounded-xl border border-slate-200">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={form.imageUrl}
-              alt="Cover preview"
-              className="h-full w-full object-cover"
-            />
+        {/* Cover & Gallery Preview */}
+        {(form.imageUrl || form.images.length > 0) && (
+          <div className="space-y-2">
+            <div className="relative h-56 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-900">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={form.images[0] || form.imageUrl}
+                alt="Cover preview"
+                className="h-full w-full object-cover"
+              />
+              <span className="absolute top-2.5 left-2.5 rounded-full bg-emerald-600 px-3 py-1 text-[11px] font-bold text-white shadow-md">
+                ★ Primary Cover
+              </span>
+            </div>
+            {form.images.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto py-1">
+                {form.images.slice(1).map((url, i) => (
+                  <div key={i} className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg border border-slate-200">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt={`Gallery ${i + 2}`} className="h-full w-full object-cover" />
+                  </div>
+                ))}
+                <span className="text-xs text-slate-500 font-medium pl-1">
+                  +{form.images.length - 1} gallery photo{form.images.length - 1 > 1 ? 's' : ''}
+                </span>
+              </div>
+            )}
           </div>
         )}
 

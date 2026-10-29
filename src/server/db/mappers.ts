@@ -20,6 +20,7 @@ import type {
   ItineraryDay,
   AvailableDate,
 } from '@/types';
+import { getCategoryDefaultCoverImage } from '@/constants';
 
 export interface FullPrismaPackage extends PrismaPackage {
   images: PrismaPackageImage[];
@@ -128,7 +129,7 @@ export function mapPrismaPackageToDomain(pkg: FullPrismaPackage): Package {
     discountPercent: pkg.discountPercent,
     finalPrice: pkg.finalPrice,
     currency: pkg.currency || 'INR',
-    images: sortedImages.length > 0 ? sortedImages : ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80'],
+    images: sortedImages.length > 0 ? sortedImages : [getCategoryDefaultCoverImage(pkg.category?.slug)],
     videoUrl: pkg.videoUrl ?? undefined,
     itinerary,
     inclusions,

@@ -265,3 +265,29 @@ export const INDIAN_STATES = [
   'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
   'Delhi', 'Jammu & Kashmir', 'Ladakh',
 ] as const;
+
+// ─── Unique Category Cover Images & Fallbacks ─────────────────
+export const CATEGORY_COVER_IMAGES: Record<string, string> = {
+  tour: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1600&q=80', // Scenic tour roadtrip
+  devotional: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1600&q=80', // Temple / Spiritual
+  foreign: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80', // Global travel flight passport
+  villa: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1600&q=80', // Luxury private villa
+  homestay: 'https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1600&q=80', // Authentic hillside homestay
+  hotel: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80', // Luxury hotel room
+  hostel: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1600&q=80', // Backpacker hostel dorm
+  camping: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1600&q=80', // Wilderness camping tents
+  food: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80', // Culinary cuisine & food experience
+  adventure: 'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?auto=format&fit=crop&w=1600&q=80', // Thrilling outdoor mountain adventure
+  guide: 'https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&w=1600&q=80', // Professional local guide walking tour
+  cab: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1600&q=80', // Verified private taxi / cab
+};
+
+export const DEFAULT_FALLBACK_IMAGE =
+  'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1600&q=80';
+
+export function getCategoryDefaultCoverImage(category?: string | null): string {
+  if (!category) return DEFAULT_FALLBACK_IMAGE;
+  const key = category.toLowerCase().trim();
+  return CATEGORY_COVER_IMAGES[key] || DEFAULT_FALLBACK_IMAGE;
+}
+
