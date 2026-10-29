@@ -17,13 +17,16 @@ import { CoverImageUploader } from '@/components/travel/CoverImageUploader';
 
 // ─── Listing Types ─────────────────────────────────────────────
 const LISTING_TYPES = [
-  { value: 'tour',       label: 'Tour Package',       emoji: '🗺️' },
-  { value: 'cab',        label: 'Cab / Taxi',         emoji: '🚗' },
-  { value: 'villa',      label: 'Villa',              emoji: '🏕️' },
-  { value: 'homestay',   label: 'Homestay',           emoji: '🏡' },
-  { value: 'hostel',     label: 'Hostel / Room Stay', emoji: '🛋️' },
-  { value: 'devotional', label: 'Devotional Trip',    emoji: '🛕' },
-  { value: 'foreign',    label: 'Foreign Trip',       emoji: '✈️' },
+  { value: 'tour',       label: 'Tour Package',          emoji: '🗺️' },
+  { value: 'cab',        label: 'Cab / Taxi',            emoji: '🚗' },
+  { value: 'villa',      label: 'Villa',                 emoji: '🏕️' },
+  { value: 'homestay',   label: 'Homestay',              emoji: '🏡' },
+  { value: 'hostel',     label: 'Hostel / Room Stay',    emoji: '🛋️' },
+  { value: 'devotional', label: 'Devotional Trip',       emoji: '🛕' },
+  { value: 'foreign',    label: 'Foreign Trip',          emoji: '✈️' },
+  { value: 'food',       label: 'Food Experience',       emoji: '🍽️' },
+  { value: 'adventure',  label: 'Adventure Activities',  emoji: '🧗' },
+  { value: 'guide',      label: 'Local Guides',          emoji: '🧭' },
 ] as const;
 
 type ListingType = typeof LISTING_TYPES[number]['value'];
@@ -510,6 +513,9 @@ const TOUR_STEPS = ['1. Basic Info', '2. Pricing', '3. Itinerary', '4. Review & 
 const CAB_STEPS = ['1. Cab Service Details', '2. Pricing', '3. Service Policies', '4. Review & Submit'] as const;
 const VILLA_STEPS = ['1. Property Information', '2. Rooms & Pricing', '3. House Rules', '4. Review & Submit'] as const;
 const HOSTEL_STEPS = ['1. Hostel Information', '2. Room Configuration', '3. Amenities', '4. Policies', '5. Review & Submit'] as const;
+const FOOD_STEPS = ['1. Experience Details', '2. Pricing & Tastings', '3. Trail & Stops', '4. Review & Submit'] as const;
+const ADVENTURE_STEPS = ['1. Activity Details', '2. Pricing & Gear', '3. Schedule & Plan', '4. Review & Submit'] as const;
+const GUIDE_STEPS = ['1. Guide Profile & City', '2. Pricing & Hours', '3. Tour Route & Topics', '4. Review & Submit'] as const;
 
 // ─── Inner Form Component ──────────────────────────────────────
 function NewPackageForm() {
@@ -530,6 +536,9 @@ function NewPackageForm() {
   const isCab = form.listingType === 'cab';
   const isVilla = form.listingType === 'villa' || form.listingType === 'homestay';
   const isHostel = form.listingType === 'hostel';
+  const isFood = form.listingType === 'food';
+  const isAdventure = form.listingType === 'adventure';
+  const isGuide = form.listingType === 'guide';
 
   const steps = isCab
     ? CAB_STEPS
@@ -537,6 +546,12 @@ function NewPackageForm() {
     ? VILLA_STEPS
     : isHostel
     ? HOSTEL_STEPS
+    : isFood
+    ? FOOD_STEPS
+    : isAdventure
+    ? ADVENTURE_STEPS
+    : isGuide
+    ? GUIDE_STEPS
     : TOUR_STEPS;
 
   // Check provider KYC verification status
@@ -564,7 +579,7 @@ function NewPackageForm() {
     packageService.getProviderPackageById(editId).then((pkg) => {
       if (!isMounted || !pkg) return;
       setForm({
-        listingType: (['tour', 'devotional', 'foreign', 'cab', 'villa', 'homestay', 'hostel'].includes(pkg.category) ? pkg.category : 'tour') as ListingType,
+        listingType: (['tour', 'devotional', 'foreign', 'cab', 'villa', 'homestay', 'hostel', 'food', 'adventure', 'guide'].includes(pkg.category) ? pkg.category : 'tour') as ListingType,
         title: pkg.name,
         category: pkg.category,
         destinationInput: pkg.destinationName ? `${pkg.destinationName}, ${pkg.state}` : '',
@@ -965,6 +980,14 @@ function NewPackageForm() {
           inclusions: form.inclusions.split('\n').map((s) => s.trim()).filter(Boolean),
           exclusions: form.exclusions.split('\n').map((s) => s.trim()).filter(Boolean),
           cancellationPolicy: form.cancellationPolicy,
+          tags: [
+            form.category,
+            form.destinationCity?.toLowerCase(),
+            form.destinationState?.toLowerCase(),
+            ...(form.category === 'food' ? ['food', 'culinary', 'tasting', 'street-food'] : []),
+            ...(form.category === 'adventure' ? ['adventure', 'outdoor', 'activities', 'thrill'] : []),
+            ...(form.category === 'guide' ? ['guide', 'local-guide', 'heritage', 'walk'] : []),
+          ].filter(Boolean) as string[],
           submitForReview: true,
         };
       }
@@ -2535,327 +2558,439 @@ function NewPackageForm() {
   };
 
   // ═════════════════════════════════════════════════════════════
-  // STANDARD TOUR PACKAGE STEP RENDERERS
+  // STANDARD TOUR & EXPERIENCE STEP RENDERERS
   // ═════════════════════════════════════════════════════════════
 
-  const renderStandardStep1 = () => (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
-      <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">
-        Basic Information
-      </h2>
+  const renderStandardStep1 = () => {
+    const titleLabel = isFood
+      ? 'EXPERIENCE TITLE *'
+      : isAdventure
+      ? 'ACTIVITY TITLE *'
+      : isGuide
+      ? 'GUIDE SERVICE TITLE *'
+      : 'PACKAGE TITLE *';
 
-      {/* Package Title */}
-      <Input
-        label="PACKAGE TITLE *"
-        placeholder="e.g. 5-Day Kashmir Paradise Tour"
-        value={form.title}
-        onChange={(e) => set('title', e.target.value)}
-      />
+    const titlePlaceholder = isFood
+      ? 'e.g. Old Delhi Heritage Street Food Walk & Spice Market'
+      : isAdventure
+      ? 'e.g. Scuba Diving & Coral Reef Exploration in Havelock'
+      : isGuide
+      ? 'e.g. Certified Historian Guide for Hampi Ruins & Temples'
+      : 'e.g. 5-Day Kashmir Paradise Tour';
 
-      {/* Destination & Category */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <LocationSearch
-          value={form.destinationInput}
-          onChange={(val) => set('destinationInput', val)}
-          onSelect={(city, state) => {
-            set('destinationCity', city);
-            set('destinationState', state);
-          }}
+    const headerTitle = isFood
+      ? 'Food Experience Details'
+      : isAdventure
+      ? 'Adventure Activity Details'
+      : isGuide
+      ? 'Local Guide Service Details'
+      : 'Basic Information';
+
+    const descPlaceholder = isFood
+      ? 'Describe the culinary trail, cuisines, authentic flavors, chef talks, or market visits...'
+      : isAdventure
+      ? 'Describe the adrenaline rush, safety briefings, instructor credentials, terrain, and thrill highlights...'
+      : isGuide
+      ? 'Describe your storytelling expertise, historical knowledge, personalized routes, and languages spoken...'
+      : 'Detailed overview of the tour experience, landscape, attractions, and cultural highlights...';
+
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+        <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">
+          {headerTitle}
+        </h2>
+
+        {/* Title */}
+        <Input
+          label={titleLabel}
+          placeholder={titlePlaceholder}
+          value={form.title}
+          onChange={(e) => set('title', e.target.value)}
         />
 
+        {/* Destination & Category */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <LocationSearch
+            value={form.destinationInput}
+            onChange={(val) => set('destinationInput', val)}
+            onSelect={(city, state) => {
+              set('destinationCity', city);
+              set('destinationState', state);
+            }}
+          />
+
+          <div className="space-y-1.5">
+            <label className="block text-[12px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+              Category <span className="text-rose-500">*</span>
+            </label>
+            <select
+              value={form.category}
+              onChange={(e) => set('category', e.target.value)}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[15px] text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+            >
+              <option value="tour">Tour Packages</option>
+              <option value="devotional">Devotional Trips</option>
+              <option value="foreign">Foreign Trips</option>
+              <option value="food">Food Experiences</option>
+              <option value="adventure">Adventures</option>
+              <option value="guide">Local Guides</option>
+              <option value="camping">Camping</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Duration & Group Size */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Input
+            label={isFood || isGuide ? 'DURATION (DAYS / SESSIONS) *' : 'DURATION (DAYS) *'}
+            type="number"
+            min="1"
+            value={form.durationDays}
+            onChange={(e) => set('durationDays', e.target.value)}
+          />
+          <Input
+            label="DURATION (NIGHTS)"
+            type="number"
+            min="0"
+            value={form.durationNights}
+            onChange={(e) => set('durationNights', e.target.value)}
+          />
+          <Input
+            label="MAX GROUP SIZE *"
+            type="number"
+            min="1"
+            value={form.maxGroupSize}
+            onChange={(e) => set('maxGroupSize', e.target.value)}
+          />
+        </div>
+
+        {/* Cover Image Upload */}
         <div className="space-y-1.5">
           <label className="block text-[12px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-            Category <span className="text-rose-500">*</span>
+            Cover Image <span className="text-rose-500">*</span>
           </label>
-          <select
-            value={form.category}
-            onChange={(e) => set('category', e.target.value)}
-            className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[15px] text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
+          <CoverImageUploader
+            value={form.imageUrl}
+            onChange={(url: string) => {
+              set('imageUrl', url);
+              setImageError(null);
+            }}
+            onError={(msg: string | null) => setImageError(msg)}
+          />
+          {imageError && (
+            <p className="text-xs text-rose-500 font-medium mt-1">{imageError}</p>
+          )}
+        </div>
+
+        {/* Description */}
+        <div className="space-y-1.5">
+          <label className="block text-[12px] font-semibold uppercase tracking-[0.12em] text-slate-600">
+            Description
+          </label>
+          <textarea
+            rows={4}
+            className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 resize-none transition-all"
+            placeholder={descPlaceholder}
+            value={form.description}
+            onChange={(e) => set('description', e.target.value)}
+          />
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-end pt-2">
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-6"
+            onClick={() => {
+              if (!form.title.trim()) {
+                setError(`${isFood ? 'Experience' : isAdventure ? 'Activity' : isGuide ? 'Guide Service' : 'Package'} Title is required`);
+                return;
+              }
+              if (!form.imageUrl) {
+                setImageError('Cover image is required before proceeding.');
+                return;
+              }
+              setError(null);
+              setStep(2);
+            }}
+            rightIcon={<ArrowRight className="w-4 h-4" />}
           >
-            <option value="tour">Tour Packages</option>
-            <option value="devotional">Devotional Trips</option>
-            <option value="foreign">Foreign Trips</option>
-            <option value="adventure">Adventures</option>
-            <option value="camping">Camping</option>
-          </select>
+            Continue to Pricing
+          </Button>
         </div>
       </div>
+    );
+  };
 
-      {/* Duration & Group Size */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Input
-          label="DURATION (DAYS) *"
-          type="number"
-          min="1"
-          value={form.durationDays}
-          onChange={(e) => set('durationDays', e.target.value)}
-        />
-        <Input
-          label="DURATION (NIGHTS)"
-          type="number"
-          min="0"
-          value={form.durationNights}
-          onChange={(e) => set('durationNights', e.target.value)}
-        />
-        <Input
-          label="MAX GROUP SIZE *"
-          type="number"
-          min="1"
-          value={form.maxGroupSize}
-          onChange={(e) => set('maxGroupSize', e.target.value)}
-        />
-      </div>
+  const renderStandardStep2 = () => {
+    const headerTitle = isFood
+      ? 'Pricing, Tastings & Inclusions'
+      : isAdventure
+      ? 'Pricing, Safety Gear & Inclusions'
+      : isGuide
+      ? 'Pricing, Hours & Inclusions'
+      : 'Pricing & Inclusions';
 
-      {/* Cover Image Upload */}
-      <div className="space-y-1.5">
-        <label className="block text-[12px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-          Cover Image <span className="text-rose-500">*</span>
-        </label>
-        <CoverImageUploader
-          value={form.imageUrl}
-          onChange={(url: string) => {
-            set('imageUrl', url);
-            setImageError(null);
-          }}
-          onError={(msg: string | null) => setImageError(msg)}
-        />
-        {imageError && (
-          <p className="text-xs text-rose-500 font-medium mt-1">{imageError}</p>
-        )}
-      </div>
+    const inclusionsPlaceholder = isFood
+      ? 'e.g.\nAll food tastings & snacks\nBottled mineral water\nExpert culinary guide\nLocal tea/lassi stop'
+      : isAdventure
+      ? 'e.g.\nCertified instructor / dive master\nSafety gear & helmet\nLife jackets & harness\nGoPro photos / video clips'
+      : isGuide
+      ? 'e.g.\nLicensed storytelling guide\nMonument entry queue assistance\nCustom itinerary planning\nLocal hidden gems recommendations'
+      : 'e.g.\nHotel accommodation\nDaily breakfast & dinner\nAirport transfers';
 
-      {/* Description */}
-      <div className="space-y-1.5">
-        <label className="block text-[12px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-          Description
-        </label>
-        <textarea
-          rows={4}
-          className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 resize-none transition-all"
-          placeholder="Detailed overview of the tour experience, landscape, attractions, and cultural highlights..."
-          value={form.description}
-          onChange={(e) => set('description', e.target.value)}
-        />
-      </div>
+    const exclusionsPlaceholder = isFood
+      ? 'e.g.\nAlcoholic beverages\nHotel transfers\nPersonal shopping'
+      : isAdventure
+      ? 'e.g.\nTransport to launch site\nPersonal medical insurance\nExtra adventure rides'
+      : isGuide
+      ? 'e.g.\nMonument entrance tickets\nMeals & transport\nTips / gratuities'
+      : 'e.g.\nFlight tickets\nPersonal expenses\nTravel insurance';
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-end pt-2">
-        <Button
-          type="button"
-          variant="primary"
-          size="md"
-          className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-6"
-          onClick={() => {
-            if (!form.title.trim()) {
-              setError('Package Title is required');
-              return;
-            }
-            if (!form.imageUrl) {
-              setImageError('Cover image is required before proceeding.');
-              return;
-            }
-            setError(null);
-            setStep(2);
-          }}
-          rightIcon={<ArrowRight className="w-4 h-4" />}
-        >
-          Continue to Pricing
-        </Button>
-      </div>
-    </div>
-  );
+    const continueLabel = isFood
+      ? 'Continue to Food Trail'
+      : isAdventure
+      ? 'Continue to Schedule'
+      : isGuide
+      ? 'Continue to Route'
+      : 'Continue to Itinerary';
 
-  const renderStandardStep2 = () => (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
-      <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">
-        Pricing & Inclusions
-      </h2>
-
-      {/* Price & Discount */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
-          label="BASE PRICE (₹) *"
-          type="number"
-          min="0"
-          value={form.basePrice}
-          onChange={(e) => set('basePrice', e.target.value)}
-        />
-        <Input
-          label="DISCOUNT (%)"
-          type="number"
-          min="0"
-          max="100"
-          value={form.discountPercent}
-          onChange={(e) => set('discountPercent', e.target.value)}
-        />
-      </div>
-
-      {/* Final Price Card */}
-      <div className="rounded-2xl bg-teal-50/80 border border-teal-200 p-4 sm:p-5 space-y-1.5">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-teal-700">
-          FINAL DISPLAY PRICE (PER PERSON)
-        </p>
-        <p className="text-2xl sm:text-3xl font-extrabold text-teal-950">
-          ₹{finalPrice.toLocaleString('en-IN')}
-        </p>
-        <p className="text-xs text-slate-500">
-          Travelers will see this discounted price on the marketplace.
-        </p>
-      </div>
-
-      {/* Inclusions & Exclusions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
-            INCLUSIONS (ONE PER LINE)
-          </label>
-          <textarea
-            rows={4}
-            className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 resize-none transition-all"
-            placeholder="e.g.&#10;Hotel accommodation&#10;Daily breakfast & dinner&#10;Airport transfers"
-            value={form.inclusions}
-            onChange={(e) => set('inclusions', e.target.value)}
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
-            EXCLUSIONS (ONE PER LINE)
-          </label>
-          <textarea
-            rows={4}
-            className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 resize-none transition-all"
-            placeholder="e.g.&#10;Flight tickets&#10;Personal expenses&#10;Travel insurance"
-            value={form.exclusions}
-            onChange={(e) => set('exclusions', e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Navigation Buttons */}
-      <div className="flex justify-between pt-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="md"
-          onClick={() => setStep(1)}
-          leftIcon={<ArrowLeft className="w-4 h-4" />}
-        >
-          Back
-        </Button>
-        <Button
-          type="button"
-          variant="primary"
-          size="md"
-          className="bg-teal-700 hover:bg-teal-800 text-white font-bold"
-          onClick={() => setStep(3)}
-          rightIcon={<ArrowRight className="w-4 h-4" />}
-        >
-          Continue to Itinerary
-        </Button>
-      </div>
-    </div>
-  );
-
-  const renderStandardStep3 = () => (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
-      <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-slate-900">
-          Day-by-Day Itinerary
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+        <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">
+          {headerTitle}
         </h2>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={addDay}
-          leftIcon={<Plus className="w-4 h-4" />}
-        >
-          Add Day
-        </Button>
-      </div>
 
-      <div className="space-y-4">
-        {form.itinerary.map((day, idx) => (
-          <div
-            key={idx}
-            className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-3 relative"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-teal-800">
-                Day {day.day}
-              </span>
-              {form.itinerary.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeDay(idx)}
-                  className="text-xs text-rose-600 hover:text-rose-700 font-medium inline-flex items-center gap-1"
-                >
-                  <Trash2 className="w-3.5 h-3.5" /> Remove
-                </button>
-              )}
-            </div>
+        {/* Price & Discount */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="BASE PRICE (₹) *"
+            type="number"
+            min="0"
+            value={form.basePrice}
+            onChange={(e) => set('basePrice', e.target.value)}
+          />
+          <Input
+            label="DISCOUNT (%)"
+            type="number"
+            min="0"
+            max="100"
+            value={form.discountPercent}
+            onChange={(e) => set('discountPercent', e.target.value)}
+          />
+        </div>
 
-            <Input
-              label="TITLE"
-              placeholder={`e.g. Day ${day.day}: Arrival & Hotel Check-in`}
-              value={day.title}
-              onChange={(e) => updateDay(idx, 'title', e.target.value)}
+        {/* Final Price Card */}
+        <div className="rounded-2xl bg-teal-50/80 border border-teal-200 p-4 sm:p-5 space-y-1.5">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-teal-700">
+            FINAL DISPLAY PRICE (PER PERSON)
+          </p>
+          <p className="text-2xl sm:text-3xl font-extrabold text-teal-950">
+            ₹{finalPrice.toLocaleString('en-IN')}
+          </p>
+          <p className="text-xs text-slate-500">
+            Travelers will see this discounted price on the marketplace.
+          </p>
+        </div>
+
+        {/* Inclusions & Exclusions */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+              INCLUSIONS (ONE PER LINE)
+            </label>
+            <textarea
+              rows={4}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 resize-none transition-all"
+              placeholder={inclusionsPlaceholder}
+              value={form.inclusions}
+              onChange={(e) => set('inclusions', e.target.value)}
             />
-
-            <div className="space-y-1">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
-                DESCRIPTION
-              </label>
-              <textarea
-                rows={2}
-                className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 resize-none transition-all"
-                placeholder="Activities, sightseeing points, meals included on this day..."
-                value={day.description}
-                onChange={(e) => updateDay(idx, 'description', e.target.value)}
-              />
-            </div>
           </div>
-        ))}
-      </div>
 
-      {/* Cancellation Policy */}
-      <div className="space-y-1.5 pt-2 border-t border-slate-100">
-        <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
-          CANCELLATION POLICY
-        </label>
-        <textarea
-          rows={3}
-          className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 resize-none transition-all"
-          placeholder="e.g. Full refund up to 7 days before departure. 50% refund between 7 and 3 days."
-          value={form.cancellationPolicy}
-          onChange={(e) => set('cancellationPolicy', e.target.value)}
-        />
-      </div>
+          <div className="space-y-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+              EXCLUSIONS (ONE PER LINE)
+            </label>
+            <textarea
+              rows={4}
+              className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 resize-none transition-all"
+              placeholder={exclusionsPlaceholder}
+              value={form.exclusions}
+              onChange={(e) => set('exclusions', e.target.value)}
+            />
+          </div>
+        </div>
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-between pt-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="md"
-          onClick={() => setStep(2)}
-          leftIcon={<ArrowLeft className="w-4 h-4" />}
-        >
-          Back
-        </Button>
-        <Button
-          type="button"
-          variant="primary"
-          size="md"
-          className="bg-teal-700 hover:bg-teal-800 text-white font-bold"
-          onClick={() => setStep(4)}
-          rightIcon={<ArrowRight className="w-4 h-4" />}
-        >
-          Review & Submit
-        </Button>
+        {/* Navigation Buttons */}
+        <div className="flex justify-between pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="md"
+            onClick={() => setStep(1)}
+            leftIcon={<ArrowLeft className="w-4 h-4" />}
+          >
+            Back
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            className="bg-teal-700 hover:bg-teal-800 text-white font-bold"
+            onClick={() => setStep(3)}
+            rightIcon={<ArrowRight className="w-4 h-4" />}
+          >
+            {continueLabel}
+          </Button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  const renderStandardStep3 = () => {
+    const headerTitle = isFood
+      ? 'Food Trail & Tasting Stops'
+      : isAdventure
+      ? 'Activity Schedule & Safety Plan'
+      : isGuide
+      ? 'Tour Route & Key Highlights'
+      : 'Day-by-Day Itinerary';
+
+    const addLabel = isFood
+      ? 'Add Stop / Meal'
+      : isAdventure
+      ? 'Add Phase / Session'
+      : isGuide
+      ? 'Add Landmark / Stop'
+      : 'Add Day';
+
+    const dayPrefix = isFood
+      ? 'Stop'
+      : isAdventure
+      ? 'Session'
+      : isGuide
+      ? 'Highlight / Stop'
+      : 'Day';
+
+    const getTitlePlaceholder = (d: number) => isFood
+      ? `e.g. Stop ${d}: Famous Paranthe & Jalebi sampling`
+      : isAdventure
+      ? `e.g. Session ${d}: Safety briefing & equipment fitting`
+      : isGuide
+      ? `e.g. Stop ${d}: Virupaksha Temple & stone chariot history`
+      : `e.g. Day ${d}: Arrival & Hotel Check-in`;
+
+    const descPlaceholder = isFood
+      ? 'Dishes sampled, history of the shop, dietary notes...'
+      : isAdventure
+      ? 'Briefing details, safety protocols, instructions...'
+      : isGuide
+      ? 'Stories shared, architectural highlights, photo spots...'
+      : 'Activities, sightseeing points, meals included on this day...';
+
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+        <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-900">
+            {headerTitle}
+          </h2>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addDay}
+            leftIcon={<Plus className="w-4 h-4" />}
+          >
+            {addLabel}
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          {form.itinerary.map((day, idx) => (
+            <div
+              key={idx}
+              className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-3 relative"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-teal-800">
+                  {dayPrefix} {day.day}
+                </span>
+                {form.itinerary.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeDay(idx)}
+                    className="text-xs text-rose-600 hover:text-rose-700 font-medium inline-flex items-center gap-1"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Remove
+                  </button>
+                )}
+              </div>
+
+              <Input
+                label="TITLE"
+                placeholder={getTitlePlaceholder(day.day)}
+                value={day.title}
+                onChange={(e) => updateDay(idx, 'title', e.target.value)}
+              />
+
+              <div className="space-y-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                  DESCRIPTION
+                </label>
+                <textarea
+                  rows={2}
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 resize-none transition-all"
+                  placeholder={descPlaceholder}
+                  value={day.description}
+                  onChange={(e) => updateDay(idx, 'description', e.target.value)}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Cancellation Policy */}
+        <div className="space-y-1.5 pt-2 border-t border-slate-100">
+          <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600">
+            CANCELLATION POLICY
+          </label>
+          <textarea
+            rows={3}
+            className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20 resize-none transition-all"
+            placeholder="e.g. Full refund up to 7 days before departure. 50% refund between 7 and 3 days."
+            value={form.cancellationPolicy}
+            onChange={(e) => set('cancellationPolicy', e.target.value)}
+          />
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="md"
+            onClick={() => setStep(2)}
+            leftIcon={<ArrowLeft className="w-4 h-4" />}
+          >
+            Back
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            className="bg-teal-700 hover:bg-teal-800 text-white font-bold"
+            onClick={() => setStep(4)}
+            rightIcon={<ArrowRight className="w-4 h-4" />}
+          >
+            Review & Submit
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   const renderStandardStep4 = () => {
     const summaryRows = [
@@ -2866,13 +3001,13 @@ function NewPackageForm() {
       { label: 'Base Price', value: `₹${(parseFloat(form.basePrice) || 0).toLocaleString('en-IN')}` },
       { label: 'Discount', value: parseFloat(form.discountPercent) > 0 ? `${form.discountPercent}%` : 'None' },
       { label: 'Display Price', value: `₹${finalPrice.toLocaleString('en-IN')}` },
-      { label: 'Itinerary Days', value: `${form.itinerary.length} Day(s) planned` },
+      { label: isFood ? 'Tasting Stops' : isAdventure ? 'Activity Sessions' : isGuide ? 'Tour Highlights' : 'Itinerary Days', value: `${form.itinerary.length} item(s) planned` },
     ];
 
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
         <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">
-          Review & Submit Package
+          Review & Submit {isFood ? 'Food Experience' : isAdventure ? 'Adventure Activity' : isGuide ? 'Guide Service' : 'Package'}
         </h2>
 
         {/* Cover Image Preview */}
@@ -2942,7 +3077,7 @@ function NewPackageForm() {
         <p className="text-xs text-slate-500 mt-1">
           {editId
             ? 'Update package details, itinerary, pricing, and resubmit for moderation.'
-            : 'Provide details for your tour, cab, villa, homestay or hostel.'}
+            : 'Provide details for your tour, cab, villa, homestay, hostel, food experience, adventure or guide service.'}
         </p>
       </div>
 

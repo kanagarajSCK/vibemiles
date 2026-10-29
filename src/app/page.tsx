@@ -183,16 +183,24 @@ export default async function HomePage() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-              {PACKAGE_CATEGORIES.map((cat) => (
-                <Link
-                  key={cat.value}
-                  href={`${ROUTES.PACKAGES}?category=${cat.value}`}
-                  className="group flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-teal-600 hover:shadow-md transition-all text-center"
-                >
-                  <span className="text-3xl group-hover:scale-110 transition-transform">{cat.icon}</span>
-                  <span className="mt-3 text-sm font-bold text-slate-900 group-hover:text-teal-700">{cat.label}</span>
-                </Link>
-              ))}
+              {PACKAGE_CATEGORIES.map((cat) => {
+                const href =
+                  cat.value === 'tour' || cat.value === 'devotional'
+                    ? `${ROUTES.PACKAGES}?category=${cat.value}`
+                    : cat.value === 'foreign'
+                    ? ROUTES.FOREIGN_TRIPS
+                    : `${ROUTES.EXPLORE}?category=${cat.value}`;
+                return (
+                  <Link
+                    key={cat.value}
+                    href={href}
+                    className="group flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-teal-600 hover:shadow-md transition-all text-center"
+                  >
+                    <span className="text-3xl group-hover:scale-110 transition-transform">{cat.icon}</span>
+                    <span className="mt-3 text-sm font-bold text-slate-900 group-hover:text-teal-700">{cat.label}</span>
+                  </Link>
+                );
+              })}
             </div>
           </section>
 

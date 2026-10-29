@@ -18,10 +18,14 @@ function isPublicPage(pathname: string): boolean {
     pathname.startsWith('/packages/') ||
     pathname === '/devotional-trips' ||
     pathname === '/foreign-trips' ||
+    pathname === '/explore' ||
+    pathname.startsWith('/explore/') ||
     pathname === '/adventures' ||
     pathname.startsWith('/adventures/') ||
     pathname === '/food' ||
     pathname.startsWith('/food/') ||
+    pathname === '/guides' ||
+    pathname.startsWith('/guides/') ||
     pathname === '/deals' ||
     pathname === '/search' ||
     pathname === '/assistant' ||

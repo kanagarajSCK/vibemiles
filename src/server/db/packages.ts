@@ -9,7 +9,9 @@ import { MOCK_PACKAGES } from '@/lib/mock-data';
 import { slugify } from '@/lib/utils';
 
 export interface GetPackagesOptions extends SearchFilters {
+  ids?: string[];
   q?: string;
+  categories?: string[];
   minDuration?: number;
   maxDuration?: number;
   duration?: number;
@@ -108,6 +110,10 @@ function filterMockPackages(options?: GetPackagesOptions): Package[] {
     );
   }
 
+  if (options?.ids && options.ids.length > 0) {
+    list = list.filter((p) => options.ids!.includes(p.id));
+  }
+
   if (options?.destination) {
     const q = options.destination.trim().toLowerCase();
     list = list.filter(
@@ -122,6 +128,9 @@ function filterMockPackages(options?: GetPackagesOptions): Package[] {
   if (options?.category) {
     const cat = options.category.toLowerCase();
     list = list.filter((p) => p.category.toLowerCase() === cat);
+  } else if (options?.categories && options.categories.length > 0) {
+    const cats = options.categories.map((c) => c.toLowerCase());
+    list = list.filter((p) => cats.includes(p.category.toLowerCase()));
   }
 
   if (options?.minPrice !== undefined) {
@@ -179,6 +188,13 @@ export function buildPublishedPackagesWhere(options?: GetPackagesOptions): Prism
       },
     },
   ];
+
+  // Specific package IDs filter (e.g. wishlist, saved items)
+  if (options?.ids && options.ids.length > 0) {
+    andConditions.push({
+      id: { in: options.ids },
+    });
+  }
 
   // Combined keyword search
   if (options?.q && options.q.trim()) {
@@ -313,6 +329,13 @@ export function buildPublishedPackagesWhere(options?: GetPackagesOptions): Prism
     andConditions.push({
       category: {
         slug: { equals: targetSlug, mode: 'insensitive' },
+      },
+    });
+  } else if (options?.categories && options.categories.length > 0) {
+    const slugs = options.categories.map((c) => c.toLowerCase().trim());
+    andConditions.push({
+      category: {
+        slug: { in: slugs },
       },
     });
   }

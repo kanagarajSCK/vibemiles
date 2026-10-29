@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Download, CheckCircle2, Clock, FileSpreadsheet } from 'lucide-react';
+import { TrendingUp, Download, CheckCircle2, Clock, FileSpreadsheet, ShieldCheck } from 'lucide-react';
 import { paymentService, type ProviderEarningsResponse } from '@/services/payment.service';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
@@ -26,9 +26,52 @@ export default function ProviderEarningsPage() {
     load();
   }, []);
 
+  function handleExportCsv() {
+    if (!data || data.settlements.length === 0) {
+      alert('No settlement records available to export.');
+      return;
+    }
+
+    const headers = [
+      'Booking Reference',
+      'Tour Package',
+      'Travel Date',
+      'Gross Amount (INR)',
+      'Commission Deducted (INR)',
+      'Host Net Payable (INR)',
+      'Payout Status',
+      'Bank Reference / UTR',
+      'Settled Date',
+    ];
+
+    const rows = data.settlements.map((s) => [
+      `"${s.bookingRef}"`,
+      `"${s.packageName.replace(/"/g, '""')}"`,
+      `"${s.travelDate}"`,
+      s.grossAmount,
+      s.commissionAmount,
+      s.providerAmount,
+      `"${s.status}"`,
+      `"${(s.referenceNote || '').replace(/"/g, '""')}"`,
+      `"${s.settledAt ? s.settledAt.split('T')[0] : ''}"`,
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `VibeMiles_Earnings_Statement_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   if (loading || !data) {
     return <LoadingState label="Loading host earnings and settlement statements..." />;
   }
+
+  const approvedPayouts = data.approvedAmount ?? 0;
 
   return (
     <div className="space-y-6">
@@ -36,7 +79,9 @@ export default function ProviderEarningsPage() {
         <h1 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
           <TrendingUp className="w-6 h-6 text-teal-700" /> Earnings & Monthly Payouts
         </h1>
-        <p className="text-xs text-slate-500">Automated bank settlement records, net disbursements, and revenue reports.</p>
+        <p className="text-xs text-slate-500">
+          Admin-controlled bank disbursement records, platform commissions, and net earnings statements.
+        </p>
       </div>
 
       {/* Main Net Revenue Card */}
@@ -44,10 +89,15 @@ export default function ProviderEarningsPage() {
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-teal-400">Total Net Host Earnings</span>
           <h2 className="text-4xl font-black text-white mt-1">{formatCurrency(data.netPayable)}</h2>
-          <p className="text-xs text-slate-400 mt-1">Calculated after standard 15% platform fee deduction</p>
+          <p className="text-xs text-slate-400 mt-1">Calculated after standard 15% platform commission deduction</p>
         </div>
-        <Button variant="accent" size="md" leftIcon={<Download className="w-4 h-4" />}>
-          Export Financial Statement
+        <Button
+          variant="accent"
+          size="md"
+          leftIcon={<Download className="w-4 h-4" />}
+          onClick={handleExportCsv}
+        >
+          Export CSV Statement
         </Button>
       </div>
 
@@ -68,10 +118,18 @@ export default function ProviderEarningsPage() {
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center gap-1.5 text-amber-600 mb-1">
             <Clock className="w-3.5 h-3.5" />
-            <span className="text-xs font-bold uppercase text-slate-500">Pending Settlement</span>
+            <span className="text-xs font-bold uppercase text-slate-500">
+              {approvedPayouts > 0 ? 'Approved / Pending' : 'Pending Settlement'}
+            </span>
           </div>
-          <span className="text-2xl font-black text-amber-600 block">{formatCurrency(data.pendingSettlementAmount)}</span>
-          <span className="text-xs text-slate-400 mt-1 block">Scheduled for next disbursement cycle</span>
+          <span className="text-2xl font-black text-amber-600 block">
+            {formatCurrency(data.pendingSettlementAmount + approvedPayouts)}
+          </span>
+          <span className="text-xs text-slate-400 mt-1 block">
+            {approvedPayouts > 0
+              ? `${formatCurrency(approvedPayouts)} approved, awaiting transfer`
+              : 'Awaiting admin payout review'}
+          </span>
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -80,7 +138,7 @@ export default function ProviderEarningsPage() {
             <span className="text-xs font-bold uppercase text-slate-500">Settled to Bank</span>
           </div>
           <span className="text-2xl font-black text-emerald-700 block">{formatCurrency(data.settledAmount)}</span>
-          <span className="text-xs text-slate-400 mt-1 block">Transferred to registered host account</span>
+          <span className="text-xs text-slate-400 mt-1 block">Transferred to registered host bank</span>
         </div>
       </div>
 
@@ -102,10 +160,12 @@ export default function ProviderEarningsPage() {
                   <th className="px-4 py-3">Booking Ref</th>
                   <th className="px-4 py-3">Tour Package</th>
                   <th className="px-4 py-3">Departure</th>
-                  <th className="px-4 py-3">Gross Total</th>
-                  <th className="px-4 py-3">Commission Cut</th>
-                  <th className="px-4 py-3">Host Net Amount</th>
-                  <th className="px-4 py-3">Settlement Status</th>
+                  <th className="px-4 py-3 text-right">Gross Total</th>
+                  <th className="px-4 py-3 text-right">Commission Cut</th>
+                  <th className="px-4 py-3 text-right">Host Net Amount</th>
+                  <th className="px-4 py-3 text-center">Payout Status</th>
+                  <th className="px-4 py-3">Bank UTR / Note</th>
+                  <th className="px-4 py-3">Settled Date</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
@@ -114,21 +174,29 @@ export default function ProviderEarningsPage() {
                     <td className="px-4 py-3 font-mono font-bold text-slate-900">{s.bookingRef}</td>
                     <td className="px-4 py-3 font-bold text-slate-900">{s.packageName}</td>
                     <td className="px-4 py-3 text-slate-500">{formatDate(s.travelDate)}</td>
-                    <td className="px-4 py-3 text-slate-700">{formatCurrency(s.grossAmount)}</td>
-                    <td className="px-4 py-3 text-rose-600">-{formatCurrency(s.commissionAmount)}</td>
-                    <td className="px-4 py-3 font-extrabold text-teal-800">{formatCurrency(s.providerAmount)}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-right text-slate-700">{formatCurrency(s.grossAmount)}</td>
+                    <td className="px-4 py-3 text-right text-rose-600">-{formatCurrency(s.commissionAmount)}</td>
+                    <td className="px-4 py-3 text-right font-extrabold text-teal-800">{formatCurrency(s.providerAmount)}</td>
+                    <td className="px-4 py-3 text-center">
                       <Badge
                         variant={
                           s.status === 'SETTLED'
                             ? 'success'
+                            : s.status === 'APPROVED'
+                            ? 'info'
                             : s.status === 'CANCELLED'
                             ? 'error'
                             : 'warning'
                         }
                       >
-                        {s.status}
+                        {s.status === 'APPROVED' ? 'APPROVED (PENDING TRANSFER)' : s.status}
                       </Badge>
+                    </td>
+                    <td className="px-4 py-3 font-mono text-[11px] text-slate-600">
+                      {s.referenceNote || <span className="text-slate-400">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-slate-500">
+                      {s.settledAt ? formatDate(s.settledAt) : <span className="text-slate-400">—</span>}
                     </td>
                   </tr>
                 ))}

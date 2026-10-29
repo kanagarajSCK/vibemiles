@@ -48,8 +48,15 @@ export function HomeHeroSearch() {
     if (travelType) params.set('travelType', travelType);
     if (tripVibe) params.set('vibe', tripVibe);
 
+    const targetRoute =
+      category === 'foreign'
+        ? ROUTES.FOREIGN_TRIPS
+        : category && !['tour', 'devotional'].includes(category)
+        ? ROUTES.EXPLORE
+        : ROUTES.PACKAGES;
+
     startTransition(() => {
-      router.push(`${ROUTES.PACKAGES}?${params.toString()}`);
+      router.push(`${targetRoute}?${params.toString()}`);
     });
   };
 

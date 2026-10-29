@@ -8,6 +8,7 @@ import { getPublishedPackages } from '@/server/db/packages';
 import { getDestinations } from '@/server/db/destinations';
 import { PackageCard } from '@/components/cards/PackageCard';
 import { DestinationCard } from '@/components/cards/DestinationCard';
+import { ROUTES } from '@/constants';
 import type { SortOption } from '@/types';
 
 export const metadata: Metadata = {
@@ -71,9 +72,18 @@ export default async function DevotionalTripsPage({ searchParams }: DevotionalTr
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-900/40 via-slate-950 to-slate-950" />
         
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-4">
-          <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-950/60 px-3.5 py-1 text-xs font-semibold text-amber-300 backdrop-blur-md">
-            <span>🛕</span>
-            <span>Sacred Pilgrimages & Spiritual Yatras</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-950/60 px-3.5 py-1 text-xs font-semibold text-amber-300 backdrop-blur-md">
+              <span>🛕</span>
+              <span>Sacred Pilgrimages & Spiritual Yatras</span>
+            </div>
+            <Link
+              href={ROUTES.PACKAGES}
+              className="inline-flex items-center gap-1.5 rounded-full border border-teal-400/30 bg-teal-950/60 px-3.5 py-1 text-xs font-semibold text-teal-300 backdrop-blur-md hover:bg-teal-900/70 transition-colors"
+            >
+              <span>🗺️</span>
+              <span>Browse All Packages →</span>
+            </Link>
           </div>
 
           <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">

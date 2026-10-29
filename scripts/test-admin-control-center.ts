@@ -50,7 +50,6 @@ async function runAdminControlCenterTests() {
   const timestamp = Date.now();
   let adminUser: any = null;
   let tempCustomerId: string | null = null;
-  let tempProviderId: string | null = null;
   let tempPackageId: string | null = null;
 
   try {

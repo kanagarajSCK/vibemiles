@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/Button';
 import { ROUTES } from '@/constants';
 import { DestinationWeather } from '@/components/weather';
 import { PackageBookingSidebar } from '@/components/travel/PackageBookingSidebar';
+import { PackageDetailWishlistButton } from '@/components/travel/PackageDetailWishlistButton';
 import { PackageReviewsSection, PackageReviewsSkeleton } from '@/components/travel/PackageReviewsSection';
 
 export default async function PackageDetailPage({
@@ -88,9 +89,7 @@ export default async function PackageDetailPage({
               <button className="rounded-full border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-100 transition-colors">
                 <Share2 className="w-4 h-4" />
               </button>
-              <button className="rounded-full border border-slate-200 p-2.5 text-rose-500 hover:bg-rose-50 transition-colors">
-                <Heart className="w-4 h-4 fill-rose-500" />
-              </button>
+              <PackageDetailWishlistButton packageData={pkg} />
             </div>
           </div>
         </div>

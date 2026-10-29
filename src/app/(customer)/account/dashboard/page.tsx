@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/Badge';
 import { PackageCard } from '@/components/cards/PackageCard';
 import { ROUTES } from '@/constants';
 import { useAuth } from '@/context/AuthContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { bookingService } from '@/services/booking.service';
 import type { Booking } from '@/types';
 
@@ -33,8 +34,9 @@ export default function CustomerDashboardPage() {
     }).catch(() => {});
   }, []);
 
+  const { wishlistCount, savedPackages } = useWishlist();
   const upcomingBookings = bookings.filter(b => b.bookingStatus === 'confirmed' || b.bookingStatus === 'pending').slice(0, 3);
-  const wishlistedPackages = MOCK_PACKAGES.slice(0, 2);
+  const wishlistedPackages = savedPackages.length > 0 ? savedPackages.slice(0, 2) : MOCK_PACKAGES.slice(0, 2);
   const totalTrips = bookings.length;
   const completedTrips = bookings.filter(b => b.bookingStatus === 'completed').length;
   const customerProfile = user as unknown as { rewardPoints?: number; fullName?: string } | null;
@@ -46,7 +48,7 @@ export default function CustomerDashboardPage() {
     { label: 'Total Trips', value: totalTrips, icon: Package, color: 'text-teal-600', bg: 'bg-teal-50' },
     { label: 'Completed', value: completedTrips, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
     { label: 'Reward Points', value: rewardPoints.toLocaleString(), icon: Gift, color: 'text-amber-600', bg: 'bg-amber-50' },
-    { label: 'Saved Packages', value: wishlistedPackages.length, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-50' },
+    { label: 'Saved Packages', value: wishlistCount, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-50' },
   ];
 
   const QUICK_LINKS = [
@@ -215,7 +217,7 @@ export default function CustomerDashboardPage() {
       {/* === RECOMMENDED PACKAGES === */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900">Recommended for You</h2>
+          <h2 className="text-lg font-bold text-slate-900">{savedPackages.length > 0 ? 'Your Saved Favorites' : 'Recommended for You'}</h2>
           <Link href={ROUTES.PACKAGES} className="text-xs font-bold text-teal-700 hover:underline flex items-center gap-1">Browse all <ArrowRight className="w-3 h-3" /></Link>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

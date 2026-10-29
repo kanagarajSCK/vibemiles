@@ -6,27 +6,40 @@ import crypto from 'node:crypto';
  * Supports production keys, test mode keys, and safe local development sandbox mode.
  */
 
-const KEY_ID = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholder_key';
-const KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'rzp_test_placeholder_secret';
-const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || 'rzp_webhook_placeholder_secret';
+function getRazorpayKeyId(): string {
+  return process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_placeholder_key';
+}
+
+function getRazorpayKeySecret(): string {
+  return process.env.RAZORPAY_KEY_SECRET || 'rzp_test_placeholder_secret';
+}
+
+function getRazorpayWebhookSecret(): string {
+  return process.env.RAZORPAY_WEBHOOK_SECRET || 'rzp_webhook_placeholder_secret';
+}
 
 export const isRazorpayConfigured = (): boolean => {
+  const keyId = getRazorpayKeyId();
+  const keySecret = getRazorpayKeySecret();
   return (
-    Boolean(process.env.RAZORPAY_KEY_ID) &&
-    Boolean(process.env.RAZORPAY_KEY_SECRET) &&
-    process.env.RAZORPAY_KEY_ID !== 'rzp_test_placeholder_key'
+    Boolean(keyId) &&
+    Boolean(keySecret) &&
+    keyId !== 'rzp_test_placeholder_key' &&
+    keySecret !== 'rzp_test_placeholder_secret' &&
+    !keyId.includes('placeholder') &&
+    !keySecret.includes('placeholder')
   );
 };
 
 export function getRazorpayClient(): Razorpay {
   return new Razorpay({
-    key_id: KEY_ID,
-    key_secret: KEY_SECRET,
+    key_id: getRazorpayKeyId(),
+    key_secret: getRazorpayKeySecret(),
   });
 }
 
 export function getPublicRazorpayKey(): string {
-  return KEY_ID;
+  return getRazorpayKeyId();
 }
 
 export function getPlatformCommissionRate(): number {
@@ -36,7 +49,7 @@ export function getPlatformCommissionRate(): number {
 }
 
 /**
- * Creates an official Razorpay Order.
+ * Creates an official Razorpay Order using authoritative server-side amounts.
  * @param amountInRupees Persisted booking total amount in INR
  * @param receipt Booking reference (e.g. VM-20261012-XXXX)
  * @param notes Contextual metadata for audit and webhook correlation
@@ -59,37 +72,74 @@ export async function createRazorpayOrder({
     throw new Error('Order amount must be greater than zero.');
   }
 
+  // Integer minor currency units (paise)
   const amountInPaise = Math.round(amountInRupees * 100);
 
-  if (isRazorpayConfigured()) {
-    try {
-      const client = getRazorpayClient();
-      const order = await client.orders.create({
-        amount: amountInPaise,
-        currency: 'INR',
-        receipt: receipt.slice(0, 40),
-        notes,
-      });
-
-      return {
-        orderId: order.id,
-        amount: Number(order.amount),
-        currency: order.currency || 'INR',
-      };
-    } catch (err) {
-      console.error('[Razorpay] Order creation failed via SDK:', err);
-      throw new Error(`Failed to create payment order with gateway: ${err instanceof Error ? err.message : String(err)}`);
-    }
+  if (!isRazorpayConfigured()) {
+    throw new Error(
+      'Razorpay payment gateway is not configured. Missing RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET in server environment.'
+    );
   }
 
-  // Safe developer sandbox mode when external gateway API keys are not supplied in .env
-  const mockOrderId = `order_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
-  return {
-    orderId: mockOrderId,
-    amount: amountInPaise,
-    currency: 'INR',
-    isSandboxFallback: true,
-  };
+  try {
+    const client = getRazorpayClient();
+    const order = await client.orders.create({
+      amount: amountInPaise,
+      currency: 'INR',
+      receipt: receipt.slice(0, 40),
+      notes,
+    });
+
+    return {
+      orderId: order.id,
+      amount: Number(order.amount),
+      currency: order.currency || 'INR',
+    };
+  } catch (err) {
+    console.error('[Razorpay] Order creation failed via SDK:', err);
+    throw new Error(`Failed to create payment order with gateway: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+/**
+ * Fetches official payment state from Razorpay gateway API.
+ * Ensures the payment was genuinely captured and validates the currency & amount.
+ */
+export async function fetchRazorpayPayment(paymentId: string): Promise<{
+  id: string;
+  status: string;
+  amount: number; // in paise
+  currency: string;
+  orderId?: string;
+  method?: string;
+  email?: string;
+  contact?: string;
+  captured?: boolean;
+} | null> {
+  if (!isRazorpayConfigured()) {
+    throw new Error('Razorpay gateway is not configured. Missing credentials in server environment.');
+  }
+
+  try {
+    const client = getRazorpayClient();
+    const payment = await client.payments.fetch(paymentId);
+    if (!payment) return null;
+
+    return {
+      id: payment.id,
+      status: payment.status,
+      amount: Number(payment.amount),
+      currency: payment.currency || 'INR',
+      orderId: (payment as any).order_id,
+      method: (payment as any).method,
+      email: (payment as any).email,
+      contact: (payment as any).contact,
+      captured: Boolean((payment as any).captured),
+    };
+  } catch (err) {
+    console.error(`[Razorpay] Failed to fetch payment ${paymentId}:`, err);
+    throw new Error(`Failed to fetch payment status from gateway: ${err instanceof Error ? err.message : String(err)}`);
+  }
 }
 
 /**
@@ -112,7 +162,7 @@ export function verifyRazorpayPaymentSignature({
   try {
     const body = `${orderId}|${paymentId}`;
     const expectedSignature = crypto
-      .createHmac('sha256', KEY_SECRET)
+      .createHmac('sha256', getRazorpayKeySecret())
       .update(body)
       .digest('hex');
 
@@ -146,7 +196,7 @@ export function verifyRazorpayWebhookSignature({
 
   try {
     const expectedSignature = crypto
-      .createHmac('sha256', WEBHOOK_SECRET)
+      .createHmac('sha256', getRazorpayWebhookSecret())
       .update(rawBody)
       .digest('hex');
 
@@ -182,29 +232,24 @@ export async function issueRazorpayRefund({
 }> {
   const amountInPaise = Math.round(amountInRupees * 100);
 
-  if (isRazorpayConfigured()) {
-    try {
-      const client = getRazorpayClient();
-      const refund = await client.payments.refund(paymentId, {
-        amount: amountInPaise,
-        notes,
-      });
-
-      return {
-        refundId: refund.id,
-        amount: Number(refund.amount) / 100,
-        status: refund.status || 'processed',
-      };
-    } catch (err) {
-      console.error('[Razorpay] Refund failed via SDK:', err);
-      throw new Error(`Gateway refund operation failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
+  if (!isRazorpayConfigured()) {
+    throw new Error('Razorpay gateway is not configured. Missing credentials in server environment.');
   }
 
-  // Developer sandbox fallback
-  return {
-    refundId: `rfnd_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
-    amount: amountInRupees,
-    status: 'processed',
-  };
+  try {
+    const client = getRazorpayClient();
+    const refund = await client.payments.refund(paymentId, {
+      amount: amountInPaise,
+      notes,
+    });
+
+    return {
+      refundId: refund.id,
+      amount: Number(refund.amount) / 100,
+      status: refund.status || 'processed',
+    };
+  } catch (err) {
+    console.error('[Razorpay] Refund failed via SDK:', err);
+    throw new Error(`Gateway refund operation failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
 }

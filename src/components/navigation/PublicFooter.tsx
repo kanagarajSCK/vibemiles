@@ -45,11 +45,11 @@ export const PublicFooter: React.FC = () => {
           <div className="hidden lg:block">
             <h4 className="font-bold text-white text-sm uppercase tracking-wider mb-4">Marketplace</h4>
             <ul className="space-y-2.5 text-sm">
-              <li><Link href={ROUTES.PACKAGES} className="hover:text-emerald-400 transition-colors">All Tour Packages</Link></li>
+              <li><Link href={ROUTES.PACKAGES} className="hover:text-emerald-400 transition-colors">Tour Packages & Yatras</Link></li>
+              <li><Link href={ROUTES.EXPLORE} className="hover:text-emerald-400 transition-colors">Explore Marketplace</Link></li>
               <li><Link href={ROUTES.DEVOTIONAL_TRIPS} className="hover:text-emerald-400 transition-colors">Devotional Trips</Link></li>
               <li><Link href={ROUTES.STAYS} className="hover:text-emerald-400 transition-colors">Luxury Stays & Villas</Link></li>
               <li><Link href={ROUTES.FOREIGN_TRIPS} className="hover:text-emerald-400 transition-colors">Foreign Trips</Link></li>
-              <li><Link href={ROUTES.FOOD} className="hover:text-emerald-400 transition-colors">Food & Cultural Tours</Link></li>
             </ul>
           </div>
 
@@ -97,11 +97,11 @@ export const PublicFooter: React.FC = () => {
               <ChevronDown className="h-6 w-6 text-emerald-400 transition-transform group-open:rotate-180" />
             </summary>
             <ul className="space-y-3 px-1 pb-5 text-sm text-slate-300">
-              <li><Link href={ROUTES.PACKAGES} className="block py-1 hover:text-emerald-400">All Tour Packages</Link></li>
+              <li><Link href={ROUTES.PACKAGES} className="block py-1 hover:text-emerald-400">Tour Packages & Yatras</Link></li>
+              <li><Link href={ROUTES.EXPLORE} className="block py-1 hover:text-emerald-400">Explore Marketplace</Link></li>
               <li><Link href={ROUTES.DEVOTIONAL_TRIPS} className="block py-1 hover:text-emerald-400">Devotional Trips</Link></li>
               <li><Link href={ROUTES.STAYS} className="block py-1 hover:text-emerald-400">Luxury Stays & Villas</Link></li>
               <li><Link href={ROUTES.FOREIGN_TRIPS} className="block py-1 hover:text-emerald-400">Foreign Trips</Link></li>
-              <li><Link href={ROUTES.FOOD} className="block py-1 hover:text-emerald-400">Food & Cultural Tours</Link></li>
             </ul>
           </details>
 

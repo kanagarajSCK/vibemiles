@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Eye, XCircle, Compass } from 'lucide-react';
+import { Eye, XCircle, Compass, Download } from 'lucide-react';
 import { bookingService } from '@/services/booking.service';
 import type { Booking } from '@/types';
 import { formatCurrency, formatDate } from '@/lib/utils';
@@ -147,6 +147,24 @@ export default function AccountBookingsPage() {
                     >
                       Cancel
                     </Button>
+                  )}
+
+                  {(booking.bookingStatus === 'confirmed' || booking.bookingStatus === 'completed') && (
+                    <a
+                      href={`/api/bookings/${booking.id}/ticket`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                    >
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        leftIcon={<Download className="w-3.5 h-3.5 text-teal-700" />}
+                        className="text-teal-800 hover:bg-teal-50 border-teal-200"
+                      >
+                        Download Ticket
+                      </Button>
+                    </a>
                   )}
 
                   <Link href={`/booking/confirmation/${booking.id}`}>

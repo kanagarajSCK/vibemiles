@@ -18,7 +18,9 @@ export interface ProviderEarningsResponse {
   platformCommission: number;
   netPayable: number;
   settledAmount: number;
+  approvedAmount?: number;
   pendingSettlementAmount: number;
+  onHoldAmount?: number;
   settlements: Array<{
     id: string;
     bookingRef: string;
@@ -29,6 +31,8 @@ export interface ProviderEarningsResponse {
     status: string;
     travelDate: string;
     createdAt: string;
+    settledAt?: string | null;
+    referenceNote?: string | null;
   }>;
 }
 
@@ -39,6 +43,28 @@ export interface AdminFinancialResponse {
   totalProviderPayables: number;
   totalRefunds: number;
   commissionRate: number;
+  paymentsSummary?: {
+    capturedCount: number;
+    capturedAmount: number;
+    pendingCount: number;
+    pendingAmount: number;
+    failedCount: number;
+    failedAmount: number;
+    refundedCount: number;
+    refundedAmount: number;
+  };
+  payoutsSummary?: {
+    pendingCount: number;
+    pendingAmount: number;
+    approvedCount: number;
+    approvedAmount: number;
+    processingCount: number;
+    processingAmount: number;
+    settledCount: number;
+    settledAmount: number;
+    onHoldCount: number;
+    onHoldAmount: number;
+  };
   recentLedger: Array<{
     id: string;
     bookingRef: string;
@@ -48,6 +74,8 @@ export interface AdminFinancialResponse {
     taxAmount: number;
     providerAmount: number;
     status: string;
+    settledAt?: string | null;
+    referenceNote?: string | null;
     createdAt: string;
   }>;
 }

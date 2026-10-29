@@ -9,6 +9,7 @@ import { cn, formatCurrency } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import { RatingStars } from '@/components/ui/RatingStars';
 import { Button } from '@/components/ui/Button';
+import { useWishlist } from '@/context/WishlistContext';
 
 export interface PackageCardProps {
   packageData: Package;
@@ -21,8 +22,10 @@ export const PackageCard: React.FC<PackageCardProps> = ({
   packageData,
   compact = false,
   onWishlistToggle,
-  isWishlisted = false,
+  isWishlisted: propIsWishlisted,
 }) => {
+  const { isWishlisted: checkWishlist, toggleWishlist } = useWishlist();
+  const isWishlisted = propIsWishlisted !== undefined ? propIsWishlisted : checkWishlist(packageData.id);
   const {
     id,
     slug,
@@ -67,9 +70,70 @@ export const PackageCard: React.FC<PackageCardProps> = ({
 
         {/* Top Badges */}
         <div className={cn('absolute z-10 flex flex-wrap', compact ? 'left-2 top-2 gap-1 sm:left-2.5 sm:top-2.5' : 'left-3 top-3 gap-1.5')}>
-          <Badge variant="brand" size="sm" className={cn('border-teal-700/50 bg-teal-900/80 text-teal-100 backdrop-blur-md', compact ? 'px-1.5 py-0 text-[9px]' : 'text-[10px]')}>
-            {category.toUpperCase()}
-          </Badge>
+          {(() => {
+            const cat = category.toLowerCase();
+            if (cat === 'devotional') {
+              return (
+                <Badge variant="warning" size="sm" className={cn('border-amber-400/50 bg-amber-950/85 text-amber-300 font-bold backdrop-blur-md inline-flex items-center gap-1', compact ? 'px-1.5 py-0 text-[9px]' : 'text-[10px]')}>
+                  <span>🛕</span> DEVOTIONAL
+                </Badge>
+              );
+            }
+            if (cat === 'food') {
+              return (
+                <Badge variant="warning" size="sm" className={cn('border-orange-500/50 bg-orange-950/85 text-orange-200 font-bold backdrop-blur-md inline-flex items-center gap-1', compact ? 'px-1.5 py-0 text-[9px]' : 'text-[10px]')}>
+                  <span>🍽️</span> FOOD EXPERIENCE
+                </Badge>
+              );
+            }
+            if (cat === 'adventure') {
+              return (
+                <Badge variant="brand" size="sm" className={cn('border-sky-500/50 bg-sky-950/85 text-sky-200 font-bold backdrop-blur-md inline-flex items-center gap-1', compact ? 'px-1.5 py-0 text-[9px]' : 'text-[10px]')}>
+                  <span>🧗</span> ADVENTURE
+                </Badge>
+              );
+            }
+            if (cat === 'guide') {
+              return (
+                <Badge variant="brand" size="sm" className={cn('border-indigo-500/50 bg-indigo-950/85 text-indigo-200 font-bold backdrop-blur-md inline-flex items-center gap-1', compact ? 'px-1.5 py-0 text-[9px]' : 'text-[10px]')}>
+                  <span>🧭</span> LOCAL GUIDE
+                </Badge>
+              );
+            }
+            if (cat === 'cab') {
+              return (
+                <Badge variant="brand" size="sm" className={cn('border-emerald-500/50 bg-emerald-950/85 text-emerald-200 font-bold backdrop-blur-md inline-flex items-center gap-1', compact ? 'px-1.5 py-0 text-[9px]' : 'text-[10px]')}>
+                  <span>🚗</span> CAB SERVICE
+                </Badge>
+              );
+            }
+            if (cat === 'villa') {
+              return (
+                <Badge variant="brand" size="sm" className={cn('border-teal-500/50 bg-teal-950/85 text-teal-200 font-bold backdrop-blur-md inline-flex items-center gap-1', compact ? 'px-1.5 py-0 text-[9px]' : 'text-[10px]')}>
+                  <span>🏡</span> VILLA
+                </Badge>
+              );
+            }
+            if (cat === 'homestay') {
+              return (
+                <Badge variant="brand" size="sm" className={cn('border-amber-500/50 bg-amber-950/85 text-amber-200 font-bold backdrop-blur-md inline-flex items-center gap-1', compact ? 'px-1.5 py-0 text-[9px]' : 'text-[10px]')}>
+                  <span>🏠</span> HOMESTAY
+                </Badge>
+              );
+            }
+            if (cat === 'hostel') {
+              return (
+                <Badge variant="brand" size="sm" className={cn('border-purple-500/50 bg-purple-950/85 text-purple-200 font-bold backdrop-blur-md inline-flex items-center gap-1', compact ? 'px-1.5 py-0 text-[9px]' : 'text-[10px]')}>
+                  <span>🛏️</span> HOSTEL
+                </Badge>
+              );
+            }
+            return (
+              <Badge variant="brand" size="sm" className={cn('border-teal-700/50 bg-teal-900/80 text-teal-100 backdrop-blur-md', compact ? 'px-1.5 py-0 text-[9px]' : 'text-[10px]')}>
+                {category.toUpperCase()}
+              </Badge>
+            );
+          })()}
           {discountPercent > 0 && (
             <Badge variant="warning" size="sm" className={cn('border-amber-600 bg-amber-500 font-bold text-white', compact ? 'px-1.5 py-0 text-[9px]' : 'text-[10px]')}>
               {discountPercent}% OFF
@@ -79,17 +143,35 @@ export const PackageCard: React.FC<PackageCardProps> = ({
 
         {/* Wishlist Button */}
         <button
+          type="button"
           onClick={(e) => {
             e.preventDefault();
-            onWishlistToggle?.(id);
+            e.stopPropagation();
+            if (onWishlistToggle) {
+              onWishlistToggle(id);
+            } else {
+              toggleWishlist(id, packageData);
+            }
           }}
           className={cn(
-            'absolute z-10 flex items-center justify-center rounded-full bg-white/80 text-slate-700 shadow-md backdrop-blur-md transition-transform hover:scale-110 hover:bg-white active:scale-95',
-            compact ? 'right-2 top-2 h-7 w-7 sm:right-2.5 sm:top-2.5 sm:h-8 sm:w-8' : 'right-3 top-3 h-8 w-8 sm:h-9 sm:w-9'
+            'absolute z-10 flex items-center justify-center rounded-full shadow-md backdrop-blur-md transition-all duration-200 hover:scale-110 active:scale-90',
+            compact ? 'right-2 top-2 h-7 w-7 sm:right-2.5 sm:top-2.5 sm:h-8 sm:w-8' : 'right-3 top-3 h-8 w-8 sm:h-9 sm:w-9',
+            isWishlisted
+              ? 'bg-rose-50/95 text-rose-500 ring-2 ring-rose-400/50 hover:bg-white'
+              : 'bg-white/85 text-slate-700 hover:bg-white hover:text-rose-500'
           )}
-          aria-label="Add to wishlist"
+          aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+          title={isWishlisted ? 'Saved in wishlist' : 'Save to wishlist'}
         >
-          <Heart className={`${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'} ${isWishlisted ? 'fill-rose-500 text-rose-500' : 'text-slate-600'}`} />
+          <Heart
+            className={cn(
+              compact ? 'h-3.5 w-3.5' : 'h-4 w-4',
+              'transition-all duration-200',
+              isWishlisted
+                ? 'fill-rose-500 text-rose-500 scale-110'
+                : 'text-slate-600 hover:text-rose-500'
+            )}
+          />
         </button>
 
         {/* Destination Chip */}

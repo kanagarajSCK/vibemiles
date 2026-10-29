@@ -213,12 +213,25 @@ export default async function BookingConfirmationPage({
         {/* Action Controls */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 pt-6">
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" leftIcon={<Printer className="w-4 h-4" />}>
-              Print Voucher
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Download className="w-4 h-4" />}>
-              Download PDF
-            </Button>
+            <a
+              href={`/api/bookings/${booking.id}/ticket`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="outline" size="sm" leftIcon={<Printer className="w-4 h-4" />}>
+                Print Voucher
+              </Button>
+            </a>
+            <a
+              href={`/api/bookings/${booking.id}/ticket`}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+            >
+              <Button variant="outline" size="sm" leftIcon={<Download className="w-4 h-4" />}>
+                Download PDF
+              </Button>
+            </a>
           </div>
 
           <Link href={ROUTES.ACCOUNT_BOOKINGS}>

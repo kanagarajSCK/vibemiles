@@ -11,6 +11,10 @@ import { DestinationAutocomplete, type DestinationOption } from './DestinationAu
 import { PACKAGE_CATEGORIES, SORT_OPTIONS, ROUTES } from '@/constants';
 
 interface PackagesFiltersProps {
+  baseRoute?: string;
+  categories?: readonly { value: string; label: string; icon?: string }[] | { value: string; label: string; icon?: string }[];
+  allCategoriesLabel?: string;
+  title?: string;
   defaultDestination?: string;
   defaultDestinationId?: string;
   defaultCategory?: string;
@@ -22,6 +26,10 @@ interface PackagesFiltersProps {
 }
 
 export const PackagesFilters: React.FC<PackagesFiltersProps> = ({
+  baseRoute = ROUTES.PACKAGES,
+  categories = PACKAGE_CATEGORIES,
+  allCategoriesLabel = 'All Categories',
+  title = 'Filter Packages',
   defaultDestination = '',
   defaultDestinationId = '',
   defaultCategory = '',
@@ -65,7 +73,7 @@ export const PackagesFilters: React.FC<PackagesFiltersProps> = ({
     if (travelType) params.set('travelType', travelType);
     if (tripVibe) params.set('vibe', tripVibe);
     startTransition(() => {
-      router.push(`${ROUTES.PACKAGES}?${params.toString()}`);
+      router.push(`${baseRoute}?${params.toString()}`);
     });
   };
 
@@ -81,7 +89,7 @@ export const PackagesFilters: React.FC<PackagesFiltersProps> = ({
     setTripVibe('');
     setMobileOpen(false);
     startTransition(() => {
-      router.push(ROUTES.PACKAGES);
+      router.push(baseRoute);
     });
   };
 
@@ -89,7 +97,7 @@ export const PackagesFilters: React.FC<PackagesFiltersProps> = ({
     <form onSubmit={handleApply} className="space-y-3 lg:space-y-4">
       <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
         <h3 className="flex items-center gap-2 text-[15px] font-bold text-slate-900 sm:text-sm">
-          <SlidersHorizontal className="h-4 w-4 text-teal-700" /> Filter Packages
+          <SlidersHorizontal className="h-4 w-4 text-teal-700" /> {title}
         </h3>
         <button
           type="button"
@@ -165,8 +173,8 @@ export const PackagesFilters: React.FC<PackagesFiltersProps> = ({
         onChange={(e) => setCategory(e.target.value)}
         className="min-h-11.5 rounded-lg border-slate-200 bg-slate-50 text-[15px] shadow-none focus:bg-white"
         options={[
-          { value: '', label: 'All Categories' },
-          ...PACKAGE_CATEGORIES.map((c) => ({ value: c.value, label: `${c.icon} ${c.label}` })),
+          { value: '', label: allCategoriesLabel },
+          ...categories.map((c) => ({ value: c.value, label: `${c.icon ? `${c.icon} ` : ''}${c.label}` })),
         ]}
       />
 

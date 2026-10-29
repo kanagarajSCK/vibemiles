@@ -116,12 +116,18 @@ export default function AdminSettlementsPage() {
     switch (status.toUpperCase()) {
       case 'SETTLED':
         return <Badge variant="success" size="sm">SETTLED</Badge>;
+      case 'APPROVED':
+        return <Badge variant="info" size="sm">APPROVED</Badge>;
       case 'PROCESSING':
         return <Badge variant="brand" size="sm">PROCESSING</Badge>;
       case 'PENDING':
         return <Badge variant="warning" size="sm">PENDING</Badge>;
+      case 'ON_HOLD':
+        return <Badge variant="neutral" size="sm">ON HOLD</Badge>;
       case 'FAILED':
         return <Badge variant="error" size="sm">FAILED</Badge>;
+      case 'CANCELLED':
+        return <Badge variant="error" size="sm">CANCELLED</Badge>;
       default:
         return <Badge variant="neutral" size="sm">{status}</Badge>;
     }
@@ -212,7 +218,7 @@ export default function AdminSettlementsPage() {
 
         {/* Status Filters */}
         <div className="flex flex-wrap gap-1.5">
-          {(['ALL', 'PENDING', 'PROCESSING', 'SETTLED', 'FAILED'] as const).map((tab) => (
+          {(['ALL', 'PENDING', 'APPROVED', 'PROCESSING', 'SETTLED', 'ON_HOLD', 'FAILED'] as const).map((tab) => (
             <button
               key={tab}
               type="button"
@@ -369,9 +375,11 @@ export default function AdminSettlementsPage() {
                 onChange={(e) => setTargetStatus(e.target.value)}
                 className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-xs text-slate-800 focus:border-teal-600 focus:outline-none"
               >
-                <option value="SETTLED">SETTLED (Disbursed to bank)</option>
+                <option value="APPROVED">APPROVED (Approved by Admin, awaiting payout batch)</option>
                 <option value="PROCESSING">PROCESSING (In transit / banking batch)</option>
+                <option value="SETTLED">SETTLED (Disbursed to host bank with UTR)</option>
                 <option value="PENDING">PENDING (Awaiting clearance)</option>
+                <option value="ON_HOLD">ON_HOLD (Compliance or dispute review hold)</option>
                 <option value="FAILED">FAILED (Transfer rejected by bank)</option>
               </select>
             </div>

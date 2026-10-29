@@ -8,12 +8,14 @@ import { Menu, X, User, Heart, Search, Building2, Compass, ChevronDown, LogOut, 
 import { PUBLIC_NAV, ROUTES } from '@/constants';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/context/AuthContext';
+import { useWishlist } from '@/context/WishlistContext';
 
 export const PublicHeader: React.FC = () => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { wishlistCount } = useWishlist();
 
   const customer = user as unknown as { fullName?: string; customerProfile?: { fullName?: string } } | null;
   const provider = user as unknown as { businessName?: string; providerProfile?: { businessName?: string } } | null;
@@ -94,10 +96,15 @@ export const PublicHeader: React.FC = () => {
             <Button
               variant="ghost"
               size="sm"
-              leftIcon={<Heart className="w-4 h-4 text-rose-500" />}
+              leftIcon={<Heart className={`w-4 h-4 ${wishlistCount > 0 ? 'text-rose-500 fill-rose-500' : 'text-rose-500'}`} />}
               className="whitespace-nowrap px-2.5"
             >
               <span className="hidden xl:inline">Wishlist</span>
+              {wishlistCount > 0 && (
+                <span className="ml-1 rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-white leading-none">
+                  {wishlistCount}
+                </span>
+              )}
             </Button>
           </Link>
 
@@ -256,8 +263,18 @@ export const PublicHeader: React.FC = () => {
               </Button>
             </Link>
             <Link href={ROUTES.ACCOUNT_WISHLIST} prefetch={true} onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="ghost" size="md" leftIcon={<Heart className="w-4 h-4 text-rose-500" />} className="w-full justify-start">
-                Wishlist
+              <Button
+                variant="ghost"
+                size="md"
+                leftIcon={<Heart className={`w-4 h-4 ${wishlistCount > 0 ? 'text-rose-500 fill-rose-500' : 'text-rose-500'}`} />}
+                className="w-full justify-between"
+              >
+                <span>Wishlist</span>
+                {wishlistCount > 0 && (
+                  <span className="rounded-full bg-rose-500 px-2 py-0.5 text-xs font-bold text-white">
+                    {wishlistCount}
+                  </span>
+                )}
               </Button>
             </Link>
             

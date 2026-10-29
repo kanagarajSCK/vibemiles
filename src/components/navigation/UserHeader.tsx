@@ -12,11 +12,13 @@ import {
 import { PUBLIC_NAV, ROUTES } from '@/constants';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { NotificationBell } from './NotificationBell';
 
 export const UserHeader: React.FC = () => {
   const pathname = usePathname();
   const { user: authUser, logout } = useAuth();
+  const { wishlistCount } = useWishlist();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
@@ -72,8 +74,15 @@ export const UserHeader: React.FC = () => {
 
           {/* Wishlist */}
           <Link href={ROUTES.ACCOUNT_WISHLIST} prefetch={true}
-            className="hidden md:flex items-center justify-center rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-rose-600 transition-colors relative">
-            <Heart className="w-4 h-4" />
+            className="hidden md:flex items-center justify-center rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-rose-600 transition-colors relative"
+            title="Saved Wishlist"
+          >
+            <Heart className={cn("w-4 h-4 transition-colors", wishlistCount > 0 ? "text-rose-500 fill-rose-500" : "")} />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white shadow-xs">
+                {wishlistCount}
+              </span>
+            )}
           </Link>
 
           {/* Notifications */}

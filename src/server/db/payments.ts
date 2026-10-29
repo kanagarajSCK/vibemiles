@@ -3,6 +3,7 @@ import {
   BookingStatus,
   PaymentStatus,
   NotificationType,
+  UserRole,
   Prisma,
 } from '@prisma/client';
 import { createNotificationInDb } from './notifications';
@@ -13,6 +14,8 @@ import {
   issueRazorpayRefund,
   getPublicRazorpayKey,
   getPlatformCommissionRate,
+  isRazorpayConfigured,
+  fetchRazorpayPayment,
 } from '@/server/payments/razorpay';
 import {
   mapPrismaBookingToDomain,
@@ -242,6 +245,28 @@ export async function verifyPaymentAndConfirmBooking({
     throw new Error('Cryptographic signature verification failed. Forged or corrupted payment request.');
   }
 
+  // Live Gateway Verification: If live Razorpay API is configured, verify captured state & exact minor currency units
+  if (isRazorpayConfigured()) {
+    const gatewayPayment = await fetchRazorpayPayment(paymentId);
+    if (!gatewayPayment) {
+      throw new Error('Payment not found on Razorpay gateway.');
+    }
+    if (!gatewayPayment.captured && gatewayPayment.status !== 'captured') {
+      throw new Error(
+        `Payment verification failed: Gateway reports payment status '${gatewayPayment.status}'. Funds must be captured.`
+      );
+    }
+    const expectedPaise = Math.round(booking.totalAmount * 100);
+    if (gatewayPayment.amount !== expectedPaise) {
+      throw new Error(
+        `Payment amount mismatch: Expected ${expectedPaise} paise, but gateway recorded ${gatewayPayment.amount} paise.`
+      );
+    }
+    if (gatewayPayment.orderId && gatewayPayment.orderId !== orderId) {
+      throw new Error('Payment order mismatch between gateway record and verification request.');
+    }
+  }
+
   // Interactive transaction for atomic verification and state advancement
   const confirmedBooking = await prisma.$transaction(
     async (tx) => {
@@ -430,6 +455,46 @@ export async function processRazorpayWebhookEvent({
 
   const orderId = entity.order_id || (event.startsWith('order.') ? entity.id : null);
   const paymentId = entity.id;
+
+  // Webhook Idempotency Check: Prevent duplicate event processing on network retries
+  const webhookEventId =
+    (payload.id as string) ||
+    (payload.event_id as string) ||
+    `evt_${event}_${paymentId || orderId}`;
+
+  const existingWebhookLog = await prisma.auditLog.findFirst({
+    where: {
+      action: 'RAZORPAY_WEBHOOK_EVENT',
+      targetId: webhookEventId,
+    },
+  });
+
+  if (existingWebhookLog) {
+    return {
+      success: true,
+      event,
+      message: `Webhook event ${webhookEventId} already processed (idempotent skip).`,
+    };
+  }
+
+  // Record webhook audit log entry to seal idempotency
+  await prisma.auditLog.create({
+    data: {
+      actorId: 'gateway_system_razorpay',
+      actorEmail: 'gateway@razorpay.com',
+      actorRole: UserRole.ADMIN,
+      action: 'RAZORPAY_WEBHOOK_EVENT',
+      targetType: 'PAYMENT_WEBHOOK',
+      targetId: webhookEventId,
+      reason: `Processed Razorpay webhook event ${event} for payment ${paymentId || 'N/A'}, order ${orderId || 'N/A'}.`,
+      metadata: {
+        event,
+        paymentId,
+        orderId,
+        entityStatus: entity.status,
+      },
+    },
+  });
 
   if (event === 'payment.captured' || event === 'order.paid') {
     // Find payment record by orderId or gatewayRef
@@ -849,7 +914,9 @@ export async function getProviderFinancialSummary(providerId: string): Promise<{
   platformCommission: number;
   netPayable: number;
   settledAmount: number;
+  approvedAmount: number;
   pendingSettlementAmount: number;
+  onHoldAmount: number;
   settlements: Array<{
     id: string;
     bookingRef: string;
@@ -860,6 +927,8 @@ export async function getProviderFinancialSummary(providerId: string): Promise<{
     status: string;
     travelDate: string;
     createdAt: string;
+    settledAt: string | null;
+    referenceNote: string | null;
   }>;
 }> {
   const records = await prisma.settlementLedger.findMany({
@@ -876,7 +945,9 @@ export async function getProviderFinancialSummary(providerId: string): Promise<{
   let platformCommission = 0;
   let netPayable = 0;
   let settledAmount = 0;
+  let approvedAmount = 0;
   let pendingSettlementAmount = 0;
+  let onHoldAmount = 0;
 
   const settlements = records.map((r) => {
     if (r.status !== 'CANCELLED') {
@@ -886,7 +957,11 @@ export async function getProviderFinancialSummary(providerId: string): Promise<{
 
       if (r.status === 'SETTLED') {
         settledAmount += r.providerAmount;
-      } else if (r.status === 'PENDING') {
+      } else if (r.status === 'APPROVED') {
+        approvedAmount += r.providerAmount;
+      } else if (r.status === 'ON_HOLD') {
+        onHoldAmount += r.providerAmount;
+      } else {
         pendingSettlementAmount += r.providerAmount;
       }
     }
@@ -901,6 +976,8 @@ export async function getProviderFinancialSummary(providerId: string): Promise<{
       status: r.status,
       travelDate: r.booking.travelDate.toISOString().split('T')[0],
       createdAt: r.createdAt.toISOString(),
+      settledAt: r.settledAt ? r.settledAt.toISOString() : null,
+      referenceNote: r.referenceNote || null,
     };
   });
 
@@ -909,7 +986,9 @@ export async function getProviderFinancialSummary(providerId: string): Promise<{
     platformCommission: Math.round(platformCommission * 100) / 100,
     netPayable: Math.round(netPayable * 100) / 100,
     settledAmount: Math.round(settledAmount * 100) / 100,
+    approvedAmount: Math.round(approvedAmount * 100) / 100,
     pendingSettlementAmount: Math.round(pendingSettlementAmount * 100) / 100,
+    onHoldAmount: Math.round(onHoldAmount * 100) / 100,
     settlements,
   };
 }
@@ -924,6 +1003,28 @@ export async function getAdminFinancialAnalytics(): Promise<{
   totalProviderPayables: number;
   totalRefunds: number;
   commissionRate: number;
+  paymentsSummary: {
+    capturedCount: number;
+    capturedAmount: number;
+    pendingCount: number;
+    pendingAmount: number;
+    failedCount: number;
+    failedAmount: number;
+    refundedCount: number;
+    refundedAmount: number;
+  };
+  payoutsSummary: {
+    pendingCount: number;
+    pendingAmount: number;
+    approvedCount: number;
+    approvedAmount: number;
+    processingCount: number;
+    processingAmount: number;
+    settledCount: number;
+    settledAmount: number;
+    onHoldCount: number;
+    onHoldAmount: number;
+  };
   recentLedger: Array<{
     id: string;
     bookingRef: string;
@@ -933,6 +1034,8 @@ export async function getAdminFinancialAnalytics(): Promise<{
     taxAmount: number;
     providerAmount: number;
     status: string;
+    settledAt: string | null;
+    referenceNote: string | null;
     createdAt: string;
   }>;
 }> {
@@ -945,19 +1048,75 @@ export async function getAdminFinancialAnalytics(): Promise<{
     take: 50,
   });
 
-  const allActiveSettlements = await prisma.settlementLedger.findMany({
-    where: { status: { not: 'CANCELLED' } },
-  });
+  const [allSettlements, allPayments, allRefunds] = await Promise.all([
+    prisma.settlementLedger.findMany(),
+    prisma.payment.findMany(),
+    prisma.refund.findMany(),
+  ]);
 
-  const allRefunds = await prisma.refund.findMany({
-    where: { status: 'PROCESSED' },
-  });
+  const activeSettlements = allSettlements.filter((s) => s.status !== 'CANCELLED');
+  const grossVolume = activeSettlements.reduce((sum, s) => sum + s.grossAmount, 0);
+  const totalCommissionEarned = activeSettlements.reduce((sum, s) => sum + s.commissionAmount, 0);
+  const totalTaxCollected = activeSettlements.reduce((sum, s) => sum + s.taxAmount, 0);
+  const totalProviderPayables = activeSettlements.reduce((sum, s) => sum + s.providerAmount, 0);
+  const totalRefunds = allRefunds.filter((r) => r.status === 'PROCESSED').reduce((sum, r) => sum + r.amount, 0);
 
-  const grossVolume = allActiveSettlements.reduce((sum, s) => sum + s.grossAmount, 0);
-  const totalCommissionEarned = allActiveSettlements.reduce((sum, s) => sum + s.commissionAmount, 0);
-  const totalTaxCollected = allActiveSettlements.reduce((sum, s) => sum + s.taxAmount, 0);
-  const totalProviderPayables = allActiveSettlements.reduce((sum, s) => sum + s.providerAmount, 0);
-  const totalRefunds = allRefunds.reduce((sum, r) => sum + r.amount, 0);
+  // Payments breakdown
+  let capturedCount = 0;
+  let capturedAmount = 0;
+  let pendingCount = 0;
+  let pendingAmount = 0;
+  let failedCount = 0;
+  let failedAmount = 0;
+  let refundedCount = 0;
+  let refundedAmount = 0;
+
+  for (const p of allPayments) {
+    if (p.status === PaymentStatus.PAID) {
+      capturedCount++;
+      capturedAmount += p.amount;
+    } else if (p.status === PaymentStatus.PENDING) {
+      pendingCount++;
+      pendingAmount += p.amount;
+    } else if (p.status === PaymentStatus.FAILED) {
+      failedCount++;
+      failedAmount += p.amount;
+    } else if (p.status === PaymentStatus.REFUNDED || p.status === PaymentStatus.PARTIALLY_REFUNDED) {
+      refundedCount++;
+      refundedAmount += (p.refundAmount || p.amount);
+    }
+  }
+
+  // Payouts breakdown
+  let pPendingCount = 0;
+  let pPendingAmount = 0;
+  let pApprovedCount = 0;
+  let pApprovedAmount = 0;
+  let pProcessingCount = 0;
+  let pProcessingAmount = 0;
+  let pSettledCount = 0;
+  let pSettledAmount = 0;
+  let pOnHoldCount = 0;
+  let pOnHoldAmount = 0;
+
+  for (const s of allSettlements) {
+    if (s.status === 'SETTLED') {
+      pSettledCount++;
+      pSettledAmount += s.providerAmount;
+    } else if (s.status === 'APPROVED') {
+      pApprovedCount++;
+      pApprovedAmount += s.providerAmount;
+    } else if (s.status === 'PROCESSING') {
+      pProcessingCount++;
+      pProcessingAmount += s.providerAmount;
+    } else if (s.status === 'ON_HOLD') {
+      pOnHoldCount++;
+      pOnHoldAmount += s.providerAmount;
+    } else if (s.status === 'PENDING') {
+      pPendingCount++;
+      pPendingAmount += s.providerAmount;
+    }
+  }
 
   return {
     grossVolume: Math.round(grossVolume * 100) / 100,
@@ -966,6 +1125,28 @@ export async function getAdminFinancialAnalytics(): Promise<{
     totalProviderPayables: Math.round(totalProviderPayables * 100) / 100,
     totalRefunds: Math.round(totalRefunds * 100) / 100,
     commissionRate: getPlatformCommissionRate(),
+    paymentsSummary: {
+      capturedCount,
+      capturedAmount: Math.round(capturedAmount * 100) / 100,
+      pendingCount,
+      pendingAmount: Math.round(pendingAmount * 100) / 100,
+      failedCount,
+      failedAmount: Math.round(failedAmount * 100) / 100,
+      refundedCount,
+      refundedAmount: Math.round(refundedAmount * 100) / 100,
+    },
+    payoutsSummary: {
+      pendingCount: pPendingCount,
+      pendingAmount: Math.round(pPendingAmount * 100) / 100,
+      approvedCount: pApprovedCount,
+      approvedAmount: Math.round(pApprovedAmount * 100) / 100,
+      processingCount: pProcessingCount,
+      processingAmount: Math.round(pProcessingAmount * 100) / 100,
+      settledCount: pSettledCount,
+      settledAmount: Math.round(pSettledAmount * 100) / 100,
+      onHoldCount: pOnHoldCount,
+      onHoldAmount: Math.round(pOnHoldAmount * 100) / 100,
+    },
     recentLedger: records.map((r) => ({
       id: r.id,
       bookingRef: r.booking.bookingRef,
@@ -975,6 +1156,8 @@ export async function getAdminFinancialAnalytics(): Promise<{
       taxAmount: r.taxAmount,
       providerAmount: r.providerAmount,
       status: r.status,
+      settledAt: r.settledAt ? r.settledAt.toISOString() : null,
+      referenceNote: r.referenceNote || null,
       createdAt: r.createdAt.toISOString(),
     })),
   };

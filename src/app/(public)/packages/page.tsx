@@ -1,8 +1,9 @@
 import React from 'react';
+import Link from 'next/link';
 import { getPublishedPackages } from '@/server/db/packages';
 import { PackageCard } from '@/components/cards/PackageCard';
 import { PackagesFilters } from '@/components/travel/PackagesFilters';
-import { ROUTES } from '@/constants';
+import { PACKAGE_PAGE_CATEGORIES, ROUTES } from '@/constants';
 import { PackageCategory, SortOption } from '@/types';
 import { getNearbyDestinations, type NearbyDestinationSuggestion } from '@/lib/india-locations';
 
@@ -28,12 +29,19 @@ export default async function PackagesPage({
   }>;
 }) {
   const params = await searchParams;
+
+  // If no specific category is selected, default to both Tour Packages and Devotional Trips
+  const isDevotional = params.category === 'devotional';
+  const isTour = params.category === 'tour';
+  const selectedCategory = params.category as PackageCategory | undefined;
+
   const packages = await getPublishedPackages({
     q: params.q,
     destination: params.destination,
     destinationId: params.destinationId,
     destinationSlug: params.destinationSlug,
-    category: params.category as PackageCategory,
+    category: selectedCategory,
+    categories: !selectedCategory ? ['tour', 'devotional'] : undefined,
     minPrice: params.minPrice ? Number(params.minPrice) : undefined,
     maxPrice: params.maxPrice ? Number(params.maxPrice) : undefined,
     duration: params.duration ? Number(params.duration) : undefined,
@@ -57,6 +65,8 @@ export default async function PackagesPage({
         try {
           const pkgs = await getPublishedPackages({
             destination: nearby.name,
+            categories: !selectedCategory ? ['tour', 'devotional'] : undefined,
+            category: selectedCategory,
             take: 3,
           });
           if (pkgs.length > 0) {
@@ -71,6 +81,7 @@ export default async function PackagesPage({
     if (recommendedPackages.length === 0) {
       try {
         recommendedPackages = await getPublishedPackages({
+          categories: ['tour', 'devotional'],
           take: 6,
           sort: 'recommended',
         });
@@ -100,20 +111,37 @@ export default async function PackagesPage({
     params.duration,
   ].filter(Boolean).length;
 
+  const buildTabHref = (targetCategory: string) => {
+    const p = new URLSearchParams();
+    if (params.destination) p.set('destination', params.destination);
+    if (params.destinationId) p.set('destinationId', params.destinationId);
+    if (params.destinationSlug) p.set('destinationSlug', params.destinationSlug);
+    if (params.q) p.set('q', params.q);
+    if (params.sort) p.set('sort', params.sort);
+    if (params.minPrice) p.set('minPrice', params.minPrice);
+    if (params.maxPrice) p.set('maxPrice', params.maxPrice);
+    if (params.duration) p.set('duration', params.duration);
+    if (params.travelType) p.set('travelType', params.travelType);
+    if (params.vibe) p.set('vibe', params.vibe);
+    if (targetCategory) p.set('category', targetCategory);
+    const qStr = p.toString();
+    return qStr ? `${ROUTES.PACKAGES}?${qStr}` : ROUTES.PACKAGES;
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 space-y-5 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10 lg:space-y-8">
       {/* Header Banner */}
       <div className="travel-catalog-hero flex flex-col justify-between gap-2 rounded-2xl bg-slate-900 p-4 text-white shadow-xl md:flex-row md:items-center md:gap-6 md:p-6 lg:p-8">
         <div className="travel-catalog-hero-content max-w-xl">
           <span className="travel-catalog-eyebrow inline-flex items-center rounded-full border border-teal-500/30 bg-teal-950/70 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-teal-300">
-            Travel Catalog
+            Tour Packages & Spiritual Yatras
           </span>
-          <h1 className="travel-catalog-heading text-3xl font-extrabold leading-tight text-white md:max-w-[14ch] md:text-4xl">
-            Browse All Tour Packages
+          <h1 className="travel-catalog-heading text-3xl font-extrabold leading-tight text-white md:max-w-[16ch] md:text-4xl">
+            {isDevotional ? 'Devotional Trips & Yatras' : isTour ? 'Curated Tour Packages' : 'Browse All Packages'}
           </h1>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="travel-catalog-description max-w-124 text-slate-300 md:text-sm md:leading-6">
-              Filter through verified tours, hill station expeditions, houseboat cruises, and heritage retreats across India.
+              Filter through verified holiday tours, hill station expeditions, holy temple darshans, and spiritual yatras across India.
             </p>
             <div className="travel-catalog-meta flex items-center gap-2 self-start sm:self-auto">
               {params.travelType && (
@@ -143,6 +171,10 @@ export default async function PackagesPage({
         {/* Sidebar Filters */}
         <aside className="lg:col-span-1 space-y-4 lg:space-y-6">
           <PackagesFilters
+            baseRoute={ROUTES.PACKAGES}
+            categories={PACKAGE_PAGE_CATEGORIES}
+            allCategoriesLabel="All Packages (Tour & Devotional)"
+            title="Filter Packages & Yatras"
             defaultDestination={params.destination}
             defaultDestinationId={params.destinationId}
             defaultCategory={params.category}
@@ -156,6 +188,65 @@ export default async function PackagesPage({
 
         {/* Packages Results */}
         <main className="lg:col-span-3 space-y-4 sm:space-y-6">
+          {/* Quick Experience Filter Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <Link
+              href={buildTabHref('')}
+              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold transition-all shrink-0 ${
+                !params.category
+                  ? 'bg-teal-700 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              <span>✨</span> All Packages (Tour & Devotional)
+            </Link>
+            <Link
+              href={buildTabHref('tour')}
+              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold transition-all shrink-0 ${
+                params.category === 'tour'
+                  ? 'bg-teal-700 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              <span>🗺️</span> Tour Packages
+            </Link>
+            <Link
+              href={buildTabHref('devotional')}
+              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold transition-all shrink-0 ${
+                params.category === 'devotional'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'bg-amber-50 border border-amber-200 text-amber-900 hover:bg-amber-100'
+              }`}
+            >
+              <span>🛕</span> Devotional Trips & Yatras
+            </Link>
+          </div>
+
+          {/* Devotional Spotlight Banner when not already filtered to Devotional */}
+          {!isDevotional && (
+            <div className="rounded-2xl border border-amber-200/90 bg-linear-to-r from-amber-50 via-white to-amber-50/50 p-4 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center text-xl shrink-0">
+                  🛕
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-amber-950 uppercase tracking-wider">
+                    Sacred Pilgrimages & Spiritual Yatras
+                  </p>
+                  <p className="text-xs text-slate-600">
+                    Looking for sacred journeys? Explore verified temple darshans and holy ghat rituals in Varanasi, Tirupati, Haridwar & Ayodhya.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href={buildTabHref('devotional')}
+                className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 hover:text-amber-950 hover:underline shrink-0"
+              >
+                View Devotional Trips →
+              </Link>
+            </div>
+          )}
+
           {activeFiltersCount > 0 && (
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-semibold text-slate-500">{packages.length} results</span>

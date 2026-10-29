@@ -9,6 +9,9 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
+    const idsParam = searchParams.get('ids');
+    const ids = idsParam ? idsParam.split(',').map((s) => s.trim()).filter(Boolean) : undefined;
+
     const q = searchParams.get('q') || searchParams.get('search') || searchParams.get('query') || undefined;
     const destination = searchParams.get('destination') || undefined;
     const destinationId = searchParams.get('destinationId') || undefined;
@@ -60,6 +63,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { packages, total } = await getPublishedPackagesWithCount({
+      ids,
       q,
       destination,
       destinationId,

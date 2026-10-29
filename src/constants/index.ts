@@ -2,10 +2,11 @@
 export const ROUTES = {
   // Public
   HOME: '/',
+  PACKAGES: '/packages',
+  EXPLORE: '/explore',
   DEVOTIONAL_TRIPS: '/devotional-trips',
   DESTINATIONS: '/destinations',
   DESTINATION: (slug: string) => `/destinations/${slug}`,
-  PACKAGES: '/packages',
   PACKAGE: (slug: string) => `/packages/${slug}`,
   STAYS: '/stays',
   STAY: (slug: string) => `/stays/${slug}`,
@@ -97,8 +98,8 @@ export const ROUTES = {
 // ─── Navigation ───────────────────────────────────────────────
 export const PUBLIC_NAV = [
   { label: 'Home', href: ROUTES.HOME },
-  { label: 'Devotional Trips', href: ROUTES.DEVOTIONAL_TRIPS },
   { label: 'Packages', href: ROUTES.PACKAGES },
+  { label: 'Explore', href: ROUTES.EXPLORE },
   { label: 'Stays', href: ROUTES.STAYS },
   { label: 'Foreign Trips', href: ROUTES.FOREIGN_TRIPS },
   { label: 'Deals', href: ROUTES.DEALS },
@@ -161,6 +162,26 @@ export const PACKAGE_CATEGORIES = [
   { value: 'adventure', label: 'Adventures', icon: '🧗' },
   { value: 'guide', label: 'Local Guides', icon: '🧭' },
   { value: 'cab', label: 'Cab Services', icon: '🚗' },
+] as const;
+
+// ─── Explore Categories (for Explore page category dropdown) ──
+// Explicitly removes "Tour Packages", "Devotional Trips", and "Foreign Trips"
+export const EXPLORE_CATEGORIES = [
+  { value: 'villa', label: 'Villas', icon: '🏡' },
+  { value: 'homestay', label: 'Homestays', icon: '🏠' },
+  { value: 'hotel', label: 'Hotels', icon: '🏨' },
+  { value: 'hostel', label: 'Hostels', icon: '🛏️' },
+  { value: 'camping', label: 'Camping', icon: '⛺' },
+  { value: 'food', label: 'Food Experiences', icon: '🍽️' },
+  { value: 'adventure', label: 'Adventures', icon: '🧗' },
+  { value: 'guide', label: 'Local Guides', icon: '🧭' },
+  { value: 'cab', label: 'Cab Services', icon: '🚗' },
+] as const;
+
+// ─── Package Page Categories (for Packages page category filter) ──
+export const PACKAGE_PAGE_CATEGORIES = [
+  { value: 'tour', label: 'Tour Packages', icon: '🗺️' },
+  { value: 'devotional', label: 'Devotional Trips', icon: '🛕' },
 ] as const;
 
 // ─── Sort Options ─────────────────────────────────────────────
