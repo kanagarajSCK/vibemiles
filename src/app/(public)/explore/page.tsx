@@ -79,13 +79,28 @@ export default async function ExplorePage({
     }
 
     if (recommendedPackages.length === 0) {
-      try {
-        recommendedPackages = await getPublishedPackages({
-          take: 6,
-          sort: 'recommended',
-        });
-      } catch {
-        recommendedPackages = [];
+      if (selectedCategory) {
+        // If a specific category was selected, recommendations MUST stay strictly within that same category!
+        try {
+          recommendedPackages = await getPublishedPackages({
+            category: selectedCategory,
+            take: 6,
+            sort: 'recommended',
+          });
+        } catch {
+          recommendedPackages = [];
+        }
+      } else {
+        // Only if NO category is filtered (All Categories) and search yielded 0 results,
+        // recommend popular marketplace experiences across categories.
+        try {
+          recommendedPackages = await getPublishedPackages({
+            take: 6,
+            sort: 'recommended',
+          });
+        } catch {
+          recommendedPackages = [];
+        }
       }
     }
 
@@ -332,10 +347,14 @@ export default async function ExplorePage({
                       <h4 className="text-lg font-bold text-slate-900">
                         {searchedLocation
                           ? `Recommended Offerings Near ${searchedLocation}`
+                          : selectedCategory
+                          ? `Other ${currentCategoryObj?.label || 'Category'} Offerings`
                           : 'Explore Popular Marketplace Experiences'}
                       </h4>
                       <p className="text-xs text-slate-500">
-                        Verified stays, adventures, and experiences available for booking
+                        {selectedCategory
+                          ? `More verified listings in ${currentCategoryObj?.label || 'this category'}`
+                          : 'Verified stays, adventures, and experiences available for booking'}
                       </p>
                     </div>
                   </div>

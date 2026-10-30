@@ -267,6 +267,57 @@ export const INDIAN_STATES = [
 ] as const;
 
 // ─── Unique Category Cover Images & Fallbacks ─────────────────
+export const CATEGORY_ALIASES: Record<string, string> = {
+  'tour': 'tour',
+  'tours': 'tour',
+  'tour-packages': 'tour',
+  'tour-package': 'tour',
+  'tour packages': 'tour',
+  'devotional': 'devotional',
+  'devotional-trips': 'devotional',
+  'devotional-trip': 'devotional',
+  'devotional trips': 'devotional',
+  'foreign': 'foreign',
+  'foreign-trips': 'foreign',
+  'foreign-trip': 'foreign',
+  'foreign trips': 'foreign',
+  'villa': 'villa',
+  'villas': 'villa',
+  'homestay': 'homestay',
+  'homestays': 'homestay',
+  'hotel': 'hotel',
+  'hotels': 'hotel',
+  'hostel': 'hostel',
+  'hostels': 'hostel',
+  'camping': 'camping',
+  'campings': 'camping',
+  'food': 'food',
+  'foods': 'food',
+  'food-experiences': 'food',
+  'food-experience': 'food',
+  'food experiences': 'food',
+  'adventure': 'adventure',
+  'adventures': 'adventure',
+  'adventure-activities': 'adventure',
+  'adventure activities': 'adventure',
+  'guide': 'guide',
+  'guides': 'guide',
+  'local-guides': 'guide',
+  'local-guide': 'guide',
+  'local guides': 'guide',
+  'cab': 'cab',
+  'cabs': 'cab',
+  'cab-services': 'cab',
+  'cab services': 'cab',
+  'taxi': 'cab',
+};
+
+export function normalizeCategorySlug(raw?: string | null): string {
+  if (!raw) return 'tour';
+  const cleaned = raw.toLowerCase().trim();
+  return CATEGORY_ALIASES[cleaned] || cleaned;
+}
+
 export const CATEGORY_COVER_IMAGES: Record<string, string> = {
   tour: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1600&q=80', // Scenic tour roadtrip
   devotional: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1600&q=80', // Temple / Spiritual
@@ -287,7 +338,7 @@ export const DEFAULT_FALLBACK_IMAGE =
 
 export function getCategoryDefaultCoverImage(category?: string | null): string {
   if (!category) return DEFAULT_FALLBACK_IMAGE;
-  const key = category.toLowerCase().trim();
+  const key = normalizeCategorySlug(category);
   return CATEGORY_COVER_IMAGES[key] || DEFAULT_FALLBACK_IMAGE;
 }
 

@@ -7,7 +7,7 @@ import { createNotificationInDb } from './notifications';
 import { recordAuditLog } from './admin';
 import { MOCK_PACKAGES } from '@/lib/mock-data';
 import { slugify } from '@/lib/utils';
-import { getCategoryDefaultCoverImage } from '@/constants';
+import { getCategoryDefaultCoverImage, normalizeCategorySlug } from '@/constants';
 
 export interface GetPackagesOptions extends SearchFilters {
   ids?: string[];
@@ -313,27 +313,14 @@ export function buildPublishedPackagesWhere(options?: GetPackagesOptions): Prism
 
   // Category filter (supports canonical slugs and descriptive aliases)
   if (options?.category) {
-    const rawCat = options.category.toLowerCase().trim();
-    const catAliases: Record<string, string> = {
-      'tour-packages': 'tour',
-      'tour-package': 'tour',
-      'devotional-trips': 'devotional',
-      'devotional-trip': 'devotional',
-      'foreign-trips': 'foreign',
-      'foreign-trip': 'foreign',
-      'adventures': 'adventure',
-      'food-experiences': 'food',
-      'cab-services': 'cab',
-      'local-guides': 'guide',
-    };
-    const targetSlug = catAliases[rawCat] || rawCat;
+    const targetSlug = normalizeCategorySlug(options.category);
     andConditions.push({
       category: {
         slug: { equals: targetSlug, mode: 'insensitive' },
       },
     });
   } else if (options?.categories && options.categories.length > 0) {
-    const slugs = options.categories.map((c) => c.toLowerCase().trim());
+    const slugs = options.categories.map((c) => normalizeCategorySlug(c));
     andConditions.push({
       category: {
         slug: { in: slugs },
@@ -697,9 +684,10 @@ export async function getPackagesByDestination(
  */
 export async function getPackagesByCategory(categorySlug: string, limit?: number): Promise<Package[]> {
   try {
+    const targetSlug = normalizeCategorySlug(categorySlug);
     const records = await prisma.package.findMany({
       where: {
-        category: { slug: categorySlug.toLowerCase() },
+        category: { slug: targetSlug },
         status: ListingStatus.PUBLISHED,
         approvalStatus: ApprovalStatus.APPROVED,
         isActive: true,
@@ -716,8 +704,8 @@ export async function getPackagesByCategory(categorySlug: string, limit?: number
     return records.map((r) => mapPrismaPackageToDomain(r as unknown as FullPrismaPackage));
   } catch (error) {
     return handleDbError(error, `getPackagesByCategory(${categorySlug})`, () => {
-      const cat = categorySlug.toLowerCase();
-      return MOCK_PACKAGES.filter((p) => p.category.toLowerCase() === cat).slice(0, limit);
+      const cat = normalizeCategorySlug(categorySlug);
+      return MOCK_PACKAGES.filter((p) => normalizeCategorySlug(p.category) === cat).slice(0, limit);
     });
   }
 }
@@ -865,16 +853,31 @@ async function resolveCategory(categoryId?: string, categorySlug?: string) {
     if (cat) return cat;
   }
 
-  const slug = (categorySlug || 'tour').toLowerCase().trim();
+  const rawSlug = (categorySlug || 'tour').trim();
+  const normalized = normalizeCategorySlug(rawSlug);
+
+  // 1. Try matching by normalized slug or raw slug / name
   const catBySlug = await prisma.category.findFirst({
     where: {
       OR: [
-        { slug: { equals: slug, mode: 'insensitive' } },
-        { name: { equals: slug, mode: 'insensitive' } },
+        { slug: { equals: normalized, mode: 'insensitive' } },
+        { slug: { equals: rawSlug, mode: 'insensitive' } },
+        { name: { equals: rawSlug, mode: 'insensitive' } },
+        { name: { contains: normalized, mode: 'insensitive' } },
       ],
     },
   });
   if (catBySlug) return catBySlug;
+
+  // 2. Try finding by unique slug directly
+  const catDirect = await prisma.category.findUnique({
+    where: { slug: normalized },
+  });
+  if (catDirect) return catDirect;
+
+  // 3. Fallback to canonical 'tour' category, never an arbitrary category
+  const tourCat = await prisma.category.findUnique({ where: { slug: 'tour' } });
+  if (tourCat) return tourCat;
 
   const firstCat = await prisma.category.findFirst();
   if (firstCat) return firstCat;
@@ -882,8 +885,8 @@ async function resolveCategory(categoryId?: string, categorySlug?: string) {
   return prisma.category.create({
     data: {
       slug: 'tour',
-      name: 'Tours & Treks',
-      description: 'Exciting tours and treks across India.',
+      name: 'Tour Packages',
+      description: 'Authentic tour packages across extraordinary Indian destinations.',
     },
   });
 }

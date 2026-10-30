@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { ROUTES, INDIAN_STATES, getCategoryDefaultCoverImage } from '@/constants';
+import { ROUTES, INDIAN_STATES, getCategoryDefaultCoverImage, normalizeCategorySlug } from '@/constants';
 import { packageService } from '@/services/package.service';
 import { CoverImageUploader } from '@/components/travel/CoverImageUploader';
 
@@ -21,7 +21,9 @@ const LISTING_TYPES = [
   { value: 'cab',        label: 'Cab / Taxi',            emoji: '🚗' },
   { value: 'villa',      label: 'Villa',                 emoji: '🏕️' },
   { value: 'homestay',   label: 'Homestay',              emoji: '🏡' },
+  { value: 'hotel',      label: 'Hotel',                 emoji: '🏨' },
   { value: 'hostel',     label: 'Hostel / Room Stay',    emoji: '🛋️' },
+  { value: 'camping',    label: 'Camping',               emoji: '⛺' },
   { value: 'devotional', label: 'Devotional Trip',       emoji: '🛕' },
   { value: 'foreign',    label: 'Foreign Trip',          emoji: '✈️' },
   { value: 'food',       label: 'Food Experience',       emoji: '🍽️' },
@@ -536,7 +538,7 @@ function NewPackageForm() {
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
 
   const isCab = form.listingType === 'cab';
-  const isVilla = form.listingType === 'villa' || form.listingType === 'homestay';
+  const isVilla = form.listingType === 'villa' || form.listingType === 'homestay' || form.listingType === 'hotel' || form.listingType === 'camping';
   const isHostel = form.listingType === 'hostel';
   const isFood = form.listingType === 'food';
   const isAdventure = form.listingType === 'adventure';
@@ -580,10 +582,11 @@ function NewPackageForm() {
     let isMounted = true;
     packageService.getProviderPackageById(editId).then((pkg) => {
       if (!isMounted || !pkg) return;
+      const normalizedCat = normalizeCategorySlug(pkg.category);
       setForm({
-        listingType: (['tour', 'devotional', 'foreign', 'cab', 'villa', 'homestay', 'hostel', 'food', 'adventure', 'guide'].includes(pkg.category) ? pkg.category : 'tour') as ListingType,
+        listingType: normalizedCat as ListingType,
         title: pkg.name,
-        category: pkg.category,
+        category: normalizedCat,
         destinationInput: pkg.destinationName ? `${pkg.destinationName}, ${pkg.state}` : '',
         destinationCity: pkg.city || pkg.destinationName || '',
         destinationState: pkg.state || '',
@@ -692,7 +695,14 @@ function NewPackageForm() {
       ...prev,
       listingType: t,
       category: t,
-      villaPropertyType: t === 'homestay' ? 'Entire Homestay' : 'Entire Villa',
+      villaPropertyType:
+        t === 'homestay'
+          ? 'Entire Homestay'
+          : t === 'hotel'
+          ? 'Boutique Hotel'
+          : t === 'camping'
+          ? 'Luxury Campsite'
+          : 'Entire Villa',
     }));
     setStep(1);
     setError(null);
@@ -877,7 +887,7 @@ function NewPackageForm() {
           submitForReview: true,
         };
       } else if (isVilla) {
-        const villaCategory = form.listingType === 'homestay' ? 'homestay' : 'villa';
+        const villaCategory = form.listingType;
         const defaultVillaImage = getCategoryDefaultCoverImage(villaCategory);
         const villaImages = form.images.length > 0
           ? form.images
@@ -889,7 +899,7 @@ function NewPackageForm() {
         payload = {
           name: form.title.trim(),
           description: form.description.trim() || `Luxurious ${form.villaPropertyType} offering ${form.bedrooms} bedrooms and ${form.bathrooms} bathrooms for up to ${form.maximumGuests} guests in ${form.city || form.destinationCity || 'scenic location'}.`,
-          category: form.listingType === 'homestay' ? 'homestay' : 'villa',
+          category: form.listingType,
           destinationCity: form.city.trim() || form.destinationCity || form.destinationInput || 'Chennai',
           destinationState: form.state.trim() || form.destinationState || 'Tamil Nadu',
           durationDays: 1,
@@ -2731,7 +2741,22 @@ function NewPackageForm() {
             </label>
             <select
               value={form.category}
-              onChange={(e) => set('category', e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value as ListingType;
+                setForm((prev) => ({
+                  ...prev,
+                  category: val,
+                  listingType: val,
+                  villaPropertyType:
+                    val === 'homestay'
+                      ? 'Entire Homestay'
+                      : val === 'hotel'
+                      ? 'Boutique Hotel'
+                      : val === 'camping'
+                      ? 'Luxury Campsite'
+                      : 'Entire Villa',
+                }));
+              }}
               className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[15px] text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
             >
               <option value="tour">Tour Packages</option>
@@ -2740,7 +2765,12 @@ function NewPackageForm() {
               <option value="food">Food Experiences</option>
               <option value="adventure">Adventures</option>
               <option value="guide">Local Guides</option>
+              <option value="villa">Villas</option>
+              <option value="homestay">Homestays</option>
+              <option value="hotel">Hotels</option>
+              <option value="hostel">Hostels</option>
               <option value="camping">Camping</option>
+              <option value="cab">Cab Services</option>
             </select>
           </div>
         </div>

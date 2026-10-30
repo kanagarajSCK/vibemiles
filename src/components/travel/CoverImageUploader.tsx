@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/Button';
 import {
   PACKAGE_CATEGORIES,
   getCategoryDefaultCoverImage,
+  normalizeCategorySlug,
   CATEGORY_COVER_IMAGES,
 } from '@/constants';
 
@@ -152,8 +153,9 @@ export const CoverImageUploader: React.FC<CoverImageUploaderProps> = ({
   // Resolve category details for suggestion
   const categoryMeta = useMemo(() => {
     if (!category) return null;
-    const cat = PACKAGE_CATEGORIES.find((c) => c.value === category.toLowerCase());
-    const defaultCover = getCategoryDefaultCoverImage(category);
+    const normalized = normalizeCategorySlug(category);
+    const cat = PACKAGE_CATEGORIES.find((c) => c.value === normalized);
+    const defaultCover = getCategoryDefaultCoverImage(normalized);
     return {
       label: cat?.label || category,
       icon: cat?.icon || '📸',

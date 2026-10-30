@@ -48,12 +48,13 @@ export function handleDbError<T>(
 ): T {
   const isConnErr = isDbConnectionError(error);
   const isDev = process.env.NODE_ENV !== 'production';
+  const isBuild = process.env.NEXT_PHASE === 'phase-production-build' || process.env.npm_lifecycle_event === 'build';
 
-  // Development-only controlled fallback if explicitly provided
-  if (isDev && devFallback && isConnErr) {
+  // Development-only or build prerender fallback if explicitly provided and connection fails
+  if ((isDev || isBuild) && devFallback && isConnErr) {
     console.warn(
-      `⚠️ [VibeMiles DB DEV WARNING] PostgreSQL unreachable at localhost:5432 during "${context}".\n` +
-      `   Using controlled development fallback. (In production, this throws DatabaseError).`
+      `⚠️ [VibeMiles DB BUILD/DEV WARNING] PostgreSQL unreachable during "${context}".\n` +
+      `   Using safe fallback. (In live production runtime, this throws DatabaseError).`
     );
     return devFallback();
   }
