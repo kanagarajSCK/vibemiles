@@ -35,6 +35,7 @@ function isPublicPage(pathname: string): boolean {
     pathname === '/terms' ||
     pathname === '/privacy' ||
     pathname === '/cancellation-policy' ||
+    pathname === '/logout' ||
     pathname === '/unauthorized'
   ) {
     return true;
@@ -135,13 +136,11 @@ export async function proxy(request: NextRequest) {
   }
   const isAuthenticated = Boolean(session && session.userId);
 
-  // 3. Handle Already-Authenticated Users on Auth Pages
+  // 3. Handle Auth Pages (Login, Register, Partner/Admin Login)
+  // We do NOT aggressively auto-redirect authenticated users away via HTTP 307.
+  // Instead, we allow the auth pages to render so users can see who is signed in,
+  // switch accounts, or re-authenticate safely without unexpected redirects.
   if (AUTH_PAGES.has(pathname)) {
-    if (isAuthenticated && session) {
-      // Redirect logged-in users away from auth pages to their respective dashboard
-      const dashboardUrl = new URL(getDashboard(session.role), request.url);
-      return NextResponse.redirect(dashboardUrl);
-    }
     return NextResponse.next();
   }
 

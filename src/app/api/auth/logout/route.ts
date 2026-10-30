@@ -44,3 +44,25 @@ export async function POST(request: NextRequest) {
     return response;
   }
 }
+
+export async function GET(request: NextRequest) {
+  try {
+    const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+    if (sessionCookie) {
+      await revokeDbSession(sessionCookie);
+    }
+  } catch (error) {
+    console.error('Logout GET error:', error);
+  }
+
+  const response = NextResponse.redirect(new URL('/login', request.url));
+  response.cookies.set(SESSION_COOKIE_NAME, '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 0,
+    expires: new Date(0),
+  });
+  return response;
+}

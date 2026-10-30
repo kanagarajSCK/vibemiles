@@ -12,24 +12,73 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const { login, user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { login, user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (!authLoading && isAuthenticated && user) {
-      if (user.role === 'admin') {
-        router.push(ROUTES.ADMIN_DASHBOARD);
-      } else if (user.role === 'provider') {
-        router.push(ROUTES.PROVIDER_DASHBOARD);
-      } else {
-        router.push(ROUTES.ACCOUNT_DASHBOARD);
-      }
-    }
-  }, [authLoading, isAuthenticated, user, router]);
+  if (!authLoading && isAuthenticated && user) {
+    const isAdmin = user.role === 'admin';
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 px-4 py-12">
+        <div className="max-w-md w-full space-y-6 rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl text-center text-white">
+          <Link href={ROUTES.HOME} className="inline-flex items-center justify-center">
+            <Image src="/vibe-miles-logo.png" alt="Vibe Miles" width={220} height={80} className="h-16 w-auto object-contain mx-auto" />
+          </Link>
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-950 border border-rose-800 text-rose-400">
+            <ShieldAlert className="h-7 w-7" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-extrabold text-white">Admin Console Access</h2>
+            <p className="mt-1 text-xs text-slate-400">
+              Current session: <span className="text-white font-semibold">{user.email}</span>
+            </p>
+            <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-slate-800 border border-slate-700 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-300">
+              Role: {user.role}
+            </div>
+            {!isAdmin && (
+              <p className="mt-3 text-xs text-rose-300 bg-rose-950/40 border border-rose-800/60 rounded-xl p-2.5">
+                Current account ({user.email}) does not have administrative privileges. Please sign in with an Administrator account.
+              </p>
+            )}
+          </div>
+          <div className="space-y-3 pt-2">
+            {isAdmin ? (
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full justify-center font-bold bg-rose-600 hover:bg-rose-500"
+                onClick={() => router.push(ROUTES.ADMIN_DASHBOARD)}
+              >
+                Go to Admin Dashboard
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="md"
+                className="w-full justify-center border-slate-700 text-slate-300 hover:bg-slate-800"
+                onClick={() => router.push(user.role === 'provider' ? ROUTES.PROVIDER_DASHBOARD : ROUTES.ACCOUNT_DASHBOARD)}
+              >
+                Return to My Dashboard
+              </Button>
+            )}
+            <Button
+              variant={isAdmin ? 'outline' : 'primary'}
+              size={isAdmin ? 'md' : 'lg'}
+              className="w-full justify-center font-bold"
+              onClick={async () => {
+                await logout();
+              }}
+            >
+              Sign In as Different Administrator
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -14,7 +14,7 @@ export const PublicHeader: React.FC = () => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, isLoading } = useAuth();
   const { wishlistCount } = useWishlist();
 
   const customer = user as unknown as { fullName?: string; customerProfile?: { fullName?: string } } | null;
@@ -110,7 +110,9 @@ export const PublicHeader: React.FC = () => {
 
           <div className="hidden xl:block h-4 w-px bg-slate-200 mx-0.5" />
 
-          {isAuthenticated && user ? (
+          {isLoading ? (
+            <div className="h-8 w-24 rounded-xl bg-slate-100 animate-pulse hidden sm:block" />
+          ) : isAuthenticated && user ? (
             <div className="relative">
               <button
                 type="button"
@@ -213,7 +215,9 @@ export const PublicHeader: React.FC = () => {
             aria-label={isAuthenticated ? "Go to your account dashboard" : "Sign in to your account"}
             className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
           >
-            {isAuthenticated ? (
+            {isLoading ? (
+              <div className="h-6 w-6 rounded-full bg-slate-100 animate-pulse" />
+            ) : isAuthenticated ? (
               <div className="h-6 w-6 rounded-full bg-teal-600 flex items-center justify-center text-white text-xs font-bold">
                 {displayName.charAt(0).toUpperCase()}
               </div>
@@ -278,7 +282,9 @@ export const PublicHeader: React.FC = () => {
               </Button>
             </Link>
             
-            {isAuthenticated && user ? (
+            {isLoading ? (
+              <div className="h-12 w-full rounded-xl bg-slate-100 animate-pulse my-2" />
+            ) : isAuthenticated && user ? (
               <>
                 <div className="rounded-xl border border-teal-100 bg-teal-50/60 p-3 my-1">
                   <p className="text-xs font-bold text-slate-900 truncate">Signed in as {displayName}</p>

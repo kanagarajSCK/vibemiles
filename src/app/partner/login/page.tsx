@@ -12,23 +12,72 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function PartnerLoginPage() {
   const router = useRouter();
-  const { login, user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { login, user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (!authLoading && isAuthenticated && user) {
-      if (user.role === 'provider') {
-        router.push(ROUTES.PROVIDER_DASHBOARD);
-      } else if (user.role === 'admin') {
-        router.push(ROUTES.ADMIN_DASHBOARD);
-      } else {
-        router.push(ROUTES.ACCOUNT_DASHBOARD);
-      }
-    }
-  }, [authLoading, isAuthenticated, user, router]);
+  if (!authLoading && isAuthenticated && user) {
+    const isPartner = user.role === 'provider';
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4 py-12">
+        <div className="max-w-md w-full space-y-6 rounded-3xl border border-slate-800 bg-slate-950 p-8 shadow-2xl text-center text-white">
+          <Link href={ROUTES.HOME} className="inline-flex items-center justify-center">
+            <Image src="/vibe-miles-logo.png" alt="Vibe Miles" width={220} height={80} className="h-16 w-auto object-contain mx-auto" />
+          </Link>
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-teal-900/60 border border-teal-700 text-teal-400">
+            <Building2 className="h-7 w-7" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-extrabold text-white">Already Signed In</h2>
+            <p className="mt-1 text-xs text-slate-400">
+              Current session: <span className="text-white font-semibold">{user.email}</span>
+            </p>
+            <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-teal-950 border border-teal-800 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal-300">
+              Role: {user.role}
+            </div>
+            {!isPartner && (
+              <p className="mt-3 text-xs text-amber-300 bg-amber-950/40 border border-amber-800/60 rounded-xl p-2.5">
+                You are currently signed in as a traveler ({user.email}). To access the partner portal, please sign in with your partner account.
+              </p>
+            )}
+          </div>
+          <div className="space-y-3 pt-2">
+            {isPartner ? (
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full justify-center font-bold"
+                onClick={() => router.push(ROUTES.PROVIDER_DASHBOARD)}
+              >
+                Go to Partner Dashboard
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="md"
+                className="w-full justify-center border-slate-700 text-slate-300 hover:bg-slate-900"
+                onClick={() => router.push(ROUTES.ACCOUNT_DASHBOARD)}
+              >
+                Return to Traveler Dashboard
+              </Button>
+            )}
+            <Button
+              variant={isPartner ? 'outline' : 'primary'}
+              size={isPartner ? 'md' : 'lg'}
+              className="w-full justify-center font-bold"
+              onClick={async () => {
+                await logout();
+              }}
+            >
+              Sign In to a Different Partner Account
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

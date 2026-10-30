@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Lock, Mail, ArrowRight, Building2 } from 'lucide-react';
+import { Lock, Mail, ArrowRight, Building2, UserCheck, LogOut } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { ROUTES } from '@/constants';
@@ -17,25 +17,113 @@ function LoginForm() {
   const nextParam = searchParams.get('next') || searchParams.get('redirect') || searchParams.get('returnUrl');
   const safeNext = sanitizeRedirectPath(nextParam, '');
 
-  const { login, user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { login, user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const isSwitchRequested = searchParams.get('switch') === 'true' || searchParams.get('prompt') === 'login';
+
   useEffect(() => {
-    if (!authLoading && isAuthenticated && user) {
-      if (safeNext && isValidInternalPath(safeNext)) {
-        router.push(safeNext);
-      } else if (user.role === 'admin') {
-        router.push(ROUTES.ADMIN_DASHBOARD);
-      } else if (user.role === 'provider') {
-        router.push(ROUTES.PROVIDER_DASHBOARD);
-      } else {
-        router.push(ROUTES.ACCOUNT_DASHBOARD);
-      }
+    if (isSwitchRequested && isAuthenticated) {
+      logout();
     }
-  }, [authLoading, isAuthenticated, user, router, safeNext]);
+  }, [isSwitchRequested, isAuthenticated, logout]);
+
+  if (!authLoading && isAuthenticated && user && !isSwitchRequested) {
+    const customer = user as unknown as { fullName?: string; customerProfile?: { fullName?: string } } | null;
+    const provider = user as unknown as { businessName?: string; providerProfile?: { businessName?: string } } | null;
+    const displayName =
+      customer?.fullName ||
+      customer?.customerProfile?.fullName ||
+      provider?.businessName ||
+      provider?.providerProfile?.businessName ||
+      user.email?.split('@')[0] ||
+      'Traveler';
+
+    const targetDashboard =
+      safeNext && isValidInternalPath(safeNext)
+        ? safeNext
+        : user.role === 'admin'
+        ? ROUTES.ADMIN_DASHBOARD
+        : user.role === 'provider'
+        ? ROUTES.PROVIDER_DASHBOARD
+        : ROUTES.ACCOUNT_DASHBOARD;
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-teal-50 via-white to-emerald-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-6 rounded-3xl border border-slate-200 bg-white p-8 shadow-xl text-center">
+          <Link href={ROUTES.HOME} className="inline-flex items-center justify-center transition-opacity hover:opacity-90">
+            <Image
+              src="/vibe-miles-logo.png"
+              alt="Vibe Miles"
+              width={220}
+              height={80}
+              className="h-16 w-auto object-contain mx-auto"
+              priority
+            />
+          </Link>
+
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-teal-50 border border-teal-100 text-teal-700 shadow-xs">
+            <UserCheck className="h-7 w-7" />
+          </div>
+
+          <div>
+            <h2 className="text-2xl font-extrabold text-slate-900">Already Signed In</h2>
+            <p className="mt-1 text-xs text-slate-500">
+              You are currently signed in as
+            </p>
+            <p className="mt-1 text-base font-bold text-slate-900">
+              {displayName}
+            </p>
+            <p className="text-xs text-slate-500">{user.email}</p>
+            <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-teal-50 border border-teal-200 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal-700">
+              Role: {user.role}
+            </div>
+          </div>
+
+          <div className="space-y-3 pt-2">
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full font-bold shadow-md justify-center"
+              onClick={() => router.push(targetDashboard)}
+              rightIcon={<ArrowRight className="w-4 h-4" />}
+            >
+              {safeNext ? 'Continue to Requested Page' : 'Continue to Dashboard'}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="md"
+              className="w-full justify-center text-slate-700"
+              onClick={async () => {
+                setIsLoading(true);
+                await logout();
+                setIsLoading(false);
+              }}
+              isLoading={isLoading}
+            >
+              Sign In to a Different Account
+            </Button>
+
+            <button
+              type="button"
+              onClick={async () => {
+                await logout();
+                router.push(ROUTES.HOME);
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-600 hover:text-rose-700 transition-colors pt-2"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              Sign Out & Return Home
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
