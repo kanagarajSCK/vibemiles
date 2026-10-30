@@ -67,12 +67,22 @@ export async function POST(req: NextRequest) {
 
     let publicUrl: string;
 
-    // Detect serverless environments (Vercel, AWS Lambda) where process.cwd() is read-only
-    const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+    // Detect serverless / cloud / read-only environments (Vercel, AWS Lambda, production)
+    // On Vercel / Lambda, /var/task is read-only and has no writable public directory.
+    const cwd = typeof process.cwd === 'function' ? process.cwd() : '';
+    const isServerless = Boolean(
+      process.env.VERCEL ||
+      process.env.VERCEL_ENV ||
+      process.env.AWS_LAMBDA_FUNCTION_NAME ||
+      process.env.LAMBDA_TASK_ROOT ||
+      cwd.startsWith('/var/task') ||
+      cwd.startsWith('/tmp') ||
+      process.env.NODE_ENV === 'production'
+    );
 
     if (!isServerless) {
       try {
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'packages');
+        const uploadDir = path.join(cwd || process.cwd(), 'public', 'uploads', 'packages');
         await fs.mkdir(uploadDir, { recursive: true });
         const filePath = path.join(uploadDir, uniqueFileName);
         await fs.writeFile(filePath, buffer);
@@ -83,7 +93,7 @@ export async function POST(req: NextRequest) {
         publicUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
       }
     } else {
-      // In serverless runtimes (Vercel / Lambda), local disk is read-only.
+      // In serverless / production runtimes (Vercel / Lambda), local disk is read-only.
       // Use standard high-efficiency base64 Data URL that is directly accepted by DB and Next.js Image.
       publicUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
     }

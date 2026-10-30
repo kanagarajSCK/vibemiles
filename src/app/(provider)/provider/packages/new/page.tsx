@@ -21,9 +21,7 @@ const LISTING_TYPES = [
   { value: 'cab',        label: 'Cab / Taxi',            emoji: '🚗' },
   { value: 'villa',      label: 'Villa',                 emoji: '🏕️' },
   { value: 'homestay',   label: 'Homestay',              emoji: '🏡' },
-  { value: 'hotel',      label: 'Hotel',                 emoji: '🏨' },
   { value: 'hostel',     label: 'Hostel / Room Stay',    emoji: '🛋️' },
-  { value: 'camping',    label: 'Camping',               emoji: '⛺' },
   { value: 'devotional', label: 'Devotional Trip',       emoji: '🛕' },
   { value: 'foreign',    label: 'Foreign Trip',          emoji: '✈️' },
   { value: 'food',       label: 'Food Experience',       emoji: '🍽️' },
@@ -342,6 +340,41 @@ const INITIAL_FORM: FormData = {
   cancellationPolicy: '',
 };
 
+function getDefaultFormForListingType(t: ListingType): FormData {
+  return {
+    ...INITIAL_FORM,
+    listingType: t,
+    category: t,
+    title: '',
+    description: '',
+    images: [],
+    imageUrl: '',
+    destinationInput: '',
+    destinationCity: '',
+    destinationState: '',
+    durationDays: t === 'cab' ? '1' : '3',
+    durationNights: t === 'cab' ? '0' : '2',
+    maxGroupSize: t === 'cab' ? '4' : '12',
+    basePrice:
+      t === 'cab'
+        ? '1500'
+        : t === 'food'
+        ? '799'
+        : t === 'adventure'
+        ? '1499'
+        : t === 'guide'
+        ? '999'
+        : t === 'villa'
+        ? '12000'
+        : t === 'homestay'
+        ? '6000'
+        : t === 'hostel'
+        ? '799'
+        : '10000',
+    villaPropertyType: t === 'homestay' ? 'Entire Homestay' : 'Entire Villa',
+  };
+}
+
 // ─── Radio Button Card Component ───────────────────────────────
 function RadioPill({
   selected,
@@ -537,8 +570,13 @@ function NewPackageForm() {
   // Single flat form state
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
 
+  // Category-isolated drafts store to prevent cross-category photo & description leakage
+  const categoryStore = useRef<Partial<Record<ListingType, FormData>>>({
+    tour: { ...INITIAL_FORM },
+  });
+
   const isCab = form.listingType === 'cab';
-  const isVilla = form.listingType === 'villa' || form.listingType === 'homestay' || form.listingType === 'hotel' || form.listingType === 'camping';
+  const isVilla = form.listingType === 'villa' || form.listingType === 'homestay';
   const isHostel = form.listingType === 'hostel';
   const isFood = form.listingType === 'food';
   const isAdventure = form.listingType === 'adventure';
@@ -582,9 +620,10 @@ function NewPackageForm() {
     let isMounted = true;
     packageService.getProviderPackageById(editId).then((pkg) => {
       if (!isMounted || !pkg) return;
-      const normalizedCat = normalizeCategorySlug(pkg.category);
-      setForm({
-        listingType: normalizedCat as ListingType,
+      const rawCat = normalizeCategorySlug(pkg.category);
+      const normalizedCat = (['tour', 'cab', 'villa', 'homestay', 'hostel', 'devotional', 'foreign', 'food', 'adventure', 'guide'].includes(rawCat) ? rawCat : 'tour') as ListingType;
+      const loadedForm: FormData = {
+        listingType: normalizedCat,
         title: pkg.name,
         category: normalizedCat,
         destinationInput: pkg.destinationName ? `${pkg.destinationName}, ${pkg.state}` : '',
@@ -678,7 +717,9 @@ function NewPackageForm() {
         inclusions: pkg.inclusions?.join('\n') || '',
         exclusions: pkg.exclusions?.join('\n') || '',
         cancellationPolicy: pkg.cancellationPolicy?.notes || '',
-      });
+      };
+      categoryStore.current[normalizedCat] = loadedForm;
+      setForm(loadedForm);
     }).catch((err) => {
       if (isMounted) setError(err instanceof Error ? err.message : 'Failed to load listing for editing');
     });
@@ -687,25 +728,36 @@ function NewPackageForm() {
 
   // Helpers to update individual fields
   const set = useCallback(<K extends keyof FormData>(k: K, v: FormData[K]) => {
-    setForm((prev) => ({ ...prev, [k]: v }));
+    setForm((prev) => {
+      const next = { ...prev, [k]: v };
+      categoryStore.current[next.listingType] = next;
+      return next;
+    });
   }, []);
 
-  const handleListingTypeChange = useCallback((t: ListingType) => {
-    setForm((prev) => ({
-      ...prev,
-      listingType: t,
-      category: t,
-      villaPropertyType:
-        t === 'homestay'
-          ? 'Entire Homestay'
-          : t === 'hotel'
-          ? 'Boutique Hotel'
-          : t === 'camping'
-          ? 'Luxury Campsite'
-          : 'Entire Villa',
-    }));
+  const handleListingTypeChange = useCallback((newType: ListingType) => {
+    setForm((currentForm) => {
+      // 1. Save current category's form state (photos, description, title, details)
+      categoryStore.current[currentForm.listingType] = { ...currentForm };
+
+      // 2. Load target category's isolated draft if it exists, or create fresh pristine draft
+      const savedForNewType = categoryStore.current[newType];
+      if (savedForNewType) {
+        return {
+          ...savedForNewType,
+          listingType: newType,
+          category: newType,
+        };
+      }
+
+      const defaultData = getDefaultFormForListingType(newType);
+      categoryStore.current[newType] = defaultData;
+      return defaultData;
+    });
+
     setStep(1);
     setError(null);
+    setImageError(null);
   }, []);
 
   // Itinerary helpers (for Tour Packages)
@@ -1174,6 +1226,7 @@ function NewPackageForm() {
       {/* Optional Vehicle Cover Photo */}
       <div className="space-y-1.5 pt-2">
         <CoverImageUploader
+          key={`cab_uploader_${form.listingType}`}
           label="Vehicle Photos (Optional)"
           category="cab"
           required={false}
@@ -1181,11 +1234,15 @@ function NewPackageForm() {
           value={form.imageUrl}
           onChange={(val, all) => {
             const list = Array.isArray(val) ? val : all || [val].filter(Boolean);
-            setForm((prev) => ({
-              ...prev,
-              images: list,
-              imageUrl: list[0] || '',
-            }));
+            setForm((prev) => {
+              const next = {
+                ...prev,
+                images: list,
+                imageUrl: list[0] || '',
+              };
+              categoryStore.current[next.listingType] = next;
+              return next;
+            });
             setImageError(null);
           }}
           onError={(msg: string | null) => setImageError(msg)}
@@ -1661,18 +1718,23 @@ function NewPackageForm() {
         {/* 7. PROPERTY IMAGES */}
         <div className="space-y-1.5">
           <CoverImageUploader
-            label="Property Images & Cover Photo"
+            key={`villa_uploader_${form.listingType}`}
+            label={form.listingType === 'homestay' ? 'Homestay Images & Cover Photo' : 'Villa Images & Cover Photo'}
             category={form.listingType === 'homestay' ? 'homestay' : 'villa'}
             required={true}
             images={form.images}
             value={form.imageUrl}
             onChange={(val, all) => {
               const list = Array.isArray(val) ? val : all || [val].filter(Boolean);
-              setForm((prev) => ({
-                ...prev,
-                images: list,
-                imageUrl: list[0] || '',
-              }));
+              setForm((prev) => {
+                const next = {
+                  ...prev,
+                  images: list,
+                  imageUrl: list[0] || '',
+                };
+                categoryStore.current[next.listingType] = next;
+                return next;
+              });
               setImageError(null);
             }}
             onError={(msg: string | null) => setImageError(msg)}
@@ -2183,6 +2245,7 @@ function NewPackageForm() {
       {/* 7. PROPERTY IMAGES */}
       <div className="space-y-1.5">
         <CoverImageUploader
+          key={`hostel_uploader_${form.listingType}`}
           label="Property & Dormitory Images"
           category="hostel"
           required={true}
@@ -2190,11 +2253,15 @@ function NewPackageForm() {
           value={form.imageUrl}
           onChange={(val, all) => {
             const list = Array.isArray(val) ? val : all || [val].filter(Boolean);
-            setForm((prev) => ({
-              ...prev,
-              images: list,
-              imageUrl: list[0] || '',
-            }));
+            setForm((prev) => {
+              const next = {
+                ...prev,
+                images: list,
+                imageUrl: list[0] || '',
+              };
+              categoryStore.current[next.listingType] = next;
+              return next;
+            });
             setImageError(null);
           }}
           onError={(msg: string | null) => setImageError(msg)}
@@ -2684,6 +2751,10 @@ function NewPackageForm() {
       ? 'ACTIVITY TITLE *'
       : isGuide
       ? 'GUIDE SERVICE TITLE *'
+      : form.listingType === 'devotional'
+      ? 'DEVOTIONAL PILGRIMAGE TITLE *'
+      : form.listingType === 'foreign'
+      ? 'FOREIGN TRIP TITLE *'
       : 'PACKAGE TITLE *';
 
     const titlePlaceholder = isFood
@@ -2692,6 +2763,10 @@ function NewPackageForm() {
       ? 'e.g. Scuba Diving & Coral Reef Exploration in Havelock'
       : isGuide
       ? 'e.g. Certified Historian Guide for Hampi Ruins & Temples'
+      : form.listingType === 'devotional'
+      ? 'e.g. Tirupati Balaji VIP Darshan & Srikalahasti Pilgrimage'
+      : form.listingType === 'foreign'
+      ? 'e.g. 5-Day Dubai City Lights & Luxury Desert Safari'
       : 'e.g. 5-Day Kashmir Paradise Tour';
 
     const headerTitle = isFood
@@ -2700,7 +2775,35 @@ function NewPackageForm() {
       ? 'Adventure Activity Details'
       : isGuide
       ? 'Local Guide Service Details'
-      : 'Basic Information';
+      : form.listingType === 'devotional'
+      ? 'Devotional Trip Details'
+      : form.listingType === 'foreign'
+      ? 'Foreign Trip Details'
+      : 'Tour Package Details';
+
+    const coverImageLabel = isFood
+      ? 'Food Experience Cover & Gallery Photos'
+      : isAdventure
+      ? 'Adventure Activity Cover & Gallery Photos'
+      : isGuide
+      ? 'Local Guide Service Cover & Gallery Photos'
+      : form.listingType === 'devotional'
+      ? 'Devotional Trip Cover & Gallery Photos'
+      : form.listingType === 'foreign'
+      ? 'Foreign Trip Cover & Gallery Photos'
+      : 'Listing Cover & Gallery Photos';
+
+    const descriptionLabel = isFood
+      ? 'Food Experience Description *'
+      : isAdventure
+      ? 'Activity Description *'
+      : isGuide
+      ? 'Guide Service Description *'
+      : form.listingType === 'devotional'
+      ? 'Devotional Pilgrimage Description *'
+      : form.listingType === 'foreign'
+      ? 'Foreign Trip Description *'
+      : 'Package Description *';
 
     const descPlaceholder = isFood
       ? 'Describe the culinary trail, cuisines, authentic flavors, chef talks, or market visits...'
@@ -2743,34 +2846,20 @@ function NewPackageForm() {
               value={form.category}
               onChange={(e) => {
                 const val = e.target.value as ListingType;
-                setForm((prev) => ({
-                  ...prev,
-                  category: val,
-                  listingType: val,
-                  villaPropertyType:
-                    val === 'homestay'
-                      ? 'Entire Homestay'
-                      : val === 'hotel'
-                      ? 'Boutique Hotel'
-                      : val === 'camping'
-                      ? 'Luxury Campsite'
-                      : 'Entire Villa',
-                }));
+                handleListingTypeChange(val);
               }}
               className="w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-[15px] text-slate-900 focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
             >
-              <option value="tour">Tour Packages</option>
-              <option value="devotional">Devotional Trips</option>
-              <option value="foreign">Foreign Trips</option>
-              <option value="food">Food Experiences</option>
-              <option value="adventure">Adventures</option>
+              <option value="tour">Tour Package</option>
+              <option value="cab">Cab / Taxi</option>
+              <option value="villa">Villa</option>
+              <option value="homestay">Homestay</option>
+              <option value="hostel">Hostel / Room Stay</option>
+              <option value="devotional">Devotional Trip</option>
+              <option value="foreign">Foreign Trip</option>
+              <option value="food">Food Experience</option>
+              <option value="adventure">Adventure Activities</option>
               <option value="guide">Local Guides</option>
-              <option value="villa">Villas</option>
-              <option value="homestay">Homestays</option>
-              <option value="hotel">Hotels</option>
-              <option value="hostel">Hostels</option>
-              <option value="camping">Camping</option>
-              <option value="cab">Cab Services</option>
             </select>
           </div>
         </div>
@@ -2803,18 +2892,23 @@ function NewPackageForm() {
         {/* Cover & Gallery Images Upload */}
         <div className="space-y-1.5">
           <CoverImageUploader
-            label="Listing Cover & Gallery Photos"
+            key={`std_uploader_${form.listingType}`}
+            label={coverImageLabel}
             category={form.category}
             required={true}
             images={form.images}
             value={form.imageUrl}
             onChange={(val, all) => {
               const list = Array.isArray(val) ? val : all || [val].filter(Boolean);
-              setForm((prev) => ({
-                ...prev,
-                images: list,
-                imageUrl: list[0] || '',
-              }));
+              setForm((prev) => {
+                const next = {
+                  ...prev,
+                  images: list,
+                  imageUrl: list[0] || '',
+                };
+                categoryStore.current[next.listingType] = next;
+                return next;
+              });
               setImageError(null);
             }}
             onError={(msg: string | null) => setImageError(msg)}
@@ -2824,7 +2918,7 @@ function NewPackageForm() {
         {/* Description */}
         <div className="space-y-1.5">
           <label className="block text-[12px] font-semibold uppercase tracking-[0.12em] text-slate-600">
-            Description
+            {descriptionLabel}
           </label>
           <textarea
             rows={4}

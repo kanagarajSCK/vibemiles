@@ -4,7 +4,16 @@ import path from 'path';
 import os from 'os';
 
 // Detect serverless environment (Vercel, AWS Lambda)
-const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const cwd = typeof process.cwd === 'function' ? process.cwd() : '';
+const isServerless = Boolean(
+  process.env.VERCEL ||
+  process.env.VERCEL_ENV ||
+  process.env.AWS_LAMBDA_FUNCTION_NAME ||
+  process.env.LAMBDA_TASK_ROOT ||
+  cwd.startsWith('/var/task') ||
+  cwd.startsWith('/tmp') ||
+  process.env.NODE_ENV === 'production'
+);
 
 // Root directory for secure documents (outside of public/ web root)
 // On Vercel / Lambda, /var/task is read-only, so os.tmpdir() is used as the writable root.
