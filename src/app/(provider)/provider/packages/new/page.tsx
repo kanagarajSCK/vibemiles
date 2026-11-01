@@ -14,6 +14,22 @@ import { Button } from '@/components/ui/Button';
 import { ROUTES, INDIAN_STATES, getCategoryDefaultCoverImage, normalizeCategorySlug } from '@/constants';
 import { packageService } from '@/services/package.service';
 import { CoverImageUploader } from '@/components/travel/CoverImageUploader';
+import {
+  FoodMenuItem,
+  GuideTourStop,
+  FoodStep1,
+  FoodStep2,
+  FoodStep3,
+  FoodStep4,
+  AdventureStep1,
+  AdventureStep2,
+  AdventureStep3,
+  AdventureStep4,
+  GuideStep1,
+  GuideStep2,
+  GuideStep3,
+  GuideStep4,
+} from './CategoryFormSteps';
 
 // ─── Listing Types ─────────────────────────────────────────────
 const LISTING_TYPES = [
@@ -238,6 +254,173 @@ interface FormData {
   inclusions: string;
   exclusions: string;
   cancellationPolicy: string;
+
+  // Food Experience Specific (Steps 1, 2, 3, 4)
+  foodRestaurantName: string;
+  foodBusinessType: string;
+  foodAddress: string;
+  foodGoogleMapsUrl: string;
+  foodCuisines: string[];
+  foodContactNumber: string;
+  foodWhatsappNumber: string;
+  foodOpeningTime: string;
+  foodClosingTime: string;
+  foodLogoUrl: string;
+  foodFormat: string;
+  foodDietaryOptions: string[];
+  foodMenuItems: FoodMenuItem[];
+  foodBasePrice: string;
+  foodPricePerPerson: string;
+  foodMinOrderAmount: string;
+  foodTaxesIncluded: string;
+  foodExtraCharges: string;
+  foodDiscountPercent: string;
+  foodMenuTimings: string;
+  foodTastingCount: string;
+  foodBeveragesIncluded: boolean;
+  foodAlcoholPolicy: string;
+  foodBookingService: string;
+  foodAvailableDays: string[];
+  foodTableCapacity: string;
+  foodAvailableTables: string;
+  foodAdvanceBooking: string;
+  foodMaxPartySize: string;
+  foodBookingTimeSlots: string;
+  foodReservationDuration: string;
+  foodMorningSlots: string;
+  foodEveningSlots: string;
+  foodSpecialRequests: string;
+  foodMeetingLandmark: string;
+  foodWalkingDistance: string;
+  foodFssaiCompliance: boolean;
+  foodFssaiNumber: string;
+  foodHygieneInfo: string;
+  foodCancellationPolicy: string;
+  foodRefundPolicy: string;
+  foodLateArrivalPolicy: string;
+  foodNoShowPolicy: string;
+  foodConfirmationMethod: string;
+  foodBusinessRegDetails: string;
+  foodGstin: string;
+
+  // Adventure Activity Specific (Steps 1, 2, 3, 4)
+  advCategory: string;
+  advDurationHours: string;
+  advMinAge: string;
+  advMaxParticipants: string;
+  advMinParticipants: string;
+  advDifficulty: string;
+  advEnvironment: string;
+  advLocationName: string;
+  advGoogleMapsUrl: string;
+  advPricePerPerson: string;
+  advAdultPrice: string;
+  advChildPrice: string;
+  advGroupPrice: string;
+  advPricingType: string;
+  advTaxesIncluded: string;
+  advAdditionalCharges: string;
+  advDiscounts: string;
+  advEquipmentIncluded: string[];
+  advSafetyGearIncluded: string;
+  advEquipmentList: string;
+  advInstructorAvailable: string;
+  advGuideIncluded: string;
+  advChangingRoom: boolean;
+  advLockerFacility: boolean;
+  advRefreshments: boolean;
+  advExtraEquipmentCharges: string;
+  advInstructorCertifications: string;
+  advInstructorRatio: string;
+  advAvailableDays: string[];
+  advOpeningTime: string;
+  advClosingTime: string;
+  advTimeSlots: string;
+  advMaxPerSlot: string;
+  advBookingCutoff: string;
+  advAdvanceBooking: string;
+  advSeasonalAvailability: string;
+  advBlackoutDates: string;
+  advStartPoint: string;
+  advCheckinTime: string;
+  advStartTime: string;
+  advCompletionTime: string;
+  advInstructionsBefore: string;
+  advWhatToBring: string;
+  advDressCode: string;
+  advWeatherRestrictions: string;
+  advTransportationAvailable: string;
+  advBatchSlots: string;
+  advPackingChecklist: string;
+  advSafetyInstructions: string;
+  advRiskLevel: string;
+  advMandatoryGear: boolean;
+  advTrainedInstructorOnSite: boolean;
+  advEmergencyContact: string;
+  advFirstAidFacility: boolean;
+  advInsuranceCoverage: string;
+  advMedicalRestrictions: string[];
+  advSwimmingRequirement: string;
+  advWeightRestrictions: string;
+  advFitnessPrerequisites: string;
+  advCancellationPolicy: string;
+  advRefundPolicy: string;
+  advReschedulingPolicy: string;
+  advBadWeatherPolicy: string;
+  advLateArrivalPolicy: string;
+  advNoShowPolicy: string;
+  advSafetyCertifications: string;
+
+  // Local Guide Specific (Steps 1, 2, 3, 4)
+  guideFullName: string;
+  guideServiceCategory: string;
+  guideExperienceYears: string;
+  guideLanguages: string[];
+  guideServiceAreas: string;
+  guideMeetingPoint: string;
+  guideGoogleMapsUrl: string;
+  guideType: string;
+  guideSpecialization: string;
+  guideTourFormat: string;
+  guideCertificationType: string;
+  guideLicenseId: string;
+  guidePricingType: string;
+  guidePricePerHour: string;
+  guideHalfDayPrice: string;
+  guideFullDayPrice: string;
+  guideGroupPrice: string;
+  guideAdditionalPersonCharge: string;
+  guideChildPrice: string;
+  guideTransportationIncluded: string;
+  guideTicketHandling: string;
+  guideAdditionalCharges: string;
+  guideTaxesIncluded: string;
+  guideAvailableDays: string[];
+  guideStartingTime: string;
+  guideEndingTime: string;
+  guideTimeSlots: string;
+  guideMaxCustomersPerSlot: string;
+  guideAdvanceBooking: string;
+  guideMinDuration: string;
+  guideAudioWhisperHeadsets: boolean;
+  guideTicketQueueAssistance: boolean;
+  guideTourStartingPoint: string;
+  guideTourEndingPoint: string;
+  guideWalkingDistance: string;
+  guideKeyMonuments: string;
+  guideTopics: string;
+  guideRouteOverview: string;
+  guideStops: GuideTourStop[];
+  guideSpecialInstructions: string;
+  guideWhatToBring: string;
+  guideTourismAffiliation: string;
+  guideEmergencyContact: string;
+  guideCancellationPolicy: string;
+  guideRefundPolicy: string;
+  guideReschedulingPolicy: string;
+  guideBadWeatherPolicy: string;
+  guideLateArrivalPolicy: string;
+  guideNoShowPolicy: string;
 }
 
 const INITIAL_FORM: FormData = {
@@ -338,6 +521,173 @@ const INITIAL_FORM: FormData = {
   inclusions: '',
   exclusions: '',
   cancellationPolicy: '',
+
+  // Food Experience Defaults
+  foodRestaurantName: '',
+  foodBusinessType: 'Restaurant / Fine Dining',
+  foodAddress: '',
+  foodGoogleMapsUrl: '',
+  foodCuisines: ['South Indian'],
+  foodContactNumber: '',
+  foodWhatsappNumber: '',
+  foodOpeningTime: '11:00',
+  foodClosingTime: '23:00',
+  foodLogoUrl: '',
+  foodFormat: 'Home Dining & Family Meal',
+  foodDietaryOptions: ['Veg Friendly', 'Pure Vegetarian (100% Veg)'],
+  foodMenuItems: [],
+  foodBasePrice: '799',
+  foodPricePerPerson: '799',
+  foodMinOrderAmount: '350',
+  foodTaxesIncluded: 'Included',
+  foodExtraCharges: '',
+  foodDiscountPercent: '0',
+  foodMenuTimings: 'Lunch & Dinner',
+  foodTastingCount: '5 Courses',
+  foodBeveragesIncluded: true,
+  foodAlcoholPolicy: 'No Alcohol Served (Family Environment)',
+  foodBookingService: 'Table Reservation',
+  foodAvailableDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+  foodTableCapacity: '30',
+  foodAvailableTables: '8',
+  foodAdvanceBooking: '2 Hours Prior',
+  foodMaxPartySize: '12',
+  foodBookingTimeSlots: '12:30 PM, 02:00 PM, 07:30 PM, 09:00 PM',
+  foodReservationDuration: '90 Minutes',
+  foodMorningSlots: '12:00 PM - 03:30 PM',
+  foodEveningSlots: '07:00 PM - 11:00 PM',
+  foodSpecialRequests: 'High chairs available, Jain preparations on request',
+  foodMeetingLandmark: '',
+  foodWalkingDistance: '',
+  foodFssaiCompliance: true,
+  foodFssaiNumber: '',
+  foodHygieneInfo: 'Packaged mineral water and sanitized tables',
+  foodCancellationPolicy: 'Free cancellation up to 4 hours before booking slot.',
+  foodRefundPolicy: 'Full refund if cancelled before 4 hours.',
+  foodLateArrivalPolicy: 'Tables held for 15 minutes past reservation time.',
+  foodNoShowPolicy: 'No-show after 20 minutes releases table to waitlist.',
+  foodConfirmationMethod: 'Instant Auto-Confirmation',
+  foodBusinessRegDetails: '',
+  foodGstin: '',
+
+  // Adventure Activity Defaults
+  advCategory: 'Trekking & Hiking',
+  advDurationHours: '3 Hours',
+  advMinAge: '12',
+  advMaxParticipants: '15',
+  advMinParticipants: '1',
+  advDifficulty: 'Moderate (Basic Fitness Required)',
+  advEnvironment: 'Outdoor Wilderness',
+  advLocationName: '',
+  advGoogleMapsUrl: '',
+  advPricePerPerson: '1499',
+  advAdultPrice: '1499',
+  advChildPrice: '999',
+  advGroupPrice: '6000',
+  advPricingType: 'Per Person',
+  advTaxesIncluded: 'Included',
+  advAdditionalCharges: '',
+  advDiscounts: '0',
+  advEquipmentIncluded: ['Safety Helmet & Harness', 'Life Jacket / Buoyancy Aid'],
+  advSafetyGearIncluded: 'CE-certified helmet, safety harness, and life vests',
+  advEquipmentList: '',
+  advInstructorAvailable: 'Yes',
+  advGuideIncluded: 'Yes',
+  advChangingRoom: true,
+  advLockerFacility: true,
+  advRefreshments: true,
+  advExtraEquipmentCharges: '',
+  advInstructorCertifications: 'Certified Mountaineering / Water Safety Instructors',
+  advInstructorRatio: '1 Instructor per 4 Participants',
+  advAvailableDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+  advOpeningTime: '06:00',
+  advClosingTime: '18:00',
+  advTimeSlots: '06:00 AM, 09:30 AM, 02:00 PM',
+  advMaxPerSlot: '12',
+  advBookingCutoff: '12 Hours Prior',
+  advAdvanceBooking: 'Yes',
+  advSeasonalAvailability: 'October to May',
+  advBlackoutDates: 'Monsoon season',
+  advStartPoint: '',
+  advCheckinTime: '30 mins before activity',
+  advStartTime: '06:30 AM',
+  advCompletionTime: '10:00 AM',
+  advInstructionsBefore: 'Safety briefing mandatory before entering launch area',
+  advWhatToBring: 'Change of clothes, towel, strap sandals, sunscreen',
+  advDressCode: 'Comfortable athletic wear / swimwear with straps',
+  advWeatherRestrictions: 'Cancelled during thunder, heavy rain, or high winds',
+  advTransportationAvailable: 'No',
+  advBatchSlots: '06:00 AM, 09:30 AM, 02:00 PM',
+  advPackingChecklist: 'Hydration bottle, dry bag, personal medications',
+  advSafetyInstructions: 'Follow instructor whistle codes and stay within boundary',
+  advRiskLevel: 'Moderate (Standard Outdoor Risk)',
+  advMandatoryGear: true,
+  advTrainedInstructorOnSite: true,
+  advEmergencyContact: '',
+  advFirstAidFacility: true,
+  advInsuranceCoverage: 'Comprehensive Adventure Accidental Coverage Included',
+  advMedicalRestrictions: ['Heart Conditions or Hypertension', 'Pregnancy'],
+  advSwimmingRequirement: 'Not Required (Life Jacket Provided)',
+  advWeightRestrictions: 'Under 120 kg',
+  advFitnessPrerequisites: 'Basic stamina to walk/swim 30 minutes',
+  advCancellationPolicy: 'Free cancellation up to 24 hours before activity.',
+  advRefundPolicy: '100% refund for weather cancellations.',
+  advReschedulingPolicy: 'Free rescheduling allowed up to 12 hours prior.',
+  advBadWeatherPolicy: 'Rescheduled or 100% refunded in case of rain/storm.',
+  advLateArrivalPolicy: 'Late arrivals join next available batch if open.',
+  advNoShowPolicy: 'No-show without notice non-refundable.',
+  advSafetyCertifications: '',
+
+  // Local Guide Defaults
+  guideFullName: '',
+  guideServiceCategory: 'Heritage & Culture Walk',
+  guideExperienceYears: '5',
+  guideLanguages: ['English', 'Hindi'],
+  guideServiceAreas: '',
+  guideMeetingPoint: '',
+  guideGoogleMapsUrl: '',
+  guideType: 'Individual Local Guide',
+  guideSpecialization: 'Heritage, Monuments & Archaeology',
+  guideTourFormat: 'Private Guided Tour (Exclusive for booked party)',
+  guideCertificationType: 'State Tourism Department Certified',
+  guideLicenseId: '',
+  guidePricingType: 'Full Day (Up to 8 Hours)',
+  guidePricePerHour: '400',
+  guideHalfDayPrice: '1500',
+  guideFullDayPrice: '2500',
+  guideGroupPrice: '3500',
+  guideAdditionalPersonCharge: '200',
+  guideChildPrice: '0',
+  guideTransportationIncluded: 'Walking Tour (No Transport Needed)',
+  guideTicketHandling: 'Customer Buys Directly at Monument Counter',
+  guideAdditionalCharges: '',
+  guideTaxesIncluded: 'Included',
+  guideAvailableDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+  guideStartingTime: '08:30',
+  guideEndingTime: '17:30',
+  guideTimeSlots: '09:00 AM, 02:00 PM',
+  guideMaxCustomersPerSlot: '10',
+  guideAdvanceBooking: '1 Day Prior',
+  guideMinDuration: '3 Hours',
+  guideAudioWhisperHeadsets: false,
+  guideTicketQueueAssistance: true,
+  guideTourStartingPoint: '',
+  guideTourEndingPoint: '',
+  guideWalkingDistance: '2 km',
+  guideKeyMonuments: '',
+  guideTopics: 'Historical folklore, dynasties, local hidden gems',
+  guideRouteOverview: '',
+  guideStops: [],
+  guideSpecialInstructions: 'Modest attire covering shoulders & knees for sanctums',
+  guideWhatToBring: 'Comfortable walking shoes, sunglasses, valid govt ID',
+  guideTourismAffiliation: '',
+  guideEmergencyContact: '',
+  guideCancellationPolicy: 'Free cancellation up to 12 hours before tour time.',
+  guideRefundPolicy: 'Full refund within 12-hour window.',
+  guideReschedulingPolicy: 'Free rescheduling allowed subject to guide availability.',
+  guideBadWeatherPolicy: 'Tours proceed with rain ponchos or indoor museum stops.',
+  guideLateArrivalPolicy: 'Guide waits up to 30 minutes at starting landmark.',
+  guideNoShowPolicy: 'No-show without notification after 45 minutes cancelled.',
 };
 
 function getDefaultFormForListingType(t: ListingType): FormData {
@@ -352,9 +702,9 @@ function getDefaultFormForListingType(t: ListingType): FormData {
     destinationInput: '',
     destinationCity: '',
     destinationState: '',
-    durationDays: t === 'cab' ? '1' : '3',
-    durationNights: t === 'cab' ? '0' : '2',
-    maxGroupSize: t === 'cab' ? '4' : '12',
+    durationDays: t === 'cab' ? '1' : t === 'food' || t === 'guide' ? '1' : '3',
+    durationNights: t === 'cab' || t === 'food' || t === 'guide' ? '0' : '2',
+    maxGroupSize: t === 'cab' ? '4' : t === 'food' ? '12' : t === 'adventure' ? '15' : t === 'guide' ? '10' : '12',
     basePrice:
       t === 'cab'
         ? '1500'
@@ -363,7 +713,7 @@ function getDefaultFormForListingType(t: ListingType): FormData {
         : t === 'adventure'
         ? '1499'
         : t === 'guide'
-        ? '999'
+        ? '2500'
         : t === 'villa'
         ? '12000'
         : t === 'homestay'
@@ -550,9 +900,24 @@ const TOUR_STEPS = ['1. Basic Info', '2. Pricing', '3. Itinerary', '4. Review & 
 const CAB_STEPS = ['1. Cab Service Details', '2. Pricing', '3. Service Policies', '4. Review & Submit'] as const;
 const VILLA_STEPS = ['1. Property Information', '2. Rooms & Pricing', '3. House Rules', '4. Review & Submit'] as const;
 const HOSTEL_STEPS = ['1. Hostel Information', '2. Room Configuration', '3. Amenities', '4. Policies', '5. Review & Submit'] as const;
-const FOOD_STEPS = ['1. Experience Details', '2. Pricing & Tastings', '3. Trail & Stops', '4. Review & Submit'] as const;
-const ADVENTURE_STEPS = ['1. Activity Details', '2. Pricing & Gear', '3. Schedule & Plan', '4. Review & Submit'] as const;
-const GUIDE_STEPS = ['1. Guide Profile & City', '2. Pricing & Hours', '3. Tour Route & Topics', '4. Review & Submit'] as const;
+const FOOD_STEPS = [
+  '1. Restaurant & Food Business',
+  '2. Menu & Pricing',
+  '3. Booking & Availability',
+  '4. Policies & Verification',
+] as const;
+const ADVENTURE_STEPS = [
+  '1. Activity Details',
+  '2. Pricing & Gear',
+  '3. Schedule & Plan',
+  '4. Safety & Policies',
+] as const;
+const GUIDE_STEPS = [
+  '1. Guide Profile & City',
+  '2. Pricing & Hours',
+  '3. Tour Route & Topics',
+  '4. Verification & Policies',
+] as const;
 
 // ─── Inner Form Component ──────────────────────────────────────
 function NewPackageForm() {
@@ -575,12 +940,91 @@ function NewPackageForm() {
     tour: { ...INITIAL_FORM },
   });
 
+  // Builder states for inline multi-item list creation
+  const [newFoodItem, setNewFoodItem] = useState<FoodMenuItem>({
+    id: '',
+    name: '',
+    description: '',
+    category: 'Main Course',
+    foodType: 'veg',
+    price: '',
+    isSpecial: false,
+    isBestseller: false,
+    imageUrl: '',
+  });
+
+  const [newGuideStop, setNewGuideStop] = useState<GuideTourStop>({
+    id: '',
+    stopName: '',
+    location: '',
+    durationMinutes: '30',
+    description: '',
+    landmark: '',
+  });
+
   const isCab = form.listingType === 'cab';
   const isVilla = form.listingType === 'villa' || form.listingType === 'homestay';
   const isHostel = form.listingType === 'hostel';
   const isFood = form.listingType === 'food';
   const isAdventure = form.listingType === 'adventure';
   const isGuide = form.listingType === 'guide';
+
+  const addFoodItem = useCallback(() => {
+    if (!newFoodItem.name.trim()) return;
+    const item: FoodMenuItem = {
+      ...newFoodItem,
+      id: Date.now().toString(),
+    };
+    setForm((prev) => ({
+      ...prev,
+      foodMenuItems: [...prev.foodMenuItems, item],
+    }));
+    setNewFoodItem({
+      id: '',
+      name: '',
+      description: '',
+      category: 'Main Course',
+      foodType: 'veg',
+      price: '',
+      isSpecial: false,
+      isBestseller: false,
+      imageUrl: '',
+    });
+  }, [newFoodItem]);
+
+  const removeFoodItem = useCallback((id: string) => {
+    setForm((prev) => ({
+      ...prev,
+      foodMenuItems: prev.foodMenuItems.filter((it) => it.id !== id),
+    }));
+  }, []);
+
+  const addGuideStop = useCallback(() => {
+    if (!newGuideStop.stopName.trim()) return;
+    const stop: GuideTourStop = {
+      ...newGuideStop,
+      id: Date.now().toString(),
+    };
+    setForm((prev) => ({
+      ...prev,
+      guideStops: [...prev.guideStops, stop],
+    }));
+    setNewGuideStop({
+      id: '',
+      stopName: '',
+      location: '',
+      durationMinutes: '30',
+      description: '',
+      landmark: '',
+    });
+  }, [newGuideStop]);
+
+  const removeGuideStop = useCallback((id: string) => {
+    setForm((prev) => ({
+      ...prev,
+      guideStops: prev.guideStops.filter((s) => s.id !== id),
+    }));
+  }, []);
 
   const steps = isCab
     ? CAB_STEPS
@@ -623,6 +1067,7 @@ function NewPackageForm() {
       const rawCat = normalizeCategorySlug(pkg.category);
       const normalizedCat = (['tour', 'cab', 'villa', 'homestay', 'hostel', 'devotional', 'foreign', 'food', 'adventure', 'guide'].includes(rawCat) ? rawCat : 'tour') as ListingType;
       const loadedForm: FormData = {
+        ...INITIAL_FORM,
         listingType: normalizedCat,
         title: pkg.name,
         category: normalizedCat,
@@ -1040,6 +1485,163 @@ function NewPackageForm() {
           ].filter(Boolean),
           submitForReview: true,
         };
+      } else if (isFood) {
+        const defaultFoodImage = getCategoryDefaultCoverImage('food');
+        const foodImages = form.images.length > 0
+          ? form.images
+          : form.imageUrl.trim()
+          ? [form.imageUrl.trim()]
+          : [defaultFoodImage];
+        const foodPrice = Number(form.foodBasePrice) || Number(form.foodPricePerPerson) || Number(form.basePrice) || 499;
+        payload = {
+          name: form.title.trim(),
+          description: form.description.trim() || `${form.foodBusinessType} culinary experience: ${form.foodRestaurantName || form.title} serving authentic ${form.foodCuisines.join(', ')} cuisine in ${form.destinationCity || form.destinationInput || 'prime location'}.`,
+          category: 'food',
+          destinationCity: form.destinationCity || form.destinationInput || form.foodAddress || 'Chennai',
+          destinationState: form.destinationState || 'Tamil Nadu',
+          durationDays: 1,
+          durationNights: 0,
+          maxGroupSize: Number(form.foodMaxPartySize) || Number(form.maxGroupSize) || 12,
+          basePrice: foodPrice,
+          discountPercent: Number(form.foodDiscountPercent) || 0,
+          images: foodImages,
+          highlights: [
+            `Business Type: ${form.foodBusinessType}`,
+            `Cuisines: ${form.foodCuisines.join(', ')}`,
+            `Dietary Options: ${form.foodDietaryOptions.join(', ')}`,
+            `Food Format: ${form.foodFormat}`,
+            `Operating Hours: ${form.foodOpeningTime} - ${form.foodClosingTime}`,
+            `Service: ${form.foodBookingService}`,
+            `Available Days: ${form.foodAvailableDays.join(', ')}`,
+            form.foodFssaiNumber ? `FSSAI Registered: ${form.foodFssaiNumber}` : 'Hygiene protocols verified',
+          ],
+          inclusions: [
+            `Curated food tastings / menu (${form.foodTastingCount || 'Curated'} courses)`,
+            form.foodBeveragesIncluded ? 'Beverages & drinking water included' : 'Filtered water provided',
+            'Reserved table seating & dedicated service',
+            ...(form.foodMenuItems.length > 0 ? form.foodMenuItems.slice(0, 5).map(m => `${m.name} (${m.foodType}) - ₹${m.price}`) : []),
+          ],
+          exclusions: [
+            `Alcohol Policy: ${form.foodAlcoholPolicy}`,
+            form.foodExtraCharges ? `Extra Charges: ${form.foodExtraCharges}` : 'Items outside preset menu billed separately',
+            form.foodMinOrderAmount ? `Minimum order value: ₹${form.foodMinOrderAmount}` : '',
+          ].filter(Boolean),
+          cancellationPolicy: form.foodCancellationPolicy.trim() || form.cancellationPolicy.trim() || 'Free cancellation up to 4 hours before reservation slot.',
+          tags: [
+            'food',
+            'dining',
+            'culinary',
+            form.foodBusinessType.toLowerCase(),
+            ...form.foodCuisines.map(c => c.toLowerCase()),
+            form.destinationCity?.toLowerCase() || 'chennai',
+          ].filter(Boolean),
+          submitForReview: true,
+        };
+      } else if (isAdventure) {
+        const defaultAdvImage = getCategoryDefaultCoverImage('adventure');
+        const advImages = form.images.length > 0
+          ? form.images
+          : form.imageUrl.trim()
+          ? [form.imageUrl.trim()]
+          : [defaultAdvImage];
+        const advPrice = Number(form.advPricePerPerson) || Number(form.basePrice) || 1499;
+        payload = {
+          name: form.title.trim(),
+          description: form.description.trim() || `Exciting ${form.advCategory} activity: ${form.title} in ${form.destinationCity || form.destinationInput || 'scenic trail'}. Supervised by certified instructors with complete safety gear.`,
+          category: 'adventure',
+          destinationCity: form.destinationCity || form.destinationInput || 'Manali',
+          destinationState: form.destinationState || 'Himachal Pradesh',
+          durationDays: 1,
+          durationNights: 0,
+          maxGroupSize: Number(form.advMaxParticipants) || Number(form.maxGroupSize) || 15,
+          basePrice: advPrice,
+          discountPercent: Number(form.advDiscounts) || 0,
+          images: advImages,
+          highlights: [
+            `Activity Type: ${form.advCategory}`,
+            `Difficulty Level: ${form.advDifficulty}`,
+            `Environment: ${form.advEnvironment}`,
+            `Duration: ${form.advDurationHours || '2-3'} Hours`,
+            `Age Requirements: Minimum ${form.advMinAge || '12'} Years`,
+            `Safety: ${form.advMandatoryGear ? 'Certified Safety Gear Mandatory' : 'Safety Equipment Provided'}`,
+            `Instructor: ${form.advInstructorAvailable === 'Yes' ? `Certified Trainer (${form.advInstructorRatio || '1:5'} Ratio)` : 'Self-guided with safety marshal'}`,
+          ],
+          inclusions: [
+            'Full activity session with certified instruction',
+            'Standard Safety Gear (Helmet, Life Jacket / Harness as applicable)',
+            form.advLockerFacility ? 'Locker and luggage storage' : '',
+            form.advChangingRoom ? 'Changing rooms and shower access' : '',
+            form.advRefreshments ? 'Hydration & energy refreshments' : '',
+            form.advFirstAidFacility ? 'Emergency First Aid Kit & On-site assistance' : '',
+          ].filter(Boolean),
+          exclusions: [
+            'Personal medical & accidental insurance',
+            form.advExtraEquipmentCharges ? `Extra equipment rental: ${form.advExtraEquipmentCharges}` : '',
+            'Transport to base camp unless selected',
+          ].filter(Boolean),
+          cancellationPolicy: form.advCancellationPolicy.trim() || form.cancellationPolicy.trim() || 'Free cancellation up to 24 hours prior. Subject to weather conditions.',
+          tags: [
+            'adventure',
+            'activity',
+            'outdoor',
+            form.advCategory.toLowerCase(),
+            form.advDifficulty.toLowerCase(),
+            form.destinationCity?.toLowerCase() || 'destination',
+          ].filter(Boolean),
+          submitForReview: true,
+        };
+      } else if (isGuide) {
+        const defaultGuideImage = getCategoryDefaultCoverImage('guide');
+        const guideImages = form.images.length > 0
+          ? form.images
+          : form.imageUrl.trim()
+          ? [form.imageUrl.trim()]
+          : [defaultGuideImage];
+        const guidePrice = Number(form.guideFullDayPrice) || Number(form.guidePricePerHour) || Number(form.basePrice) || 1200;
+        payload = {
+          name: form.title.trim(),
+          description: form.description.trim() || `Professional ${form.guideSpecialization} guide service in ${form.destinationCity || form.destinationInput || 'heritage circuit'} by ${form.guideFullName || form.title}. Deep historical insights, customized routes, and multilingual storytelling.`,
+          category: 'guide',
+          destinationCity: form.destinationCity || form.destinationInput || 'Varanasi',
+          destinationState: form.destinationState || 'Uttar Pradesh',
+          durationDays: 1,
+          durationNights: 0,
+          maxGroupSize: Number(form.guideMaxCustomersPerSlot) || Number(form.maxGroupSize) || 10,
+          basePrice: guidePrice,
+          discountPercent: 0,
+          images: guideImages,
+          highlights: [
+            `Guide: ${form.guideFullName || 'Verified Local Guide'} (${form.guideExperienceYears || '5+'} Years Exp)`,
+            `Specialization: ${form.guideSpecialization}`,
+            `Languages: ${form.guideLanguages.join(', ')}`,
+            `Tour Format: ${form.guideTourFormat}`,
+            `Starting Point: ${form.guideTourStartingPoint || form.guideMeetingPoint || 'City Center'}`,
+            `Tour Duration: ${form.guidePricingType} (${form.guideStartingTime} - ${form.guideEndingTime})`,
+            `Credentials: ${form.guideCertificationType !== 'None' ? `${form.guideCertificationType}${form.guideLicenseId ? ` (ID: ${form.guideLicenseId})` : ''}` : 'Local Cultural Expert'}`,
+          ],
+          inclusions: [
+            'Dedicated private/group local storytelling guide',
+            form.guideAudioWhisperHeadsets ? 'Audio whisper headsets for clear commentary' : '',
+            form.guideTicketHandling ? 'Priority ticket queue management & assistance' : '',
+            form.guideTransportationIncluded === 'Yes' ? 'Local transfer between monuments included' : '',
+          ].filter(Boolean),
+          exclusions: [
+            'Monument / Museum entry tickets (unless arranged separately)',
+            'Food, snacks & personal purchases',
+            'Gratuities / tips',
+          ],
+          cancellationPolicy: form.guideCancellationPolicy.trim() || form.cancellationPolicy.trim() || 'Free cancellation up to 12 hours prior to scheduled tour time.',
+          tags: [
+            'guide',
+            'local-guide',
+            'heritage',
+            'storytelling',
+            form.guideSpecialization.toLowerCase(),
+            ...form.guideLanguages.map(l => l.toLowerCase()),
+            form.destinationCity?.toLowerCase() || 'city',
+          ].filter(Boolean),
+          submitForReview: true,
+        };
       } else {
         const defaultCatImage = getCategoryDefaultCoverImage(form.category);
         const packageImages = form.images.length > 0
@@ -1087,7 +1689,7 @@ function NewPackageForm() {
       setError(err instanceof Error ? err.message : 'Failed to save listing');
       setSubmitting(false);
     }
-  }, [form, editId, isCab, isVilla, isHostel, verificationStatus, router]);
+  }, [form, editId, isCab, isVilla, isHostel, isFood, isAdventure, isGuide, verificationStatus, router]);
 
   // ═════════════════════════════════════════════════════════════
   // CAB / TAXI SPECIFIC STEP RENDERERS
@@ -3440,6 +4042,130 @@ function NewPackageForm() {
           {step === 3 && renderHostelStep3()}
           {step === 4 && renderHostelStep4()}
           {step === 5 && renderHostelStep5()}
+        </>
+      ) : isFood ? (
+        <>
+          {step === 1 && (
+            <FoodStep1
+              form={form}
+              set={set}
+              setForm={setForm}
+              categoryStore={categoryStore}
+              setImageError={setImageError}
+              setError={setError}
+              setStep={setStep}
+            />
+          )}
+          {step === 2 && (
+            <FoodStep2
+              form={form}
+              set={set}
+              newFoodItem={newFoodItem}
+              setNewFoodItem={setNewFoodItem}
+              addFoodItem={addFoodItem}
+              removeFoodItem={removeFoodItem}
+              setError={setError}
+              setStep={setStep}
+            />
+          )}
+          {step === 3 && (
+            <FoodStep3
+              form={form}
+              set={set}
+              setError={setError}
+              setStep={setStep}
+            />
+          )}
+          {step === 4 && (
+            <FoodStep4
+              form={form}
+              set={set}
+              setStep={setStep}
+              verificationStatus={verificationStatus}
+              submitting={submitting}
+              onSubmit={handleSubmit}
+            />
+          )}
+        </>
+      ) : isAdventure ? (
+        <>
+          {step === 1 && (
+            <AdventureStep1
+              form={form}
+              set={set}
+              setForm={setForm}
+              categoryStore={categoryStore}
+              setImageError={setImageError}
+              setError={setError}
+              setStep={setStep}
+            />
+          )}
+          {step === 2 && (
+            <AdventureStep2
+              form={form}
+              set={set}
+              setStep={setStep}
+            />
+          )}
+          {step === 3 && (
+            <AdventureStep3
+              form={form}
+              set={set}
+              setStep={setStep}
+            />
+          )}
+          {step === 4 && (
+            <AdventureStep4
+              form={form}
+              set={set}
+              setStep={setStep}
+              verificationStatus={verificationStatus}
+              submitting={submitting}
+              onSubmit={handleSubmit}
+            />
+          )}
+        </>
+      ) : isGuide ? (
+        <>
+          {step === 1 && (
+            <GuideStep1
+              form={form}
+              set={set}
+              setForm={setForm}
+              categoryStore={categoryStore}
+              setImageError={setImageError}
+              setError={setError}
+              setStep={setStep}
+            />
+          )}
+          {step === 2 && (
+            <GuideStep2
+              form={form}
+              set={set}
+              setStep={setStep}
+            />
+          )}
+          {step === 3 && (
+            <GuideStep3
+              form={form}
+              set={set}
+              newGuideStop={newGuideStop}
+              setNewGuideStop={setNewGuideStop}
+              addGuideStop={addGuideStop}
+              removeGuideStop={removeGuideStop}
+              setStep={setStep}
+            />
+          )}
+          {step === 4 && (
+            <GuideStep4
+              form={form}
+              set={set}
+              setStep={setStep}
+              verificationStatus={verificationStatus}
+              submitting={submitting}
+              onSubmit={handleSubmit}
+            />
+          )}
         </>
       ) : (
         <>

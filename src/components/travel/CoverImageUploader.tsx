@@ -217,17 +217,34 @@ export const CoverImageUploader: React.FC<CoverImageUploaderProps> = ({
           const formData = new FormData();
           formData.append('file', optimizedFile);
 
-          const res = await fetch('/api/provider/packages/upload-image', {
-            method: 'POST',
-            body: formData,
-          });
+          let uploadedUrl: string | null = null;
+          try {
+            const res = await fetch('/api/provider/packages/upload-image', {
+              method: 'POST',
+              body: formData,
+            });
 
-          const json = await res.json().catch(() => ({}));
-          if (!res.ok || !json.success || !json.url) {
-            throw new Error(json.error || `Failed to upload "${rawFile.name}".`);
+            const json = await res.json().catch(() => ({}));
+            if (res.ok && json.success && json.url) {
+              uploadedUrl = json.url;
+            } else {
+              console.warn('Upload API returned non-success, using client-side data URL:', json.error);
+            }
+          } catch (netErr) {
+            console.warn('Upload API request error, using client-side data URL:', netErr);
           }
 
-          newlyUploaded.push(json.url);
+          // Resilient client fallback: convert compressed file directly to data URL
+          if (!uploadedUrl) {
+            uploadedUrl = await new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result as string);
+              reader.onerror = () => reject(new Error('Failed to read image file.'));
+              reader.readAsDataURL(optimizedFile);
+            });
+          }
+
+          newlyUploaded.push(uploadedUrl);
         }
 
         if (newlyUploaded.length > 0) {

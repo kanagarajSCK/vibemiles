@@ -67,10 +67,10 @@ export async function POST(req: NextRequest) {
 
     let publicUrl: string;
 
-    // Detect serverless / cloud / read-only environments (Vercel, AWS Lambda, production)
-    // On Vercel / Lambda, /var/task is read-only and has no writable public directory.
+    // Detect local development environment vs serverless / cloud / production (Vercel, AWS Lambda)
+    // On Vercel / Lambda, /var/task is read-only and static assets cannot be written at runtime.
     const cwd = typeof process.cwd === 'function' ? process.cwd() : '';
-    const isServerless = Boolean(
+    const isExplicitServerless = Boolean(
       process.env.VERCEL ||
       process.env.VERCEL_ENV ||
       process.env.AWS_LAMBDA_FUNCTION_NAME ||
@@ -80,7 +80,8 @@ export async function POST(req: NextRequest) {
       process.env.NODE_ENV === 'production'
     );
 
-    if (!isServerless) {
+    // Only attempt local disk storage when explicitly in local development and not in serverless
+    if (!isExplicitServerless) {
       try {
         const uploadDir = path.join(cwd || process.cwd(), 'public', 'uploads', 'packages');
         await fs.mkdir(uploadDir, { recursive: true });
