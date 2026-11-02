@@ -215,6 +215,7 @@ export const ADV_SWIMMING_REQUIREMENTS = [
 ] as const;
 
 export const ADV_INSURANCE_OPTIONS = [
+  'Not Included (Personal Insurance Recommended)',
   'Comprehensive Adventure Accidental Coverage Included',
   'Basic First Aid Support (Personal Insurance Recommended)',
   'Optional Add-on Insurance Available at Site',
@@ -733,21 +734,21 @@ export function FoodStep1({
               setError('Restaurant / Experience Name is required');
               return;
             }
+            if (!form.destinationCity?.trim() && !form.destinationInput?.trim()) {
+              setError('Destination / City is required. Please specify your location.');
+              return;
+            }
             if (!form.foodAddress.trim()) {
               setError('Full Business Address is required');
               return;
             }
-            if (form.foodCuisines.length === 0) {
+            if (!Array.isArray(form.foodCuisines) || form.foodCuisines.length === 0) {
               setError('Please select at least one Cuisine Type');
               return;
             }
-            if (!form.imageUrl && form.images.length === 0) {
-              const defaultImage = getCategoryDefaultCoverImage('food');
-              setForm((prev: any) => ({
-                ...prev,
-                images: [defaultImage],
-                imageUrl: defaultImage,
-              }));
+            if (!form.imageUrl && (!Array.isArray(form.images) || form.images.length === 0)) {
+              setError('Please upload at least one cover photo or restaurant ambience image');
+              return;
             }
             setError(null);
             setStep(2);
@@ -1077,8 +1078,11 @@ export function FoodStep2({
           size="md"
           className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-6"
           onClick={() => {
-            if (!form.foodBasePrice && !form.foodPricePerPerson && form.foodMenuItems.length === 0) {
-              setError('Please provide at least a Base Price, Price Per Person, or add Menu Items');
+            const hasBasePrice = Number(form.foodBasePrice) > 0;
+            const hasPersonPrice = Number(form.foodPricePerPerson) > 0;
+            const hasPricedItems = Array.isArray(form.foodMenuItems) && form.foodMenuItems.some((m: any) => Number(m.price) > 0);
+            if (!hasBasePrice && !hasPersonPrice && !hasPricedItems) {
+              setError('Price is required. Please provide a valid Base Price, Price Per Person, or add priced Menu Items.');
               return;
             }
             setError(null);
@@ -1308,6 +1312,9 @@ export function FoodStep4({
   verificationStatus,
   submitting,
   onSubmit,
+  onSaveDraft,
+  savingDraft,
+  setError,
 }: {
   form: any;
   set: (k: any, v: any) => void;
@@ -1315,6 +1322,9 @@ export function FoodStep4({
   verificationStatus: string | null;
   submitting: boolean;
   onSubmit: () => void;
+  onSaveDraft?: () => void;
+  savingDraft?: boolean;
+  setError?: (err: string | null) => void;
 }) {
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -1447,29 +1457,53 @@ export function FoodStep4({
         />
       </div>
 
-      <div className="flex justify-between pt-2">
+      <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
         <Button
           type="button"
           variant="outline"
           size="md"
           onClick={() => setStep(3)}
           leftIcon={<ArrowLeft className="w-4 h-4" />}
+          className="w-full sm:w-auto"
         >
           Back
         </Button>
 
-        <Button
-          type="button"
-          variant="primary"
-          size="lg"
-          className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8"
-          isLoading={submitting}
-          onClick={onSubmit}
-        >
-          {verificationStatus !== 'VERIFIED'
-            ? 'Verification Required'
-            : 'Submit for Approval'}
-        </Button>
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          {onSaveDraft && (
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              disabled={submitting || savingDraft}
+              isLoading={savingDraft}
+              onClick={onSaveDraft}
+              className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+            >
+              Save as Draft
+            </Button>
+          )}
+
+          <Button
+            type="button"
+            variant="primary"
+            size="lg"
+            className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8 w-full sm:w-auto"
+            disabled={savingDraft}
+            isLoading={submitting}
+            onClick={() => {
+              if (!termsAccepted) {
+                if (setError) setError('Please agree to the VibeMiles Provider Terms before submitting.');
+                return;
+              }
+              onSubmit();
+            }}
+          >
+            {verificationStatus !== 'VERIFIED'
+              ? 'Verification Required'
+              : 'Submit for Approval'}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -1675,21 +1709,21 @@ export function AdventureStep1({
           size="md"
           className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-6"
           onClick={() => {
-            if (!form.title.trim()) {
-              setError('Activity Title is required');
+            if (!form.title.trim() || form.title.trim().length < 3) {
+              setError('Activity Title is required and must be at least 3 characters');
+              return;
+            }
+            if (!form.destinationCity?.trim() && !form.destinationInput?.trim()) {
+              setError('Destination / City is required. Please specify your location.');
               return;
             }
             if (!form.advLocationName.trim()) {
               setError('Base / Launch Point Name is required');
               return;
             }
-            if (!form.imageUrl && form.images.length === 0) {
-              const defaultImage = getCategoryDefaultCoverImage('adventure');
-              setForm((prev: any) => ({
-                ...prev,
-                images: [defaultImage],
-                imageUrl: defaultImage,
-              }));
+            if (!form.imageUrl && (!Array.isArray(form.images) || form.images.length === 0)) {
+              setError('Please upload at least one activity cover photo or image');
+              return;
             }
             setError(null);
             setStep(2);
@@ -1707,10 +1741,12 @@ export function AdventureStep2({
   form,
   set,
   setStep,
+  setError,
 }: {
   form: any;
   set: (k: any, v: any) => void;
   setStep: (s: number) => void;
+  setError?: (err: string | null) => void;
 }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
@@ -1906,7 +1942,19 @@ export function AdventureStep2({
           variant="primary"
           size="md"
           className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-6"
-          onClick={() => setStep(3)}
+          onClick={() => {
+            const hasPrice =
+              Number(form.advPricePerPerson) > 0 ||
+              Number(form.advAdultPrice) > 0 ||
+              Number(form.advGroupPrice) > 0 ||
+              Number(form.basePrice) > 0;
+            if (!hasPrice) {
+              if (setError) setError('Activity price is required. Please specify at least a price per person, adult price, or group price.');
+              return;
+            }
+            if (setError) setError(null);
+            setStep(3);
+          }}
           rightIcon={<ArrowRight className="w-4 h-4" />}
         >
           Continue to Schedule & Plan
@@ -2087,6 +2135,9 @@ export function AdventureStep4({
   verificationStatus,
   submitting,
   onSubmit,
+  onSaveDraft,
+  savingDraft,
+  setError,
 }: {
   form: any;
   set: (k: any, v: any) => void;
@@ -2094,6 +2145,9 @@ export function AdventureStep4({
   verificationStatus: string | null;
   submitting: boolean;
   onSubmit: () => void;
+  onSaveDraft?: () => void;
+  savingDraft?: boolean;
+  setError?: (err: string | null) => void;
 }) {
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -2257,29 +2311,53 @@ export function AdventureStep4({
         />
       </div>
 
-      <div className="flex justify-between pt-2">
+      <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
         <Button
           type="button"
           variant="outline"
           size="md"
           onClick={() => setStep(3)}
           leftIcon={<ArrowLeft className="w-4 h-4" />}
+          className="w-full sm:w-auto"
         >
           Back
         </Button>
 
-        <Button
-          type="button"
-          variant="primary"
-          size="lg"
-          className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8"
-          isLoading={submitting}
-          onClick={onSubmit}
-        >
-          {verificationStatus !== 'VERIFIED'
-            ? 'Verification Required'
-            : 'Submit for Approval'}
-        </Button>
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          {onSaveDraft && (
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              disabled={submitting || savingDraft}
+              isLoading={savingDraft}
+              onClick={onSaveDraft}
+              className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+            >
+              Save as Draft
+            </Button>
+          )}
+
+          <Button
+            type="button"
+            variant="primary"
+            size="lg"
+            className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8 w-full sm:w-auto"
+            disabled={savingDraft}
+            isLoading={submitting}
+            onClick={() => {
+              if (!termsAccepted) {
+                if (setError) setError('Please agree to the VibeMiles Provider Terms before submitting.');
+                return;
+              }
+              onSubmit();
+            }}
+          >
+            {verificationStatus !== 'VERIFIED'
+              ? 'Verification Required'
+              : 'Submit for Approval'}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -2501,21 +2579,21 @@ export function GuideStep1({
           size="md"
           className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-6"
           onClick={() => {
-            if (!form.title.trim()) {
-              setError('Guide Service Title is required');
+            if (!form.title.trim() || form.title.trim().length < 3) {
+              setError('Guide Service Title is required and must be at least 3 characters');
               return;
             }
-            if (form.guideLanguages.length === 0) {
+            if (!form.destinationCity?.trim() && !form.destinationInput?.trim()) {
+              setError('Destination / City is required. Please specify your location.');
+              return;
+            }
+            if (!Array.isArray(form.guideLanguages) || form.guideLanguages.length === 0) {
               setError('Please select at least one Language Spoken');
               return;
             }
-            if (!form.imageUrl && form.images.length === 0) {
-              const defaultImage = getCategoryDefaultCoverImage('guide');
-              setForm((prev: any) => ({
-                ...prev,
-                images: [defaultImage],
-                imageUrl: defaultImage,
-              }));
+            if (!form.imageUrl && (!Array.isArray(form.images) || form.images.length === 0)) {
+              setError('Please upload at least one guide profile photo or cover image');
+              return;
             }
             setError(null);
             setStep(2);
@@ -2533,10 +2611,12 @@ export function GuideStep2({
   form,
   set,
   setStep,
+  setError,
 }: {
   form: any;
   set: (k: any, v: any) => void;
   setStep: (s: number) => void;
+  setError?: (err: string | null) => void;
 }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
@@ -2716,7 +2796,20 @@ export function GuideStep2({
           variant="primary"
           size="md"
           className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-6"
-          onClick={() => setStep(3)}
+          onClick={() => {
+            const hasPrice =
+              Number(form.guideFullDayPrice) > 0 ||
+              Number(form.guideHalfDayPrice) > 0 ||
+              Number(form.guidePricePerHour) > 0 ||
+              Number(form.guideGroupPrice) > 0 ||
+              Number(form.basePrice) > 0;
+            if (!hasPrice) {
+              if (setError) setError('Guide fee / price is required. Please specify at least a full-day, half-day, or hourly rate.');
+              return;
+            }
+            if (setError) setError(null);
+            setStep(3);
+          }}
           rightIcon={<ArrowRight className="w-4 h-4" />}
         >
           Continue to Tour Route & Topics
@@ -2962,6 +3055,9 @@ export function GuideStep4({
   verificationStatus,
   submitting,
   onSubmit,
+  onSaveDraft,
+  savingDraft,
+  setError,
 }: {
   form: any;
   set: (k: any, v: any) => void;
@@ -2969,6 +3065,9 @@ export function GuideStep4({
   verificationStatus: string | null;
   submitting: boolean;
   onSubmit: () => void;
+  onSaveDraft?: () => void;
+  savingDraft?: boolean;
+  setError?: (err: string | null) => void;
 }) {
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -3067,29 +3166,53 @@ export function GuideStep4({
         />
       </div>
 
-      <div className="flex justify-between pt-2">
+      <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
         <Button
           type="button"
           variant="outline"
           size="md"
           onClick={() => setStep(3)}
           leftIcon={<ArrowLeft className="w-4 h-4" />}
+          className="w-full sm:w-auto"
         >
           Back
         </Button>
 
-        <Button
-          type="button"
-          variant="primary"
-          size="lg"
-          className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8"
-          isLoading={submitting}
-          onClick={onSubmit}
-        >
-          {verificationStatus !== 'VERIFIED'
-            ? 'Verification Required'
-            : 'Submit for Approval'}
-        </Button>
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+          {onSaveDraft && (
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              disabled={submitting || savingDraft}
+              isLoading={savingDraft}
+              onClick={onSaveDraft}
+              className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+            >
+              Save as Draft
+            </Button>
+          )}
+
+          <Button
+            type="button"
+            variant="primary"
+            size="lg"
+            className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8 w-full sm:w-auto"
+            disabled={savingDraft}
+            isLoading={submitting}
+            onClick={() => {
+              if (!termsAccepted) {
+                if (setError) setError('Please agree to the VibeMiles Provider Terms before submitting.');
+                return;
+              }
+              onSubmit();
+            }}
+          >
+            {verificationStatus !== 'VERIFIED'
+              ? 'Verification Required'
+              : 'Submit for Approval'}
+          </Button>
+        </div>
       </div>
     </div>
   );

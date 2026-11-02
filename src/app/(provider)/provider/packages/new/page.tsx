@@ -446,7 +446,7 @@ const INITIAL_FORM: FormData = {
   acType: 'AC',
   // Cab pricing
   cabPricingType: 'Per Day',
-  baseFare: '1000',
+  baseFare: '',
   pricePerKm: '18',
   driverAllowance: '0',
   tollCharges: '0',
@@ -464,14 +464,14 @@ const INITIAL_FORM: FormData = {
   locationName: '',
   address: '',
   city: '',
-  state: 'Tamil Nadu',
+  state: '',
   pinCode: '',
   maximumGuests: '10',
   bedrooms: '4',
   beds: '4',
   bathrooms: '3',
   villaAmenities: ['Private Pool', 'Parking', 'Wi-Fi'],
-  villaPricePerNight: '12000',
+  villaPricePerNight: '',
   villaDiscountPercent: '0',
   villaCleaningFee: '0',
   villaSecurityDeposit: '0',
@@ -488,7 +488,7 @@ const INITIAL_FORM: FormData = {
       availableBeds: '6',
       gender: 'Mixed',
       bathroomType: 'Shared',
-      pricePerNight: '799',
+      pricePerNight: '',
     },
   ],
   hostelAmenities: [
@@ -510,7 +510,7 @@ const INITIAL_FORM: FormData = {
   accommodationType: '',
   totalRooms: '',
   amenities: '',
-  basePrice: '10000',
+  basePrice: '',
   discountPercent: '0',
   images: [],
   imageUrl: '',
@@ -527,18 +527,18 @@ const INITIAL_FORM: FormData = {
   foodBusinessType: 'Restaurant / Fine Dining',
   foodAddress: '',
   foodGoogleMapsUrl: '',
-  foodCuisines: ['South Indian'],
+  foodCuisines: [],
   foodContactNumber: '',
   foodWhatsappNumber: '',
   foodOpeningTime: '11:00',
   foodClosingTime: '23:00',
   foodLogoUrl: '',
   foodFormat: 'Home Dining & Family Meal',
-  foodDietaryOptions: ['Veg Friendly', 'Pure Vegetarian (100% Veg)'],
+  foodDietaryOptions: [],
   foodMenuItems: [],
-  foodBasePrice: '799',
-  foodPricePerPerson: '799',
-  foodMinOrderAmount: '350',
+  foodBasePrice: '',
+  foodPricePerPerson: '',
+  foodMinOrderAmount: '',
   foodTaxesIncluded: 'Included',
   foodExtraCharges: '',
   foodDiscountPercent: '0',
@@ -559,7 +559,7 @@ const INITIAL_FORM: FormData = {
   foodSpecialRequests: 'High chairs available, Jain preparations on request',
   foodMeetingLandmark: '',
   foodWalkingDistance: '',
-  foodFssaiCompliance: true,
+  foodFssaiCompliance: false,
   foodFssaiNumber: '',
   foodHygieneInfo: 'Packaged mineral water and sanitized tables',
   foodCancellationPolicy: 'Free cancellation up to 4 hours before booking slot.',
@@ -580,24 +580,24 @@ const INITIAL_FORM: FormData = {
   advEnvironment: 'Outdoor Wilderness',
   advLocationName: '',
   advGoogleMapsUrl: '',
-  advPricePerPerson: '1499',
-  advAdultPrice: '1499',
-  advChildPrice: '999',
-  advGroupPrice: '6000',
+  advPricePerPerson: '',
+  advAdultPrice: '',
+  advChildPrice: '',
+  advGroupPrice: '',
   advPricingType: 'Per Person',
   advTaxesIncluded: 'Included',
   advAdditionalCharges: '',
   advDiscounts: '0',
-  advEquipmentIncluded: ['Safety Helmet & Harness', 'Life Jacket / Buoyancy Aid'],
-  advSafetyGearIncluded: 'CE-certified helmet, safety harness, and life vests',
+  advEquipmentIncluded: [],
+  advSafetyGearIncluded: '',
   advEquipmentList: '',
   advInstructorAvailable: 'Yes',
   advGuideIncluded: 'Yes',
-  advChangingRoom: true,
-  advLockerFacility: true,
-  advRefreshments: true,
+  advChangingRoom: false,
+  advLockerFacility: false,
+  advRefreshments: false,
   advExtraEquipmentCharges: '',
-  advInstructorCertifications: 'Certified Mountaineering / Water Safety Instructors',
+  advInstructorCertifications: '',
   advInstructorRatio: '1 Instructor per 4 Participants',
   advAvailableDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
   advOpeningTime: '06:00',
@@ -607,7 +607,7 @@ const INITIAL_FORM: FormData = {
   advBookingCutoff: '12 Hours Prior',
   advAdvanceBooking: 'Yes',
   advSeasonalAvailability: 'October to May',
-  advBlackoutDates: 'Monsoon season',
+  advBlackoutDates: '',
   advStartPoint: '',
   advCheckinTime: '30 mins before activity',
   advStartTime: '06:30 AM',
@@ -621,12 +621,12 @@ const INITIAL_FORM: FormData = {
   advPackingChecklist: 'Hydration bottle, dry bag, personal medications',
   advSafetyInstructions: 'Follow instructor whistle codes and stay within boundary',
   advRiskLevel: 'Moderate (Standard Outdoor Risk)',
-  advMandatoryGear: true,
-  advTrainedInstructorOnSite: true,
+  advMandatoryGear: false,
+  advTrainedInstructorOnSite: false,
   advEmergencyContact: '',
-  advFirstAidFacility: true,
-  advInsuranceCoverage: 'Comprehensive Adventure Accidental Coverage Included',
-  advMedicalRestrictions: ['Heart Conditions or Hypertension', 'Pregnancy'],
+  advFirstAidFacility: false,
+  advInsuranceCoverage: '',
+  advMedicalRestrictions: [],
   advSwimmingRequirement: 'Not Required (Life Jacket Provided)',
   advWeightRestrictions: 'Under 120 kg',
   advFitnessPrerequisites: 'Basic stamina to walk/swim 30 minutes',
@@ -641,23 +641,23 @@ const INITIAL_FORM: FormData = {
   // Local Guide Defaults
   guideFullName: '',
   guideServiceCategory: 'Heritage & Culture Walk',
-  guideExperienceYears: '5',
-  guideLanguages: ['English', 'Hindi'],
+  guideExperienceYears: '',
+  guideLanguages: [],
   guideServiceAreas: '',
   guideMeetingPoint: '',
   guideGoogleMapsUrl: '',
   guideType: 'Individual Local Guide',
   guideSpecialization: 'Heritage, Monuments & Archaeology',
   guideTourFormat: 'Private Guided Tour (Exclusive for booked party)',
-  guideCertificationType: 'State Tourism Department Certified',
+  guideCertificationType: 'None',
   guideLicenseId: '',
   guidePricingType: 'Full Day (Up to 8 Hours)',
-  guidePricePerHour: '400',
-  guideHalfDayPrice: '1500',
-  guideFullDayPrice: '2500',
-  guideGroupPrice: '3500',
-  guideAdditionalPersonCharge: '200',
-  guideChildPrice: '0',
+  guidePricePerHour: '',
+  guideHalfDayPrice: '',
+  guideFullDayPrice: '',
+  guideGroupPrice: '',
+  guideAdditionalPersonCharge: '',
+  guideChildPrice: '',
   guideTransportationIncluded: 'Walking Tour (No Transport Needed)',
   guideTicketHandling: 'Customer Buys Directly at Monument Counter',
   guideAdditionalCharges: '',
@@ -670,10 +670,10 @@ const INITIAL_FORM: FormData = {
   guideAdvanceBooking: '1 Day Prior',
   guideMinDuration: '3 Hours',
   guideAudioWhisperHeadsets: false,
-  guideTicketQueueAssistance: true,
+  guideTicketQueueAssistance: false,
   guideTourStartingPoint: '',
   guideTourEndingPoint: '',
-  guideWalkingDistance: '2 km',
+  guideWalkingDistance: '',
   guideKeyMonuments: '',
   guideTopics: 'Historical folklore, dynasties, local hidden gems',
   guideRouteOverview: '',
@@ -705,22 +705,7 @@ function getDefaultFormForListingType(t: ListingType): FormData {
     durationDays: t === 'cab' ? '1' : t === 'food' || t === 'guide' ? '1' : '3',
     durationNights: t === 'cab' || t === 'food' || t === 'guide' ? '0' : '2',
     maxGroupSize: t === 'cab' ? '4' : t === 'food' ? '12' : t === 'adventure' ? '15' : t === 'guide' ? '10' : '12',
-    basePrice:
-      t === 'cab'
-        ? '1500'
-        : t === 'food'
-        ? '799'
-        : t === 'adventure'
-        ? '1499'
-        : t === 'guide'
-        ? '2500'
-        : t === 'villa'
-        ? '12000'
-        : t === 'homestay'
-        ? '6000'
-        : t === 'hostel'
-        ? '799'
-        : '10000',
+    basePrice: '',
     villaPropertyType: t === 'homestay' ? 'Entire Homestay' : 'Entire Villa',
   };
 }
@@ -1088,7 +1073,7 @@ function NewPackageForm() {
         driverIncluded: 'Yes',
         acType: 'AC',
         cabPricingType: 'Per Day',
-        baseFare: String(pkg.basePrice || 1000),
+        baseFare: String(pkg.basePrice || ''),
         pricePerKm: '18',
         driverAllowance: '0',
         tollCharges: '0',
@@ -1100,18 +1085,18 @@ function NewPackageForm() {
         waitingChargesPerHour: '150',
         extraKmCharges: '20',
         cabTermsAndConditions: '',
-        villaPropertyType: 'Entire Villa',
+        villaPropertyType: normalizedCat === 'homestay' ? 'Entire Homestay' : 'Entire Villa',
         locationName: pkg.destinationName || '',
         address: '',
         city: pkg.city || pkg.destinationName || '',
-        state: pkg.state || 'Tamil Nadu',
+        state: pkg.state || '',
         pinCode: '',
         maximumGuests: String(pkg.maxGroupSize || 10),
         bedrooms: '4',
         beds: '4',
         bathrooms: '3',
         villaAmenities: ['Private Pool', 'Parking', 'Wi-Fi'],
-        villaPricePerNight: String(pkg.basePrice || 12000),
+        villaPricePerNight: String(pkg.basePrice || ''),
         villaDiscountPercent: String(pkg.discountPercent || 0),
         villaCleaningFee: '0',
         villaSecurityDeposit: '0',
@@ -1127,7 +1112,7 @@ function NewPackageForm() {
             availableBeds: '6',
             gender: 'Mixed',
             bathroomType: 'Shared',
-            pricePerNight: String(pkg.basePrice || 799),
+            pricePerNight: String(pkg.basePrice || ''),
           },
         ],
         hostelAmenities: [
@@ -1148,8 +1133,15 @@ function NewPackageForm() {
         accommodationType: '',
         totalRooms: '',
         amenities: '',
-        basePrice: String(pkg.basePrice || 10000),
+        basePrice: String(pkg.basePrice || ''),
         discountPercent: String(pkg.discountPercent || 0),
+        foodRestaurantName: normalizedCat === 'food' ? pkg.name : '',
+        foodBasePrice: String(pkg.basePrice || ''),
+        foodPricePerPerson: String(pkg.basePrice || ''),
+        advPricePerPerson: String(pkg.basePrice || ''),
+        advAdultPrice: String(pkg.basePrice || ''),
+        guideFullDayPrice: String(pkg.basePrice || ''),
+        guidePricePerHour: String(pkg.basePrice ? Math.round(pkg.basePrice / 8) : ''),
         images: Array.isArray(pkg.images) && pkg.images.length > 0
           ? pkg.images
           : (pkg as unknown as { imageUrl?: string }).imageUrl
@@ -1321,6 +1313,413 @@ function NewPackageForm() {
     });
   }, []);
 
+  const [savingDraft, setSavingDraft] = useState(false);
+
+  const buildPayload = useCallback((submitForReview: boolean) => {
+    // 1. Strict Validation if submitting for admin review
+    if (submitForReview) {
+      if (!form.title.trim() || form.title.trim().length < 3) {
+        throw new Error('Title / Name is required and must be at least 3 characters.');
+      }
+      if (!form.description.trim() || form.description.trim().length < 10) {
+        throw new Error('Description is required and must be at least 10 characters.');
+      }
+      const hasImages = (Array.isArray(form.images) && form.images.length > 0) || Boolean(form.imageUrl.trim());
+      if (!hasImages) {
+        throw new Error('Please upload at least one cover photo or image for your listing.');
+      }
+    }
+
+    const rawImages = Array.isArray(form.images) && form.images.length > 0
+      ? form.images
+      : form.imageUrl.trim()
+      ? [form.imageUrl.trim()]
+      : [];
+
+    let payload: Record<string, unknown>;
+
+    if (isCab) {
+      const destCity = form.pickupLocation.trim() || form.destinationCity.trim() || form.destinationInput.trim();
+      const destState = form.destinationState.trim() || form.state.trim() || 'India';
+      const fare = Number(form.baseFare) || Number(form.basePrice) || 0;
+
+      if (submitForReview) {
+        if (!destCity) throw new Error('Pickup Location or Destination City is required.');
+        if (fare <= 0) throw new Error('Valid base fare is required and must be greater than 0.');
+      }
+
+      payload = {
+        name: form.title.trim() || 'Cab Service',
+        description: form.description.trim() || `${form.cabServiceType} Cab Service with ${form.vehicleType}.`,
+        category: 'cab',
+        destinationCity: destCity || 'Unspecified',
+        destinationState: destState,
+        durationDays: 1,
+        durationNights: 0,
+        maxGroupSize: Number(form.seatingCapacity) || 4,
+        basePrice: fare,
+        discountPercent: 0,
+        images: rawImages,
+        highlights: [
+          `Service Type: ${form.cabServiceType}`,
+          `Vehicle: ${form.vehicleType}${form.vehicleModel ? ` (${form.vehicleModel})` : ''}`,
+          `Seating Capacity: ${form.seatingCapacity} Passengers`,
+          form.pickupLocation ? `Pickup: ${form.pickupLocation}` : '',
+          form.dropLocation ? `Drop: ${form.dropLocation}` : '',
+          `Driver: ${form.driverIncluded === 'Yes' ? 'Commercial Driver Included' : 'Self-Drive / Unaccompanied'}`,
+          `Air Conditioning: ${form.acType}`,
+          fare > 0 ? `Pricing: ₹${fare} Base Fare (₹${form.pricePerKm || '0'}/KM)` : '',
+        ].filter(Boolean),
+        inclusions: [
+          `${form.acType} Vehicle (${form.vehicleType})`,
+          form.driverIncluded === 'Yes' ? 'Commercial Driver Allowance' : '',
+          Number(form.tollCharges) > 0 ? `Toll Charges (₹${form.tollCharges})` : '',
+          Number(form.parkingCharges) > 0 ? `Parking charges (₹${form.parkingCharges})` : '',
+        ].filter(Boolean),
+        exclusions: [
+          'Interstate permits / Border tax (if applicable outside state)',
+          form.waitingChargesPerHour ? `Waiting charges: ₹${form.waitingChargesPerHour}/hour after free pickup window` : '',
+          form.extraKmCharges ? `Extra KM charges: ₹${form.extraKmCharges}/KM beyond trip distance` : '',
+        ].filter(Boolean),
+        cancellationPolicy: form.cancellationPolicy.trim() || 'Free cancellation up to 6 hours before scheduled pickup time.',
+        tags: [
+          'cab',
+          'taxi',
+          form.cabServiceType?.toLowerCase(),
+          form.vehicleType?.toLowerCase(),
+          form.pickupLocation?.toLowerCase(),
+          form.dropLocation?.toLowerCase(),
+        ].filter(Boolean),
+        submitForReview,
+      };
+    } else if (isVilla) {
+      const destCity = form.city.trim() || form.destinationCity.trim() || form.destinationInput.trim();
+      const destState = form.state.trim() || form.destinationState.trim() || 'India';
+      const nightPrice = Number(form.villaPricePerNight) || Number(form.basePrice) || 0;
+      const discount = Number(form.villaDiscountPercent) || 0;
+
+      if (submitForReview) {
+        if (!destCity) throw new Error('Property City / Location is required.');
+        if (nightPrice <= 0) throw new Error('Price per night is required and must be greater than 0.');
+      }
+
+      payload = {
+        name: form.title.trim() || 'Villa / Homestay Property',
+        description: form.description.trim() || `${form.villaPropertyType} in ${destCity || 'scenic location'}.`,
+        category: form.listingType,
+        destinationCity: destCity || 'Unspecified',
+        destinationState: destState,
+        durationDays: 1,
+        durationNights: 1,
+        maxGroupSize: Number(form.maximumGuests) || 10,
+        basePrice: nightPrice,
+        discountPercent: discount,
+        images: rawImages,
+        highlights: [
+          `Property Type: ${form.villaPropertyType}`,
+          `Capacity: Up to ${form.maximumGuests} Guests`,
+          `Rooms: ${form.bedrooms} Bedrooms · ${form.beds} Beds · ${form.bathrooms} Bathrooms`,
+          destCity ? `Location: ${form.locationName || form.address ? `${form.locationName || form.address}, ` : ''}${destCity}, ${destState}` : '',
+          form.villaAmenities.length > 0 ? `Amenities: ${form.villaAmenities.join(', ')}` : '',
+        ].filter(Boolean),
+        inclusions: [
+          `Accommodation in ${form.villaPropertyType}`,
+          ...form.villaAmenities,
+          'Clean Linens, Towels and Toiletries',
+          Number(form.villaCleaningFee) > 0 ? `Cleaning Fee: ₹${form.villaCleaningFee}` : '',
+        ].filter(Boolean),
+        exclusions: [
+          Number(form.villaSecurityDeposit) > 0 ? `Refundable Security Deposit: ₹${form.villaSecurityDeposit}` : '',
+          Number(form.villaExtraGuestCharge) > 0 ? `Extra Guest Charge: ₹${form.villaExtraGuestCharge} / night` : '',
+          form.villaHouseRules.length > 0 ? `House Rules: ${form.villaHouseRules.join(', ')}` : '',
+        ].filter(Boolean),
+        cancellationPolicy: form.cancellationPolicy.trim() || 'Free cancellation up to 48 hours before check-in.',
+        tags: [
+          form.listingType,
+          'stay',
+          'villa',
+          form.villaPropertyType.toLowerCase(),
+          destCity?.toLowerCase(),
+        ].filter(Boolean),
+        submitForReview,
+      };
+    } else if (isHostel) {
+      const destCity = form.city.trim() || form.destinationCity.trim() || form.destinationInput.trim();
+      const destState = form.state.trim() || form.destinationState.trim() || 'India';
+      const validRoomPrices = form.hostelRooms
+        .map((r) => Number(r.pricePerNight))
+        .filter((p) => p > 0);
+      const lowestPrice = validRoomPrices.length > 0 ? Math.min(...validRoomPrices) : Number(form.basePrice) || 0;
+      const maxBeds = Math.max(...form.hostelRooms.map((r) => Number(r.totalBeds) || 0), 0);
+
+      if (submitForReview) {
+        if (!destCity) throw new Error('Hostel City / Location is required.');
+        if (lowestPrice <= 0) throw new Error('Price per night is required for hostel rooms.');
+      }
+
+      payload = {
+        name: form.title.trim() || 'Hostel Accommodation',
+        description: form.description.trim() || `${form.hostelPropertyType} in ${destCity || 'prime location'}.`,
+        category: 'hostel',
+        destinationCity: destCity || 'Unspecified',
+        destinationState: destState,
+        durationDays: 1,
+        durationNights: 1,
+        maxGroupSize: maxBeds || 12,
+        basePrice: lowestPrice,
+        discountPercent: 0,
+        images: rawImages,
+        highlights: [
+          `Property Type: ${form.hostelPropertyType}`,
+          `Room Types: ${form.hostelRooms.map((r) => `${r.roomName || 'Dorm'} (${r.gender}) - ₹${r.pricePerNight || '0'}/night`).join(' · ')}`,
+          `Timings: Check-in ${form.hostelCheckInTime} · Check-out ${form.hostelCheckOutTime}`,
+          destCity ? `Location: ${form.locationName || form.address ? `${form.locationName || form.address}, ` : ''}${destCity}, ${destState}` : '',
+          form.hostelAmenities.length > 0 ? `Amenities: ${form.hostelAmenities.join(', ')}` : '',
+        ].filter(Boolean),
+        inclusions: [
+          'Bunk bed accommodation as per selected room',
+          'Personal Locker / Safe Storage',
+          'High-Speed Wi-Fi',
+          ...form.hostelAmenities.filter((a) => a !== 'High-Speed Wi-Fi'),
+          'Clean Bed Linen & Pillow',
+        ].filter(Boolean),
+        exclusions: [
+          'Towel rental (available at front desk)',
+          'Food & Beverages unless purchased separately',
+          'Valid Govt ID required at check-in',
+        ],
+        cancellationPolicy: form.cancellationPolicy.trim() || 'Free cancellation up to 24 hours before check-in time.',
+        tags: [
+          'hostel',
+          'backpacker',
+          'dormitory',
+          form.hostelPropertyType.toLowerCase(),
+          destCity?.toLowerCase(),
+        ].filter(Boolean),
+        submitForReview,
+      };
+    } else if (isFood) {
+      const destCity = form.destinationCity.trim() || form.destinationInput.trim() || form.foodAddress.trim();
+      const destState = form.destinationState.trim() || 'India';
+      const foodPrice =
+        Number(form.foodBasePrice) ||
+        Number(form.foodPricePerPerson) ||
+        Number(form.basePrice) ||
+        (form.foodMenuItems.length > 0 && Number(form.foodMenuItems[0].price) > 0 ? Number(form.foodMenuItems[0].price) : 0);
+
+      if (submitForReview) {
+        if (!destCity) throw new Error('Destination / City is required for Food Experience.');
+        if (foodPrice <= 0 && form.foodMenuItems.length === 0) {
+          throw new Error('Valid food experience price or menu item pricing is required.');
+        }
+      }
+
+      payload = {
+        name: form.title.trim() || form.foodRestaurantName.trim() || 'Food Experience',
+        description: form.description.trim() || `${form.foodBusinessType} experience in ${destCity || 'city'}.`,
+        category: 'food',
+        destinationCity: destCity || 'Unspecified',
+        destinationState: destState,
+        durationDays: 1,
+        durationNights: 0,
+        maxGroupSize: Number(form.foodMaxPartySize) || Number(form.maxGroupSize) || 12,
+        basePrice: foodPrice,
+        discountPercent: Number(form.foodDiscountPercent) || 0,
+        images: rawImages,
+        highlights: [
+          `Business Type: ${form.foodBusinessType}`,
+          form.foodCuisines.length > 0 ? `Cuisines: ${form.foodCuisines.join(', ')}` : '',
+          form.foodDietaryOptions.length > 0 ? `Dietary Options: ${form.foodDietaryOptions.join(', ')}` : '',
+          `Food Format: ${form.foodFormat}`,
+          `Operating Hours: ${form.foodOpeningTime} - ${form.foodClosingTime}`,
+          `Service: ${form.foodBookingService}`,
+          form.foodAvailableDays.length > 0 ? `Available Days: ${form.foodAvailableDays.join(', ')}` : '',
+          form.foodFssaiCompliance && form.foodFssaiNumber.trim() ? `FSSAI Registered: ${form.foodFssaiNumber.trim()}` : '',
+        ].filter(Boolean),
+        inclusions: [
+          form.foodTastingCount ? `Curated food tastings (${form.foodTastingCount})` : 'Curated meal experience',
+          form.foodBeveragesIncluded ? 'Beverages & drinking water included' : 'Filtered water provided',
+          'Reserved dining area & dedicated service',
+          ...(form.foodMenuItems.length > 0 ? form.foodMenuItems.slice(0, 5).map((m) => `${m.name} (${m.foodType}) - ₹${m.price}`) : []),
+        ].filter(Boolean),
+        exclusions: [
+          `Alcohol Policy: ${form.foodAlcoholPolicy}`,
+          form.foodExtraCharges ? `Extra Charges: ${form.foodExtraCharges}` : '',
+          Number(form.foodMinOrderAmount) > 0 ? `Minimum order value: ₹${form.foodMinOrderAmount}` : '',
+        ].filter(Boolean),
+        cancellationPolicy: form.foodCancellationPolicy.trim() || form.cancellationPolicy.trim() || 'Free cancellation up to 4 hours before reservation slot.',
+        tags: [
+          'food',
+          'dining',
+          'culinary',
+          form.foodBusinessType.toLowerCase(),
+          ...form.foodCuisines.map((c) => c.toLowerCase()),
+          destCity?.toLowerCase(),
+        ].filter(Boolean),
+        submitForReview,
+      };
+    } else if (isAdventure) {
+      const destCity = form.destinationCity.trim() || form.destinationInput.trim();
+      const destState = form.destinationState.trim() || 'India';
+      const advPrice =
+        Number(form.advPricePerPerson) ||
+        Number(form.advAdultPrice) ||
+        Number(form.advGroupPrice) ||
+        Number(form.basePrice) ||
+        0;
+
+      if (submitForReview) {
+        if (!destCity) throw new Error('Destination / City is required for Adventure Activity.');
+        if (advPrice <= 0) throw new Error('Adventure activity price is required and must be greater than 0.');
+      }
+
+      payload = {
+        name: form.title.trim() || 'Adventure Activity',
+        description: form.description.trim() || `${form.advCategory} activity in ${destCity || 'nature'}.`,
+        category: 'adventure',
+        destinationCity: destCity || 'Unspecified',
+        destinationState: destState,
+        durationDays: 1,
+        durationNights: 0,
+        maxGroupSize: Number(form.advMaxParticipants) || Number(form.maxGroupSize) || 15,
+        basePrice: advPrice,
+        discountPercent: Number(form.advDiscounts) || 0,
+        images: rawImages,
+        highlights: [
+          `Activity Type: ${form.advCategory}`,
+          `Difficulty Level: ${form.advDifficulty}`,
+          `Environment: ${form.advEnvironment}`,
+          form.advDurationHours ? `Duration: ${form.advDurationHours}` : '',
+          form.advMinAge ? `Age Requirements: Minimum ${form.advMinAge} Years` : '',
+          form.advMandatoryGear ? 'Certified Safety Gear Mandatory' : '',
+          form.advInstructorAvailable === 'Yes' ? `Instructor: Certified Trainer${form.advInstructorRatio ? ` (${form.advInstructorRatio})` : ''}` : '',
+          form.advInstructorCertifications.trim() ? `Instructor Certifications: ${form.advInstructorCertifications.trim()}` : '',
+          form.advInsuranceCoverage.trim() && !form.advInsuranceCoverage.includes('Not Included') ? `Insurance: ${form.advInsuranceCoverage.trim()}` : '',
+        ].filter(Boolean),
+        inclusions: [
+          'Full activity session with safety marshals',
+          form.advSafetyGearIncluded ? `Safety Gear: ${form.advSafetyGearIncluded}` : 'Standard protective gear as applicable',
+          form.advLockerFacility ? 'Locker and luggage storage' : '',
+          form.advChangingRoom ? 'Changing rooms access' : '',
+          form.advRefreshments ? 'Hydration & energy refreshments' : '',
+          form.advFirstAidFacility ? 'Emergency First Aid Kit & On-site assistance' : '',
+        ].filter(Boolean),
+        exclusions: [
+          'Personal accidental insurance unless selected',
+          form.advExtraEquipmentCharges ? `Extra equipment rental: ${form.advExtraEquipmentCharges}` : '',
+          'Transport to base camp unless selected',
+        ].filter(Boolean),
+        cancellationPolicy: form.advCancellationPolicy.trim() || form.cancellationPolicy.trim() || 'Free cancellation up to 24 hours prior. Subject to weather conditions.',
+        tags: [
+          'adventure',
+          'activity',
+          'outdoor',
+          form.advCategory.toLowerCase(),
+          form.advDifficulty.toLowerCase(),
+          destCity?.toLowerCase(),
+        ].filter(Boolean),
+        submitForReview,
+      };
+    } else if (isGuide) {
+      const destCity = form.destinationCity.trim() || form.destinationInput.trim();
+      const destState = form.destinationState.trim() || 'India';
+      const guidePrice =
+        Number(form.guideFullDayPrice) ||
+        Number(form.guideHalfDayPrice) ||
+        Number(form.guidePricePerHour) ||
+        Number(form.guideGroupPrice) ||
+        Number(form.basePrice) ||
+        0;
+
+      if (submitForReview) {
+        if (!destCity) throw new Error('Destination / City is required for Guide Service.');
+        if (guidePrice <= 0) throw new Error('Guide service fee is required and must be greater than 0.');
+      }
+
+      payload = {
+        name: form.title.trim() || form.guideFullName.trim() || 'Local Guide Service',
+        description: form.description.trim() || `Local guide service in ${destCity || 'city'} covering heritage and culture.`,
+        category: 'guide',
+        destinationCity: destCity || 'Unspecified',
+        destinationState: destState,
+        durationDays: 1,
+        durationNights: 0,
+        maxGroupSize: Number(form.guideMaxCustomersPerSlot) || Number(form.maxGroupSize) || 10,
+        basePrice: guidePrice,
+        discountPercent: 0,
+        images: rawImages,
+        highlights: [
+          `Guide: ${form.guideFullName || form.title}${form.guideExperienceYears ? ` (${form.guideExperienceYears} Years Exp)` : ''}`,
+          `Specialization: ${form.guideSpecialization}`,
+          form.guideLanguages.length > 0 ? `Languages: ${form.guideLanguages.join(', ')}` : '',
+          `Tour Format: ${form.guideTourFormat}`,
+          form.guideTourStartingPoint || form.guideMeetingPoint ? `Starting Point: ${form.guideTourStartingPoint || form.guideMeetingPoint}` : '',
+          `Tour Duration: ${form.guidePricingType}${form.guideStartingTime && form.guideEndingTime ? ` (${form.guideStartingTime} - ${form.guideEndingTime})` : ''}`,
+          form.guideCertificationType && form.guideCertificationType !== 'None'
+            ? `Credentials: ${form.guideCertificationType}${form.guideLicenseId ? ` (ID: ${form.guideLicenseId})` : ''}`
+            : 'Independent Local Storyteller & Guide',
+        ].filter(Boolean),
+        inclusions: [
+          'Dedicated private/group local storytelling guide',
+          form.guideAudioWhisperHeadsets ? 'Audio whisper headsets for clear commentary' : '',
+          form.guideTicketQueueAssistance ? 'Priority ticket queue management & assistance' : '',
+          form.guideTransportationIncluded === 'Yes' ? 'Local transfer between monuments included' : '',
+        ].filter(Boolean),
+        exclusions: [
+          'Monument / Museum entry tickets (unless arranged separately)',
+          'Food, snacks & personal purchases',
+          'Gratuities / tips',
+        ],
+        cancellationPolicy: form.guideCancellationPolicy.trim() || form.cancellationPolicy.trim() || 'Free cancellation up to 12 hours prior to scheduled tour time.',
+        tags: [
+          'guide',
+          'local-guide',
+          'heritage',
+          'storytelling',
+          form.guideSpecialization.toLowerCase(),
+          ...form.guideLanguages.map((l) => l.toLowerCase()),
+          destCity?.toLowerCase(),
+        ].filter(Boolean),
+        submitForReview,
+      };
+    } else {
+      const destCity = form.destinationCity.trim() || form.destinationInput.trim();
+      const destState = form.destinationState.trim() || 'India';
+      const tourPrice = Number(form.basePrice) || 0;
+
+      if (submitForReview) {
+        if (!destCity) throw new Error('Destination City is required for Tour Package.');
+        if (tourPrice <= 0) throw new Error('Package base price is required and must be greater than 0.');
+      }
+
+      payload = {
+        name: form.title.trim() || 'Tour Package',
+        description: form.description.trim() || `Travel experience in ${destCity || 'scenic destination'}.`,
+        category: form.category,
+        destinationCity: destCity || 'Unspecified',
+        destinationState: destState,
+        durationDays: Number(form.durationDays) || 1,
+        durationNights: Number(form.durationNights) ?? Math.max(0, (Number(form.durationDays) || 1) - 1),
+        maxGroupSize: Number(form.maxGroupSize) || 10,
+        basePrice: tourPrice,
+        discountPercent: Number(form.discountPercent) || 0,
+        images: rawImages,
+        itinerary: form.itinerary,
+        inclusions: form.inclusions.split('\n').map((s) => s.trim()).filter(Boolean),
+        exclusions: form.exclusions.split('\n').map((s) => s.trim()).filter(Boolean),
+        cancellationPolicy: form.cancellationPolicy,
+        tags: [
+          form.category,
+          destCity?.toLowerCase(),
+          destState?.toLowerCase(),
+        ].filter(Boolean) as string[],
+        submitForReview,
+      };
+    }
+
+    return payload;
+  }, [form, isCab, isVilla, isHostel, isFood, isAdventure, isGuide]);
+
   const handleSubmit = useCallback(async () => {
     if (verificationStatus !== 'VERIFIED') {
       setError('KYC Verification Required: Your business profile must be verified by admin before submitting listings.');
@@ -1330,354 +1729,7 @@ function NewPackageForm() {
     setSubmitting(true);
     setError(null);
     try {
-      let payload: Record<string, unknown>;
-
-      if (isCab) {
-        const defaultCabImage = getCategoryDefaultCoverImage('cab');
-        const cabImages = form.images.length > 0
-          ? form.images
-          : form.imageUrl.trim()
-          ? [form.imageUrl.trim()]
-          : [defaultCabImage];
-        payload = {
-          name: form.title.trim(),
-          description: form.description.trim() || `${form.cabServiceType} Cab Service with verified ${form.vehicleType} (${form.vehicleModel || 'AC Cab'}). ${form.driverIncluded === 'Yes' ? 'Professional Driver included.' : ''} ${form.acType} vehicle from ${form.pickupLocation || 'Pickup location'} to ${form.dropLocation || 'Drop location'}.`,
-          category: 'cab',
-          destinationCity: form.pickupLocation || form.destinationCity || form.destinationInput || 'Chennai',
-          destinationState: form.destinationState || 'Tamil Nadu',
-          durationDays: 1,
-          durationNights: 0,
-          maxGroupSize: Number(form.seatingCapacity) || 4,
-          basePrice: Number(form.baseFare) || 1000,
-          discountPercent: 0,
-          images: cabImages,
-          highlights: [
-            `Service Type: ${form.cabServiceType}`,
-            `Vehicle: ${form.vehicleType}${form.vehicleModel ? ` (${form.vehicleModel})` : ''}`,
-            `Seating Capacity: ${form.seatingCapacity} Passengers`,
-            `Pickup: ${form.pickupLocation || 'Specified by customer'}`,
-            `Drop: ${form.dropLocation || 'Specified by customer'}`,
-            `Driver: ${form.driverIncluded === 'Yes' ? 'Included' : 'Self-Drive / Not Included'}`,
-            `Air Conditioning: ${form.acType}`,
-            `Pricing: ₹${form.baseFare} Base Fare (₹${form.pricePerKm}/KM)`,
-          ],
-          inclusions: [
-            `${form.acType} Vehicle (${form.vehicleType})`,
-            form.driverIncluded === 'Yes' ? 'Commercial Driver Allowance' : '',
-            Number(form.tollCharges) > 0 ? `Toll Charges (₹${form.tollCharges})` : 'Tolls included or as per actuals',
-            Number(form.parkingCharges) > 0 ? `Parking charges (₹${form.parkingCharges})` : '',
-          ].filter(Boolean),
-          exclusions: [
-            'Interstate permits / Border tax (if applicable outside state)',
-            `Waiting charges: ₹${form.waitingChargesPerHour || '150'}/hour after free pickup window`,
-            `Extra KM charges: ₹${form.extraKmCharges || '20'}/KM beyond estimated trip distance`,
-          ],
-          cancellationPolicy: form.cancellationPolicy.trim() || 'Free cancellation up to 6 hours before scheduled pickup time.',
-          tags: [
-            'cab',
-            'taxi',
-            form.cabServiceType.toLowerCase(),
-            form.vehicleType.toLowerCase(),
-            form.pickupLocation.toLowerCase(),
-            form.dropLocation.toLowerCase(),
-          ].filter(Boolean),
-          submitForReview: true,
-        };
-      } else if (isVilla) {
-        const villaCategory = form.listingType;
-        const defaultVillaImage = getCategoryDefaultCoverImage(villaCategory);
-        const villaImages = form.images.length > 0
-          ? form.images
-          : form.imageUrl.trim()
-          ? [form.imageUrl.trim()]
-          : [defaultVillaImage];
-        const baseNightPrice = Number(form.villaPricePerNight) || Number(form.basePrice) || 12000;
-        const discount = Number(form.villaDiscountPercent) || 0;
-        payload = {
-          name: form.title.trim(),
-          description: form.description.trim() || `Luxurious ${form.villaPropertyType} offering ${form.bedrooms} bedrooms and ${form.bathrooms} bathrooms for up to ${form.maximumGuests} guests in ${form.city || form.destinationCity || 'scenic location'}.`,
-          category: form.listingType,
-          destinationCity: form.city.trim() || form.destinationCity || form.destinationInput || 'Chennai',
-          destinationState: form.state.trim() || form.destinationState || 'Tamil Nadu',
-          durationDays: 1,
-          durationNights: 1,
-          maxGroupSize: Number(form.maximumGuests) || 10,
-          basePrice: baseNightPrice,
-          discountPercent: discount,
-          images: villaImages,
-          highlights: [
-            `Property Type: ${form.villaPropertyType}`,
-            `Capacity: Up to ${form.maximumGuests} Guests`,
-            `Rooms: ${form.bedrooms} Bedrooms · ${form.beds} Beds · ${form.bathrooms} Bathrooms`,
-            `Location: ${form.locationName || form.address ? `${form.locationName || form.address}, ` : ''}${form.city}, ${form.state}${form.pinCode ? ` - ${form.pinCode}` : ''}`,
-            `Key Amenities: ${form.villaAmenities.length > 0 ? form.villaAmenities.join(', ') : 'All essential comforts'}`,
-          ],
-          inclusions: [
-            `Accommodation in ${form.villaPropertyType}`,
-            ...form.villaAmenities,
-            'Clean Linens, Towels and Toiletries',
-            Number(form.villaCleaningFee) > 0 ? `Cleaning Fee: ₹${form.villaCleaningFee}` : 'Standard Cleaning & Maintenance included',
-          ].filter(Boolean),
-          exclusions: [
-            Number(form.villaSecurityDeposit) > 0 ? `Refundable Security Deposit: ₹${form.villaSecurityDeposit}` : '',
-            Number(form.villaExtraGuestCharge) > 0 ? `Extra Guest Charge: ₹${form.villaExtraGuestCharge} / night` : '',
-            `House Rules Enforced: ${form.villaHouseRules.join(', ')}`,
-          ].filter(Boolean),
-          cancellationPolicy: form.cancellationPolicy.trim() || 'Free cancellation up to 48 hours before check-in.',
-          tags: [
-            form.listingType,
-            'stay',
-            'villa',
-            form.villaPropertyType.toLowerCase(),
-            form.city.toLowerCase(),
-            form.state.toLowerCase(),
-          ].filter(Boolean),
-          submitForReview: true,
-        };
-      } else if (isHostel) {
-        const defaultHostelImage = getCategoryDefaultCoverImage('hostel');
-        const hostelImages = form.images.length > 0
-          ? form.images
-          : form.imageUrl.trim()
-          ? [form.imageUrl.trim()]
-          : [defaultHostelImage];
-        const lowestPrice = Math.min(...form.hostelRooms.map(r => Number(r.pricePerNight) || 799));
-        const maxBeds = Math.max(...form.hostelRooms.map(r => Number(r.totalBeds) || 6));
-        payload = {
-          name: form.title.trim(),
-          description: form.description.trim() || `Vibrant ${form.hostelPropertyType} in ${form.city || 'central location'} with modern dormitories, social lounge, high-speed Wi-Fi, and backpacker community vibes.`,
-          category: 'hostel',
-          destinationCity: form.city.trim() || form.destinationCity || form.destinationInput || 'Bangalore',
-          destinationState: form.state.trim() || form.destinationState || 'Karnataka',
-          durationDays: 1,
-          durationNights: 1,
-          maxGroupSize: maxBeds || 12,
-          basePrice: lowestPrice || 799,
-          discountPercent: 0,
-          images: hostelImages,
-          highlights: [
-            `Property Type: ${form.hostelPropertyType}`,
-            `Room Types: ${form.hostelRooms.map(r => `${r.roomName || 'Dorm'} (${r.gender}) - ₹${r.pricePerNight}/night`).join(' · ')}`,
-            `Timings: Check-in ${form.hostelCheckInTime} · Check-out ${form.hostelCheckOutTime}`,
-            `Location: ${form.locationName || form.address ? `${form.locationName || form.address}, ` : ''}${form.city}, ${form.state}${form.pinCode ? ` - ${form.pinCode}` : ''}`,
-            `Top Amenities: ${form.hostelAmenities.join(', ')}`,
-          ],
-          inclusions: [
-            'Comfortable bunk bed / stay as per selected room configuration',
-            'Personal Locker / Safe Storage',
-            'High-Speed Wi-Fi',
-            ...form.hostelAmenities.filter(a => a !== 'High-Speed Wi-Fi'),
-            'Fresh Bed Linen & Pillow',
-          ].filter(Boolean),
-          exclusions: [
-            'Towel rental (available at front desk)',
-            'Food & Beverages unless purchased separately',
-            'Govt ID verification mandatory at check-in',
-          ],
-          cancellationPolicy: form.cancellationPolicy.trim() || 'Free cancellation up to 24 hours before check-in time.',
-          tags: [
-            'hostel',
-            'backpacker',
-            'dormitory',
-            form.hostelPropertyType.toLowerCase(),
-            form.city.toLowerCase(),
-            form.state.toLowerCase(),
-          ].filter(Boolean),
-          submitForReview: true,
-        };
-      } else if (isFood) {
-        const defaultFoodImage = getCategoryDefaultCoverImage('food');
-        const foodImages = form.images.length > 0
-          ? form.images
-          : form.imageUrl.trim()
-          ? [form.imageUrl.trim()]
-          : [defaultFoodImage];
-        const foodPrice = Number(form.foodBasePrice) || Number(form.foodPricePerPerson) || Number(form.basePrice) || 499;
-        payload = {
-          name: form.title.trim(),
-          description: form.description.trim() || `${form.foodBusinessType} culinary experience: ${form.foodRestaurantName || form.title} serving authentic ${form.foodCuisines.join(', ')} cuisine in ${form.destinationCity || form.destinationInput || 'prime location'}.`,
-          category: 'food',
-          destinationCity: form.destinationCity || form.destinationInput || form.foodAddress || 'Chennai',
-          destinationState: form.destinationState || 'Tamil Nadu',
-          durationDays: 1,
-          durationNights: 0,
-          maxGroupSize: Number(form.foodMaxPartySize) || Number(form.maxGroupSize) || 12,
-          basePrice: foodPrice,
-          discountPercent: Number(form.foodDiscountPercent) || 0,
-          images: foodImages,
-          highlights: [
-            `Business Type: ${form.foodBusinessType}`,
-            `Cuisines: ${form.foodCuisines.join(', ')}`,
-            `Dietary Options: ${form.foodDietaryOptions.join(', ')}`,
-            `Food Format: ${form.foodFormat}`,
-            `Operating Hours: ${form.foodOpeningTime} - ${form.foodClosingTime}`,
-            `Service: ${form.foodBookingService}`,
-            `Available Days: ${form.foodAvailableDays.join(', ')}`,
-            form.foodFssaiNumber ? `FSSAI Registered: ${form.foodFssaiNumber}` : 'Hygiene protocols verified',
-          ],
-          inclusions: [
-            `Curated food tastings / menu (${form.foodTastingCount || 'Curated'} courses)`,
-            form.foodBeveragesIncluded ? 'Beverages & drinking water included' : 'Filtered water provided',
-            'Reserved table seating & dedicated service',
-            ...(form.foodMenuItems.length > 0 ? form.foodMenuItems.slice(0, 5).map(m => `${m.name} (${m.foodType}) - ₹${m.price}`) : []),
-          ],
-          exclusions: [
-            `Alcohol Policy: ${form.foodAlcoholPolicy}`,
-            form.foodExtraCharges ? `Extra Charges: ${form.foodExtraCharges}` : 'Items outside preset menu billed separately',
-            form.foodMinOrderAmount ? `Minimum order value: ₹${form.foodMinOrderAmount}` : '',
-          ].filter(Boolean),
-          cancellationPolicy: form.foodCancellationPolicy.trim() || form.cancellationPolicy.trim() || 'Free cancellation up to 4 hours before reservation slot.',
-          tags: [
-            'food',
-            'dining',
-            'culinary',
-            form.foodBusinessType.toLowerCase(),
-            ...form.foodCuisines.map(c => c.toLowerCase()),
-            form.destinationCity?.toLowerCase() || 'chennai',
-          ].filter(Boolean),
-          submitForReview: true,
-        };
-      } else if (isAdventure) {
-        const defaultAdvImage = getCategoryDefaultCoverImage('adventure');
-        const advImages = form.images.length > 0
-          ? form.images
-          : form.imageUrl.trim()
-          ? [form.imageUrl.trim()]
-          : [defaultAdvImage];
-        const advPrice = Number(form.advPricePerPerson) || Number(form.basePrice) || 1499;
-        payload = {
-          name: form.title.trim(),
-          description: form.description.trim() || `Exciting ${form.advCategory} activity: ${form.title} in ${form.destinationCity || form.destinationInput || 'scenic trail'}. Supervised by certified instructors with complete safety gear.`,
-          category: 'adventure',
-          destinationCity: form.destinationCity || form.destinationInput || 'Manali',
-          destinationState: form.destinationState || 'Himachal Pradesh',
-          durationDays: 1,
-          durationNights: 0,
-          maxGroupSize: Number(form.advMaxParticipants) || Number(form.maxGroupSize) || 15,
-          basePrice: advPrice,
-          discountPercent: Number(form.advDiscounts) || 0,
-          images: advImages,
-          highlights: [
-            `Activity Type: ${form.advCategory}`,
-            `Difficulty Level: ${form.advDifficulty}`,
-            `Environment: ${form.advEnvironment}`,
-            `Duration: ${form.advDurationHours || '2-3'} Hours`,
-            `Age Requirements: Minimum ${form.advMinAge || '12'} Years`,
-            `Safety: ${form.advMandatoryGear ? 'Certified Safety Gear Mandatory' : 'Safety Equipment Provided'}`,
-            `Instructor: ${form.advInstructorAvailable === 'Yes' ? `Certified Trainer (${form.advInstructorRatio || '1:5'} Ratio)` : 'Self-guided with safety marshal'}`,
-          ],
-          inclusions: [
-            'Full activity session with certified instruction',
-            'Standard Safety Gear (Helmet, Life Jacket / Harness as applicable)',
-            form.advLockerFacility ? 'Locker and luggage storage' : '',
-            form.advChangingRoom ? 'Changing rooms and shower access' : '',
-            form.advRefreshments ? 'Hydration & energy refreshments' : '',
-            form.advFirstAidFacility ? 'Emergency First Aid Kit & On-site assistance' : '',
-          ].filter(Boolean),
-          exclusions: [
-            'Personal medical & accidental insurance',
-            form.advExtraEquipmentCharges ? `Extra equipment rental: ${form.advExtraEquipmentCharges}` : '',
-            'Transport to base camp unless selected',
-          ].filter(Boolean),
-          cancellationPolicy: form.advCancellationPolicy.trim() || form.cancellationPolicy.trim() || 'Free cancellation up to 24 hours prior. Subject to weather conditions.',
-          tags: [
-            'adventure',
-            'activity',
-            'outdoor',
-            form.advCategory.toLowerCase(),
-            form.advDifficulty.toLowerCase(),
-            form.destinationCity?.toLowerCase() || 'destination',
-          ].filter(Boolean),
-          submitForReview: true,
-        };
-      } else if (isGuide) {
-        const defaultGuideImage = getCategoryDefaultCoverImage('guide');
-        const guideImages = form.images.length > 0
-          ? form.images
-          : form.imageUrl.trim()
-          ? [form.imageUrl.trim()]
-          : [defaultGuideImage];
-        const guidePrice = Number(form.guideFullDayPrice) || Number(form.guidePricePerHour) || Number(form.basePrice) || 1200;
-        payload = {
-          name: form.title.trim(),
-          description: form.description.trim() || `Professional ${form.guideSpecialization} guide service in ${form.destinationCity || form.destinationInput || 'heritage circuit'} by ${form.guideFullName || form.title}. Deep historical insights, customized routes, and multilingual storytelling.`,
-          category: 'guide',
-          destinationCity: form.destinationCity || form.destinationInput || 'Varanasi',
-          destinationState: form.destinationState || 'Uttar Pradesh',
-          durationDays: 1,
-          durationNights: 0,
-          maxGroupSize: Number(form.guideMaxCustomersPerSlot) || Number(form.maxGroupSize) || 10,
-          basePrice: guidePrice,
-          discountPercent: 0,
-          images: guideImages,
-          highlights: [
-            `Guide: ${form.guideFullName || 'Verified Local Guide'} (${form.guideExperienceYears || '5+'} Years Exp)`,
-            `Specialization: ${form.guideSpecialization}`,
-            `Languages: ${form.guideLanguages.join(', ')}`,
-            `Tour Format: ${form.guideTourFormat}`,
-            `Starting Point: ${form.guideTourStartingPoint || form.guideMeetingPoint || 'City Center'}`,
-            `Tour Duration: ${form.guidePricingType} (${form.guideStartingTime} - ${form.guideEndingTime})`,
-            `Credentials: ${form.guideCertificationType !== 'None' ? `${form.guideCertificationType}${form.guideLicenseId ? ` (ID: ${form.guideLicenseId})` : ''}` : 'Local Cultural Expert'}`,
-          ],
-          inclusions: [
-            'Dedicated private/group local storytelling guide',
-            form.guideAudioWhisperHeadsets ? 'Audio whisper headsets for clear commentary' : '',
-            form.guideTicketHandling ? 'Priority ticket queue management & assistance' : '',
-            form.guideTransportationIncluded === 'Yes' ? 'Local transfer between monuments included' : '',
-          ].filter(Boolean),
-          exclusions: [
-            'Monument / Museum entry tickets (unless arranged separately)',
-            'Food, snacks & personal purchases',
-            'Gratuities / tips',
-          ],
-          cancellationPolicy: form.guideCancellationPolicy.trim() || form.cancellationPolicy.trim() || 'Free cancellation up to 12 hours prior to scheduled tour time.',
-          tags: [
-            'guide',
-            'local-guide',
-            'heritage',
-            'storytelling',
-            form.guideSpecialization.toLowerCase(),
-            ...form.guideLanguages.map(l => l.toLowerCase()),
-            form.destinationCity?.toLowerCase() || 'city',
-          ].filter(Boolean),
-          submitForReview: true,
-        };
-      } else {
-        const defaultCatImage = getCategoryDefaultCoverImage(form.category);
-        const packageImages = form.images.length > 0
-          ? form.images
-          : form.imageUrl.trim()
-          ? [form.imageUrl.trim()]
-          : [defaultCatImage];
-
-        payload = {
-          name: form.title.trim(),
-          description: form.description.trim() || 'Exciting travel experience with comprehensive itinerary and verified service.',
-          category: form.category,
-          destinationCity: form.destinationCity || form.destinationInput,
-          destinationState: form.destinationState || 'India',
-          durationDays: Number(form.durationDays) || 1,
-          durationNights: Number(form.durationNights) ?? Math.max(0, (Number(form.durationDays) || 1) - 1),
-          maxGroupSize: Number(form.maxGroupSize) || 10,
-          basePrice: Number(form.basePrice) || 0,
-          discountPercent: Number(form.discountPercent) || 0,
-          images: packageImages,
-          itinerary: form.itinerary,
-          inclusions: form.inclusions.split('\n').map((s) => s.trim()).filter(Boolean),
-          exclusions: form.exclusions.split('\n').map((s) => s.trim()).filter(Boolean),
-          cancellationPolicy: form.cancellationPolicy,
-          tags: [
-            form.category,
-            form.destinationCity?.toLowerCase(),
-            form.destinationState?.toLowerCase(),
-            ...(form.category === 'food' ? ['food', 'culinary', 'tasting', 'street-food'] : []),
-            ...(form.category === 'adventure' ? ['adventure', 'outdoor', 'activities', 'thrill'] : []),
-            ...(form.category === 'guide' ? ['guide', 'local-guide', 'heritage', 'walk'] : []),
-          ].filter(Boolean) as string[],
-          submitForReview: true,
-        };
-      }
-
+      const payload = buildPayload(true);
       if (editId) {
         await packageService.updateProviderPackage(editId, payload as any);
       } else {
@@ -1689,7 +1741,25 @@ function NewPackageForm() {
       setError(err instanceof Error ? err.message : 'Failed to save listing');
       setSubmitting(false);
     }
-  }, [form, editId, isCab, isVilla, isHostel, isFood, isAdventure, isGuide, verificationStatus, router]);
+  }, [buildPayload, editId, verificationStatus, router]);
+
+  const handleSaveDraft = useCallback(async () => {
+    setSavingDraft(true);
+    setError(null);
+    try {
+      const payload = buildPayload(false);
+      if (editId) {
+        await packageService.updateProviderPackage(editId, payload as any);
+      } else {
+        await packageService.createProviderPackage(payload as any);
+      }
+
+      router.push(ROUTES.PROVIDER_PACKAGES);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save draft');
+      setSavingDraft(false);
+    }
+  }, [buildPayload, editId, router]);
 
   // ═════════════════════════════════════════════════════════════
   // CAB / TAXI SPECIFIC STEP RENDERERS
@@ -1859,8 +1929,16 @@ function NewPackageForm() {
           size="md"
           className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-6"
           onClick={() => {
-            if (!form.title.trim()) {
-              setError('Service Name is required');
+            if (!form.title.trim() || form.title.trim().length < 3) {
+              setError('Service Name is required and must be at least 3 characters');
+              return;
+            }
+            if (!form.pickupLocation.trim()) {
+              setError('Pickup Location is required');
+              return;
+            }
+            if (!form.imageUrl && (!Array.isArray(form.images) || form.images.length === 0)) {
+              setError('Please upload at least one vehicle photo');
               return;
             }
             setError(null);
@@ -1998,7 +2076,14 @@ function NewPackageForm() {
           variant="primary"
           size="md"
           className="bg-teal-700 hover:bg-teal-800 text-white font-bold"
-          onClick={() => setStep(3)}
+          onClick={() => {
+            if (!Number(form.baseFare) || Number(form.baseFare) <= 0) {
+              setError('Base fare is required and must be greater than 0');
+              return;
+            }
+            setError(null);
+            setStep(3);
+          }}
           rightIcon={<ArrowRight className="w-4 h-4" />}
         >
           Continue
@@ -2185,29 +2270,45 @@ function NewPackageForm() {
         </div>
 
         {/* Verification Check & Action Buttons */}
-        <div className="flex justify-between pt-2">
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
           <Button
             type="button"
             variant="outline"
             size="md"
             onClick={() => setStep(3)}
             leftIcon={<ArrowLeft className="w-4 h-4" />}
+            className="w-full sm:w-auto"
           >
             Back
           </Button>
 
-          <Button
-            type="button"
-            variant="primary"
-            size="lg"
-            className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8"
-            isLoading={submitting}
-            onClick={handleSubmit}
-          >
-            {verificationStatus !== 'VERIFIED'
-              ? 'Verification Required'
-              : 'Submit for Approval'}
-          </Button>
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              disabled={submitting || savingDraft}
+              isLoading={savingDraft}
+              onClick={handleSaveDraft}
+              className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+            >
+              Save as Draft
+            </Button>
+
+            <Button
+              type="button"
+              variant="primary"
+              size="lg"
+              className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8 w-full sm:w-auto"
+              disabled={savingDraft}
+              isLoading={submitting}
+              onClick={handleSubmit}
+            >
+              {verificationStatus !== 'VERIFIED'
+                ? 'Verification Required'
+                : 'Submit for Approval'}
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -2407,8 +2508,16 @@ function NewPackageForm() {
             size="md"
             className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-6"
             onClick={() => {
-              if (!form.title.trim()) {
-                setError('Property Name is required');
+              if (!form.title.trim() || form.title.trim().length < 3) {
+                setError('Property Name is required and must be at least 3 characters');
+                return;
+              }
+              if (!form.city.trim() && !form.destinationCity.trim() && !form.destinationInput.trim()) {
+                setError('City / Location is required');
+                return;
+              }
+              if (!form.imageUrl && (!Array.isArray(form.images) || form.images.length === 0)) {
+                setError('Please upload at least one property photo');
                 return;
               }
               setError(null);
@@ -2517,7 +2626,14 @@ function NewPackageForm() {
           variant="primary"
           size="md"
           className="bg-teal-700 hover:bg-teal-800 text-white font-bold"
-          onClick={() => setStep(3)}
+          onClick={() => {
+            if (!Number(form.villaPricePerNight) || Number(form.villaPricePerNight) <= 0) {
+              setError('Price per night is required and must be greater than 0');
+              return;
+            }
+            setError(null);
+            setStep(3);
+          }}
           rightIcon={<ArrowRight className="w-4 h-4" />}
         >
           Continue to House Rules
@@ -2716,29 +2832,45 @@ function NewPackageForm() {
         </div>
 
         {/* Verification Check & Action Buttons */}
-        <div className="flex justify-between pt-2">
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
           <Button
             type="button"
             variant="outline"
             size="md"
             onClick={() => setStep(3)}
             leftIcon={<ArrowLeft className="w-4 h-4" />}
+            className="w-full sm:w-auto"
           >
             Back
           </Button>
 
-          <Button
-            type="button"
-            variant="primary"
-            size="lg"
-            className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8"
-            isLoading={submitting}
-            onClick={handleSubmit}
-          >
-            {verificationStatus !== 'VERIFIED'
-              ? 'Verification Required'
-              : 'Submit for Approval'}
-          </Button>
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              disabled={submitting || savingDraft}
+              isLoading={savingDraft}
+              onClick={handleSaveDraft}
+              className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+            >
+              Save as Draft
+            </Button>
+
+            <Button
+              type="button"
+              variant="primary"
+              size="lg"
+              className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8 w-full sm:w-auto"
+              disabled={savingDraft}
+              isLoading={submitting}
+              onClick={handleSubmit}
+            >
+              {verificationStatus !== 'VERIFIED'
+                ? 'Verification Required'
+                : 'Submit for Approval'}
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -2878,8 +3010,16 @@ function NewPackageForm() {
           size="md"
           className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-6"
           onClick={() => {
-            if (!form.title.trim()) {
-              setError('Hostel Name is required');
+            if (!form.title.trim() || form.title.trim().length < 3) {
+              setError('Hostel Name is required and must be at least 3 characters');
+              return;
+            }
+            if (!form.city.trim() && !form.destinationCity.trim() && !form.destinationInput.trim()) {
+              setError('City / Location is required');
+              return;
+            }
+            if (!form.imageUrl && (!Array.isArray(form.images) || form.images.length === 0)) {
+              setError('Please upload at least one hostel photo');
               return;
             }
             setError(null);
@@ -3058,6 +3198,11 @@ function NewPackageForm() {
             const emptyRoom = form.hostelRooms.find((r) => !r.roomName.trim());
             if (emptyRoom) {
               setError('Please enter a room name for all configured room types.');
+              return;
+            }
+            const invalidPrice = form.hostelRooms.find((r) => !Number(r.pricePerNight) || Number(r.pricePerNight) <= 0);
+            if (invalidPrice) {
+              setError('Please specify a valid price per night greater than 0 for all rooms.');
               return;
             }
             setError(null);
@@ -3314,29 +3459,45 @@ function NewPackageForm() {
         </div>
 
         {/* Verification Check & Action Buttons */}
-        <div className="flex justify-between pt-2">
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
           <Button
             type="button"
             variant="outline"
             size="md"
             onClick={() => setStep(4)}
             leftIcon={<ArrowLeft className="w-4 h-4" />}
+            className="w-full sm:w-auto"
           >
             Back
           </Button>
 
-          <Button
-            type="button"
-            variant="primary"
-            size="lg"
-            className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8"
-            isLoading={submitting}
-            onClick={handleSubmit}
-          >
-            {verificationStatus !== 'VERIFIED'
-              ? 'Verification Required'
-              : 'Submit for Approval'}
-          </Button>
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              disabled={submitting || savingDraft}
+              isLoading={savingDraft}
+              onClick={handleSaveDraft}
+              className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+            >
+              Save as Draft
+            </Button>
+
+            <Button
+              type="button"
+              variant="primary"
+              size="lg"
+              className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8 w-full sm:w-auto"
+              disabled={savingDraft}
+              isLoading={submitting}
+              onClick={handleSubmit}
+            >
+              {verificationStatus !== 'VERIFIED'
+                ? 'Verification Required'
+                : 'Submit for Approval'}
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -3539,17 +3700,17 @@ function NewPackageForm() {
             size="md"
             className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-6"
             onClick={() => {
-              if (!form.title.trim()) {
-                setError(`${isFood ? 'Experience' : isAdventure ? 'Activity' : isGuide ? 'Guide Service' : 'Package'} Title is required`);
+              if (!form.title.trim() || form.title.trim().length < 3) {
+                setError('Package Title is required and must be at least 3 characters');
                 return;
               }
-              if (!form.imageUrl && form.images.length === 0) {
-                const defaultImage = getCategoryDefaultCoverImage(form.category);
-                setForm((prev) => ({
-                  ...prev,
-                  images: [defaultImage],
-                  imageUrl: defaultImage,
-                }));
+              if (!form.destinationCity?.trim() && !form.destinationInput?.trim()) {
+                setError('Destination City is required');
+                return;
+              }
+              if (!form.imageUrl && (!Array.isArray(form.images) || form.images.length === 0)) {
+                setError('Please upload at least one cover photo or image');
+                return;
               }
               setError(null);
               setStep(2);
@@ -3679,7 +3840,14 @@ function NewPackageForm() {
             variant="primary"
             size="md"
             className="bg-teal-700 hover:bg-teal-800 text-white font-bold"
-            onClick={() => setStep(3)}
+            onClick={() => {
+              if (!Number(form.basePrice) || Number(form.basePrice) <= 0) {
+                setError('Package base price is required and must be greater than 0');
+                return;
+              }
+              setError(null);
+              setStep(3);
+            }}
             rightIcon={<ArrowRight className="w-4 h-4" />}
           >
             {continueLabel}
@@ -3896,29 +4064,45 @@ function NewPackageForm() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-between pt-2">
+        <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
           <Button
             type="button"
             variant="outline"
             size="md"
             onClick={() => setStep(3)}
             leftIcon={<ArrowLeft className="w-4 h-4" />}
+            className="w-full sm:w-auto"
           >
             Back
           </Button>
 
-          <Button
-            type="button"
-            variant="primary"
-            size="lg"
-            className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8"
-            isLoading={submitting}
-            onClick={handleSubmit}
-          >
-            {verificationStatus !== 'VERIFIED'
-              ? 'Verification Required'
-              : 'Submit for Approval'}
-          </Button>
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              disabled={submitting || savingDraft}
+              isLoading={savingDraft}
+              onClick={handleSaveDraft}
+              className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+            >
+              Save as Draft
+            </Button>
+
+            <Button
+              type="button"
+              variant="primary"
+              size="lg"
+              className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-8 w-full sm:w-auto"
+              disabled={savingDraft}
+              isLoading={submitting}
+              onClick={handleSubmit}
+            >
+              {verificationStatus !== 'VERIFIED'
+                ? 'Verification Required'
+                : 'Submit for Approval'}
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -3927,15 +4111,30 @@ function NewPackageForm() {
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12">
       {/* ── HEADER ───────────────────────────────────────────── */}
-      <div>
-        <h1 className="text-2xl font-extrabold text-slate-900">
-          {editId ? 'Edit Package Listing' : 'Create New Listing'}
-        </h1>
-        <p className="text-xs text-slate-500 mt-1">
-          {editId
-            ? 'Update package details, itinerary, pricing, and resubmit for moderation.'
-            : 'Provide details for your tour, cab, villa, homestay, hostel, food experience, adventure or guide service.'}
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-slate-900">
+            {editId ? 'Edit Package Listing' : 'Create New Listing'}
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            {editId
+              ? 'Update package details, itinerary, pricing, and resubmit for moderation.'
+              : 'Provide details for your tour, cab, villa, homestay, hostel, food experience, adventure or guide service.'}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleSaveDraft}
+            disabled={submitting || savingDraft}
+            isLoading={savingDraft}
+            className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold"
+          >
+            Save as Draft
+          </Button>
+        </div>
       </div>
 
       {/* ── KYC VERIFICATION STATUS BANNER ── */}
@@ -4084,6 +4283,9 @@ function NewPackageForm() {
               verificationStatus={verificationStatus}
               submitting={submitting}
               onSubmit={handleSubmit}
+              onSaveDraft={handleSaveDraft}
+              savingDraft={savingDraft}
+              setError={setError}
             />
           )}
         </>
@@ -4105,6 +4307,7 @@ function NewPackageForm() {
               form={form}
               set={set}
               setStep={setStep}
+              setError={setError}
             />
           )}
           {step === 3 && (
@@ -4122,6 +4325,9 @@ function NewPackageForm() {
               verificationStatus={verificationStatus}
               submitting={submitting}
               onSubmit={handleSubmit}
+              onSaveDraft={handleSaveDraft}
+              savingDraft={savingDraft}
+              setError={setError}
             />
           )}
         </>
@@ -4143,6 +4349,7 @@ function NewPackageForm() {
               form={form}
               set={set}
               setStep={setStep}
+              setError={setError}
             />
           )}
           {step === 3 && (
@@ -4164,6 +4371,9 @@ function NewPackageForm() {
               verificationStatus={verificationStatus}
               submitting={submitting}
               onSubmit={handleSubmit}
+              onSaveDraft={handleSaveDraft}
+              savingDraft={savingDraft}
+              setError={setError}
             />
           )}
         </>
