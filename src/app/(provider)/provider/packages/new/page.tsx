@@ -904,6 +904,258 @@ const GUIDE_STEPS = [
   '4. Verification & Policies',
 ] as const;
 
+// ─── Extract Category Metadata for Real DB Persistence ───────────
+function extractCategoryMetadata(form: FormData): Record<string, unknown> {
+  const t = form.listingType;
+  if (t === 'food') {
+    return {
+      listingType: 'food',
+      foodRestaurantName: form.foodRestaurantName || form.title,
+      foodBusinessType: form.foodBusinessType,
+      foodAddress: form.foodAddress,
+      foodGoogleMapsUrl: form.foodGoogleMapsUrl,
+      foodCuisines: form.foodCuisines,
+      foodContactNumber: form.foodContactNumber,
+      foodWhatsappNumber: form.foodWhatsappNumber,
+      foodOpeningTime: form.foodOpeningTime,
+      foodClosingTime: form.foodClosingTime,
+      foodLogoUrl: form.foodLogoUrl,
+      foodFormat: form.foodFormat,
+      foodDietaryOptions: form.foodDietaryOptions,
+      foodMenuItems: form.foodMenuItems,
+      foodBasePrice: form.foodBasePrice,
+      foodPricePerPerson: form.foodPricePerPerson,
+      foodMinOrderAmount: form.foodMinOrderAmount,
+      foodTaxesIncluded: form.foodTaxesIncluded,
+      foodExtraCharges: form.foodExtraCharges,
+      foodDiscountPercent: form.foodDiscountPercent,
+      foodMenuTimings: form.foodMenuTimings,
+      foodTastingCount: form.foodTastingCount,
+      foodBeveragesIncluded: form.foodBeveragesIncluded,
+      foodAlcoholPolicy: form.foodAlcoholPolicy,
+      foodBookingService: form.foodBookingService,
+      foodAvailableDays: form.foodAvailableDays,
+      foodTableCapacity: form.foodTableCapacity,
+      foodAvailableTables: form.foodAvailableTables,
+      foodAdvanceBooking: form.foodAdvanceBooking,
+      foodMaxPartySize: form.foodMaxPartySize,
+      foodBookingTimeSlots: form.foodBookingTimeSlots,
+      foodReservationDuration: form.foodReservationDuration,
+      foodMorningSlots: form.foodMorningSlots,
+      foodEveningSlots: form.foodEveningSlots,
+      foodSpecialRequests: form.foodSpecialRequests,
+      foodMeetingLandmark: form.foodMeetingLandmark,
+      foodWalkingDistance: form.foodWalkingDistance,
+      foodFssaiCompliance: form.foodFssaiCompliance,
+      foodFssaiNumber: form.foodFssaiNumber,
+      foodHygieneInfo: form.foodHygieneInfo,
+      foodCancellationPolicy: form.foodCancellationPolicy,
+      foodRefundPolicy: form.foodRefundPolicy,
+      foodLateArrivalPolicy: form.foodLateArrivalPolicy,
+      foodNoShowPolicy: form.foodNoShowPolicy,
+      foodConfirmationMethod: form.foodConfirmationMethod,
+      foodBusinessRegDetails: form.foodBusinessRegDetails,
+      foodGstin: form.foodGstin,
+    };
+  }
+
+  if (t === 'adventure') {
+    return {
+      listingType: 'adventure',
+      advCategory: form.advCategory,
+      advDurationHours: form.advDurationHours,
+      advMinAge: form.advMinAge,
+      advMaxParticipants: form.advMaxParticipants,
+      advMinParticipants: form.advMinParticipants,
+      advDifficulty: form.advDifficulty,
+      advEnvironment: form.advEnvironment,
+      advLocationName: form.advLocationName,
+      advGoogleMapsUrl: form.advGoogleMapsUrl,
+      advPricePerPerson: form.advPricePerPerson,
+      advAdultPrice: form.advAdultPrice,
+      advChildPrice: form.advChildPrice,
+      advGroupPrice: form.advGroupPrice,
+      advPricingType: form.advPricingType,
+      advTaxesIncluded: form.advTaxesIncluded,
+      advAdditionalCharges: form.advAdditionalCharges,
+      advDiscounts: form.advDiscounts,
+      advEquipmentIncluded: form.advEquipmentIncluded,
+      advSafetyGearIncluded: form.advSafetyGearIncluded,
+      advEquipmentList: form.advEquipmentList,
+      advInstructorAvailable: form.advInstructorAvailable,
+      advGuideIncluded: form.advGuideIncluded,
+      advChangingRoom: form.advChangingRoom,
+      advLockerFacility: form.advLockerFacility,
+      advRefreshments: form.advRefreshments,
+      advExtraEquipmentCharges: form.advExtraEquipmentCharges,
+      advInstructorCertifications: form.advInstructorCertifications,
+      advInstructorRatio: form.advInstructorRatio,
+      advAvailableDays: form.advAvailableDays,
+      advOpeningTime: form.advOpeningTime,
+      advClosingTime: form.advClosingTime,
+      advTimeSlots: form.advTimeSlots,
+      advMaxPerSlot: form.advMaxPerSlot,
+      advBookingCutoff: form.advBookingCutoff,
+      advAdvanceBooking: form.advAdvanceBooking,
+      advSeasonalAvailability: form.advSeasonalAvailability,
+      advBlackoutDates: form.advBlackoutDates,
+      advStartPoint: form.advStartPoint,
+      advCheckinTime: form.advCheckinTime,
+      advStartTime: form.advStartTime,
+      advCompletionTime: form.advCompletionTime,
+      advInstructionsBefore: form.advInstructionsBefore,
+      advWhatToBring: form.advWhatToBring,
+      advDressCode: form.advDressCode,
+      advWeatherRestrictions: form.advWeatherRestrictions,
+      advTransportationAvailable: form.advTransportationAvailable,
+      advBatchSlots: form.advBatchSlots,
+      advPackingChecklist: form.advPackingChecklist,
+      advSafetyInstructions: form.advSafetyInstructions,
+      advRiskLevel: form.advRiskLevel,
+      advMandatoryGear: form.advMandatoryGear,
+      advTrainedInstructorOnSite: form.advTrainedInstructorOnSite,
+      advEmergencyContact: form.advEmergencyContact,
+      advFirstAidFacility: form.advFirstAidFacility,
+      advInsuranceCoverage: form.advInsuranceCoverage,
+      advMedicalRestrictions: form.advMedicalRestrictions,
+      advSwimmingRequirement: form.advSwimmingRequirement,
+      advWeightRestrictions: form.advWeightRestrictions,
+      advFitnessPrerequisites: form.advFitnessPrerequisites,
+      advCancellationPolicy: form.advCancellationPolicy,
+      advRefundPolicy: form.advRefundPolicy,
+      advReschedulingPolicy: form.advReschedulingPolicy,
+      advBadWeatherPolicy: form.advBadWeatherPolicy,
+      advLateArrivalPolicy: form.advLateArrivalPolicy,
+      advNoShowPolicy: form.advNoShowPolicy,
+      advSafetyCertifications: form.advSafetyCertifications,
+    };
+  }
+
+  if (t === 'guide') {
+    return {
+      listingType: 'guide',
+      guideFullName: form.guideFullName || form.title,
+      guideServiceCategory: form.guideServiceCategory,
+      guideExperienceYears: form.guideExperienceYears,
+      guideLanguages: form.guideLanguages,
+      guideServiceAreas: form.guideServiceAreas,
+      guideMeetingPoint: form.guideMeetingPoint,
+      guideGoogleMapsUrl: form.guideGoogleMapsUrl,
+      guideType: form.guideType,
+      guideSpecialization: form.guideSpecialization,
+      guideTourFormat: form.guideTourFormat,
+      guideCertificationType: form.guideCertificationType,
+      guideLicenseId: form.guideLicenseId,
+      guidePricingType: form.guidePricingType,
+      guidePricePerHour: form.guidePricePerHour,
+      guideHalfDayPrice: form.guideHalfDayPrice,
+      guideFullDayPrice: form.guideFullDayPrice,
+      guideGroupPrice: form.guideGroupPrice,
+      guideAdditionalPersonCharge: form.guideAdditionalPersonCharge,
+      guideChildPrice: form.guideChildPrice,
+      guideTransportationIncluded: form.guideTransportationIncluded,
+      guideTicketHandling: form.guideTicketHandling,
+      guideAdditionalCharges: form.guideAdditionalCharges,
+      guideTaxesIncluded: form.guideTaxesIncluded,
+      guideAvailableDays: form.guideAvailableDays,
+      guideStartingTime: form.guideStartingTime,
+      guideEndingTime: form.guideEndingTime,
+      guideTimeSlots: form.guideTimeSlots,
+      guideMaxCustomersPerSlot: form.guideMaxCustomersPerSlot,
+      guideAdvanceBooking: form.guideAdvanceBooking,
+      guideMinDuration: form.guideMinDuration,
+      guideAudioWhisperHeadsets: form.guideAudioWhisperHeadsets,
+      guideTicketQueueAssistance: form.guideTicketQueueAssistance,
+      guideTourStartingPoint: form.guideTourStartingPoint,
+      guideTourEndingPoint: form.guideTourEndingPoint,
+      guideWalkingDistance: form.guideWalkingDistance,
+      guideKeyMonuments: form.guideKeyMonuments,
+      guideTopics: form.guideTopics,
+      guideRouteOverview: form.guideRouteOverview,
+      guideStops: form.guideStops,
+      guideSpecialInstructions: form.guideSpecialInstructions,
+      guideWhatToBring: form.guideWhatToBring,
+      guideTourismAffiliation: form.guideTourismAffiliation,
+      guideEmergencyContact: form.guideEmergencyContact,
+      guideCancellationPolicy: form.guideCancellationPolicy,
+      guideRefundPolicy: form.guideRefundPolicy,
+      guideReschedulingPolicy: form.guideReschedulingPolicy,
+      guideBadWeatherPolicy: form.guideBadWeatherPolicy,
+      guideLateArrivalPolicy: form.guideLateArrivalPolicy,
+      guideNoShowPolicy: form.guideNoShowPolicy,
+    };
+  }
+
+  if (t === 'cab') {
+    return {
+      listingType: 'cab',
+      cabServiceType: form.cabServiceType,
+      vehicleType: form.vehicleType,
+      vehicleModel: form.vehicleModel,
+      vehicleRegNumber: form.vehicleRegNumber,
+      seatingCapacity: form.seatingCapacity,
+      pickupLocation: form.pickupLocation,
+      dropLocation: form.dropLocation,
+      driverIncluded: form.driverIncluded,
+      acType: form.acType,
+      cabPricingType: form.cabPricingType,
+      baseFare: form.baseFare,
+      pricePerKm: form.pricePerKm,
+      driverAllowance: form.driverAllowance,
+      tollCharges: form.tollCharges,
+      parkingCharges: form.parkingCharges,
+      nightCharges: form.nightCharges,
+      minimumKm: form.minimumKm,
+      estimatedDistanceKm: form.estimatedDistanceKm,
+      advancePaymentPercent: form.advancePaymentPercent,
+      waitingChargesPerHour: form.waitingChargesPerHour,
+      extraKmCharges: form.extraKmCharges,
+      cabTermsAndConditions: form.cabTermsAndConditions,
+    };
+  }
+
+  if (t === 'villa' || t === 'homestay') {
+    return {
+      listingType: t,
+      villaPropertyType: form.villaPropertyType,
+      locationName: form.locationName,
+      address: form.address,
+      city: form.city,
+      state: form.state,
+      pinCode: form.pinCode,
+      maximumGuests: form.maximumGuests,
+      bedrooms: form.bedrooms,
+      beds: form.beds,
+      bathrooms: form.bathrooms,
+      villaAmenities: form.villaAmenities,
+      villaPricePerNight: form.villaPricePerNight,
+      villaDiscountPercent: form.villaDiscountPercent,
+      villaCleaningFee: form.villaCleaningFee,
+      villaSecurityDeposit: form.villaSecurityDeposit,
+      villaExtraGuestCharge: form.villaExtraGuestCharge,
+      villaMinStayNights: form.villaMinStayNights,
+      villaHouseRules: form.villaHouseRules,
+    };
+  }
+
+  if (t === 'hostel') {
+    return {
+      listingType: 'hostel',
+      hostelPropertyType: form.hostelPropertyType,
+      hostelRooms: form.hostelRooms,
+      hostelAmenities: form.hostelAmenities,
+      hostelCheckInTime: form.hostelCheckInTime,
+      hostelCheckOutTime: form.hostelCheckOutTime,
+      hostelPolicies: form.hostelPolicies,
+      hostelTerms: form.hostelTerms,
+    };
+  }
+
+  return {
+    listingType: t,
+  };
+}
+
 // ─── Inner Form Component ──────────────────────────────────────
 function NewPackageForm() {
   const router = useRouter();
@@ -1051,18 +1303,36 @@ function NewPackageForm() {
       if (!isMounted || !pkg) return;
       const rawCat = normalizeCategorySlug(pkg.category);
       const normalizedCat = (['tour', 'cab', 'villa', 'homestay', 'hostel', 'devotional', 'foreign', 'food', 'adventure', 'guide'].includes(rawCat) ? rawCat : 'tour') as ListingType;
+      
+      const meta = (pkg.metadata && typeof pkg.metadata === 'object' ? pkg.metadata : {}) as Record<string, any>;
+      const activeCat = (meta.listingType as ListingType) || normalizedCat;
+
       const loadedForm: FormData = {
         ...INITIAL_FORM,
-        listingType: normalizedCat,
+        listingType: activeCat,
         title: pkg.name,
-        category: normalizedCat,
+        category: activeCat,
         destinationInput: pkg.destinationName ? `${pkg.destinationName}, ${pkg.state}` : '',
         destinationCity: pkg.city || pkg.destinationName || '',
         destinationState: pkg.state || '',
-        durationDays: String(pkg.durationDays || 3),
-        durationNights: String(pkg.durationNights || 2),
-        maxGroupSize: String(pkg.maxGroupSize || 12),
+        durationDays: String(pkg.durationDays || (activeCat === 'cab' || activeCat === 'food' || activeCat === 'guide' ? 1 : 3)),
+        durationNights: String(pkg.durationNights || 0),
+        maxGroupSize: String(pkg.maxGroupSize || (activeCat === 'cab' ? 4 : activeCat === 'food' ? 12 : activeCat === 'adventure' ? 15 : activeCat === 'guide' ? 10 : 12)),
         description: pkg.description || '',
+        basePrice: String(pkg.basePrice || ''),
+        discountPercent: String(pkg.discountPercent || 0),
+        images: Array.isArray(pkg.images) && pkg.images.length > 0
+          ? pkg.images
+          : (pkg as unknown as { imageUrl?: string }).imageUrl
+          ? [(pkg as unknown as { imageUrl?: string }).imageUrl!]
+          : [],
+        imageUrl: pkg.images?.[0] || (pkg as unknown as { imageUrl?: string }).imageUrl || '',
+        itinerary: pkg.itinerary && pkg.itinerary.length > 0
+          ? pkg.itinerary.map((i) => ({ day: i.day, title: i.title, description: i.description }))
+          : INITIAL_FORM.itinerary,
+        inclusions: pkg.inclusions?.join('\n') || '',
+        exclusions: pkg.exclusions?.join('\n') || '',
+        cancellationPolicy: pkg.cancellationPolicy?.notes || '',
         cabServiceType: 'Outstation',
         vehicleType: 'Sedan',
         vehicleModel: '',
@@ -1085,7 +1355,7 @@ function NewPackageForm() {
         waitingChargesPerHour: '150',
         extraKmCharges: '20',
         cabTermsAndConditions: '',
-        villaPropertyType: normalizedCat === 'homestay' ? 'Entire Homestay' : 'Entire Villa',
+        villaPropertyType: activeCat === 'homestay' ? 'Entire Homestay' : 'Entire Villa',
         locationName: pkg.destinationName || '',
         address: '',
         city: pkg.city || pkg.destinationName || '',
@@ -1133,29 +1403,18 @@ function NewPackageForm() {
         accommodationType: '',
         totalRooms: '',
         amenities: '',
-        basePrice: String(pkg.basePrice || ''),
-        discountPercent: String(pkg.discountPercent || 0),
-        foodRestaurantName: normalizedCat === 'food' ? pkg.name : '',
+        foodRestaurantName: activeCat === 'food' ? pkg.name : '',
         foodBasePrice: String(pkg.basePrice || ''),
         foodPricePerPerson: String(pkg.basePrice || ''),
         advPricePerPerson: String(pkg.basePrice || ''),
         advAdultPrice: String(pkg.basePrice || ''),
+        guideFullName: pkg.name,
         guideFullDayPrice: String(pkg.basePrice || ''),
         guidePricePerHour: String(pkg.basePrice ? Math.round(pkg.basePrice / 8) : ''),
-        images: Array.isArray(pkg.images) && pkg.images.length > 0
-          ? pkg.images
-          : (pkg as unknown as { imageUrl?: string }).imageUrl
-          ? [(pkg as unknown as { imageUrl?: string }).imageUrl!]
-          : [],
-        imageUrl: pkg.images?.[0] || (pkg as unknown as { imageUrl?: string }).imageUrl || '',
-        itinerary: pkg.itinerary && pkg.itinerary.length > 0
-          ? pkg.itinerary.map((i) => ({ day: i.day, title: i.title, description: i.description }))
-          : INITIAL_FORM.itinerary,
-        inclusions: pkg.inclusions?.join('\n') || '',
-        exclusions: pkg.exclusions?.join('\n') || '',
-        cancellationPolicy: pkg.cancellationPolicy?.notes || '',
+        // Fully restore every category-specific field from database metadata
+        ...meta,
       };
-      categoryStore.current[normalizedCat] = loadedForm;
+      categoryStore.current[activeCat] = loadedForm;
       setForm(loadedForm);
     }).catch((err) => {
       if (isMounted) setError(err instanceof Error ? err.message : 'Failed to load listing for editing');
@@ -1717,10 +1976,12 @@ function NewPackageForm() {
       };
     }
 
+    payload.metadata = extractCategoryMetadata(form);
     return payload;
   }, [form, isCab, isVilla, isHostel, isFood, isAdventure, isGuide]);
 
   const handleSubmit = useCallback(async () => {
+    if (submitting || savingDraft) return;
     if (verificationStatus !== 'VERIFIED') {
       setError('KYC Verification Required: Your business profile must be verified by admin before submitting listings.');
       return;
@@ -1741,9 +2002,10 @@ function NewPackageForm() {
       setError(err instanceof Error ? err.message : 'Failed to save listing');
       setSubmitting(false);
     }
-  }, [buildPayload, editId, verificationStatus, router]);
+  }, [buildPayload, editId, verificationStatus, router, submitting, savingDraft]);
 
   const handleSaveDraft = useCallback(async () => {
+    if (submitting || savingDraft) return;
     setSavingDraft(true);
     setError(null);
     try {
@@ -1759,7 +2021,7 @@ function NewPackageForm() {
       setError(err instanceof Error ? err.message : 'Failed to save draft');
       setSavingDraft(false);
     }
-  }, [buildPayload, editId, router]);
+  }, [buildPayload, editId, router, submitting, savingDraft]);
 
   // ═════════════════════════════════════════════════════════════
   // CAB / TAXI SPECIFIC STEP RENDERERS

@@ -114,6 +114,7 @@ export async function PUT(
       cancellationPolicy: body.cancellationPolicy,
       highlights: Array.isArray(body.highlights) ? body.highlights : undefined,
       tags: Array.isArray(body.tags) ? body.tags : undefined,
+      metadata: body.metadata && typeof body.metadata === 'object' ? body.metadata : undefined,
       submitForReview: Boolean(body.submitForReview),
       unarchive: Boolean(body.unarchive),
     };

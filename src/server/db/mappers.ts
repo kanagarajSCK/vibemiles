@@ -147,6 +147,7 @@ export function mapPrismaPackageToDomain(pkg: FullPrismaPackage): Package {
     createdAt: pkg.createdAt instanceof Date ? pkg.createdAt.toISOString() : String(pkg.createdAt),
     updatedAt: pkg.updatedAt instanceof Date ? pkg.updatedAt.toISOString() : String(pkg.updatedAt),
     tags: pkg.tags || [],
+    metadata: (pkg.metadata as Record<string, any>) ?? undefined,
   };
 }
 

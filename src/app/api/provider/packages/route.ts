@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
       cancellationPolicy: body.cancellationPolicy,
       highlights: Array.isArray(body.highlights) ? body.highlights : [],
       tags: Array.isArray(body.tags) ? body.tags : [],
+      metadata: body.metadata && typeof body.metadata === 'object' ? body.metadata : undefined,
       status: body.submitForReview ? 'PENDING_REVIEW' : 'DRAFT',
     };
 

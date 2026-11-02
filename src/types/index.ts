@@ -172,6 +172,7 @@ export interface Package {
   createdAt: string;
   updatedAt: string;
   tags: string[];
+  metadata?: Record<string, any>;
 }
 
 // ─── Booking ──────────────────────────────────────────────────

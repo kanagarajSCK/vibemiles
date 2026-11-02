@@ -312,6 +312,7 @@ model Package {
   isFeatured         Boolean        @default(false)
   tags               String[]       @default([])
   rejectionReason    String?        @db.Text
+  metadata           Json?
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
 

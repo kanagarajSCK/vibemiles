@@ -776,6 +776,7 @@ export interface CreatePackageInput {
   highlights?: string[];
   tags?: string[];
   status?: 'DRAFT' | 'PENDING_REVIEW';
+  metadata?: Prisma.InputJsonValue;
 }
 
 export interface UpdatePackageInput extends Partial<CreatePackageInput> {
@@ -1009,6 +1010,7 @@ export async function createPackage(
         isActive: true,
         isFeatured: false,
         tags: input.tags || [],
+        metadata: input.metadata ?? undefined,
         rejectionReason: null,
       },
     });
@@ -1224,6 +1226,7 @@ export async function updatePackage(
           input.cancellationPolicy !== undefined ? input.cancellationPolicy : existing.cancellationPolicy,
         highlights: input.highlights || existing.highlights,
         tags: input.tags || existing.tags,
+        ...(input.metadata !== undefined ? { metadata: input.metadata } : {}),
         status: newStatus,
         approvalStatus: newApprovalStatus,
         rejectionReason: newRejectionReason,
@@ -1354,6 +1357,10 @@ export async function submitPackageForReview(
 
   if (existing.status === ListingStatus.ARCHIVED) {
     throw new Error('Archived packages cannot be submitted for review');
+  }
+
+  if (existing.status === ListingStatus.PENDING_REVIEW && existing.approvalStatus === ApprovalStatus.PENDING) {
+    throw new Error('This listing has already been submitted and is currently pending admin moderation.');
   }
 
   const updated = await prisma.package.update({
