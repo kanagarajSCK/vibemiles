@@ -33,6 +33,18 @@ export async function GET(request: NextRequest, context: RouteContext) {
             verificationStatus: true,
             isActive: true,
             userId: true,
+            documents: {
+              select: {
+                id: true,
+                type: true,
+                fileName: true,
+                fileSize: true,
+                mimeType: true,
+                status: true,
+                rejectionReason: true,
+                uploadedAt: true,
+              },
+            },
           },
         },
         _count: {
