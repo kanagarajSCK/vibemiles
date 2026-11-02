@@ -14,6 +14,10 @@ import {
   ArrowRight,
   Heart,
   Share2,
+  Utensils,
+  Mountain,
+  Award,
+  Languages,
 } from 'lucide-react';
 import { getSessionUser } from '@/server/auth/guard';
 import { getPackageBySlug } from '@/server/db/packages';
@@ -22,10 +26,14 @@ import { Badge } from '@/components/ui/Badge';
 import { RatingStars } from '@/components/ui/RatingStars';
 import { Button } from '@/components/ui/Button';
 import { ROUTES } from '@/constants';
-import { DestinationWeather } from '@/components/weather';
 import { PackageBookingSidebar } from '@/components/travel/PackageBookingSidebar';
 import { PackageDetailWishlistButton } from '@/components/travel/PackageDetailWishlistButton';
 import { PackageReviewsSection, PackageReviewsSkeleton } from '@/components/travel/PackageReviewsSection';
+import {
+  FoodDetailSections,
+  AdventureDetailSections,
+  GuideDetailSections,
+} from './CategoryDetailSections';
 
 export default async function PackageDetailPage({
   params,
@@ -45,6 +53,26 @@ export default async function PackageDetailPage({
   }
 
   const isPreview = pkg.status !== 'PUBLISHED';
+  const cat = pkg.category.toLowerCase();
+  const meta = (pkg.metadata || {}) as Record<string, any>;
+
+  const categoryLink =
+    cat === 'food'
+      ? '/food'
+      : cat === 'adventure'
+      ? '/adventures'
+      : cat === 'guide'
+      ? '/guides'
+      : ROUTES.PACKAGES;
+
+  const categoryLabel =
+    cat === 'food'
+      ? 'Food Experiences'
+      : cat === 'adventure'
+      ? 'Adventures'
+      : cat === 'guide'
+      ? 'Local Guides'
+      : 'Packages';
 
   return (
     <div className="mx-auto max-w-7xl space-y-5 px-3 py-5 pb-16 sm:space-y-8 sm:px-6 sm:py-8 sm:pb-20 lg:px-8">
@@ -66,7 +94,7 @@ export default async function PackageDetailPage({
         <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
           <Link href={ROUTES.HOME} className="hover:text-teal-700">Home</Link>
           <span>/</span>
-          <Link href={ROUTES.PACKAGES} className="hover:text-teal-700">Packages</Link>
+          <Link href={categoryLink} className="hover:text-teal-700">{categoryLabel}</Link>
           <span>/</span>
           <span className="text-slate-900 font-semibold truncate">{pkg.name}</span>
         </div>
@@ -84,9 +112,16 @@ export default async function PackageDetailPage({
           </div>
 
           <div className="flex items-center gap-4">
-            <RatingStars rating={pkg.rating} reviewCount={pkg.reviewCount} size="lg" />
+            {pkg.reviewCount > 0 ? (
+              <RatingStars rating={pkg.rating} reviewCount={pkg.reviewCount} size="lg" />
+            ) : (
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-100 rounded-full px-3 py-1">
+                <span>★</span>
+                <span>New Verified Listing</span>
+              </div>
+            )}
             <div className="flex items-center gap-2">
-              <button className="rounded-full border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-100 transition-colors">
+              <button className="rounded-full border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-100 transition-colors" title="Share Experience">
                 <Share2 className="w-4 h-4" />
               </button>
               <PackageDetailWishlistButton packageData={pkg} />
@@ -135,121 +170,303 @@ export default async function PackageDetailPage({
 
       {/* QUICK HIGHLIGHTS BAR */}
       <div className="grid grid-cols-2 gap-3 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:grid-cols-4 sm:gap-4 sm:divide-y-0 sm:divide-x sm:p-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 sm:h-10 sm:w-10">
-            <Clock className="w-5 h-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="text-xs text-slate-400 block">Duration</span>
-            <span className="text-sm font-bold text-slate-900">{pkg.durationDays} Days / {pkg.durationNights} Nights</span>
-          </div>
-        </div>
+        {cat === 'food' ? (
+          <>
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700 sm:h-10 sm:w-10">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Operating Hours</span>
+                <span className="text-sm font-bold text-slate-900 truncate">
+                  {meta.foodOpeningTime && meta.foodClosingTime
+                    ? `${meta.foodOpeningTime} - ${meta.foodClosingTime}`
+                    : 'Flexible Timings'}
+                </span>
+              </div>
+            </div>
 
-        <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700 sm:h-10 sm:w-10">
-            <Users className="w-5 h-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="text-xs text-slate-400 block">Group Size</span>
-            <span className="text-sm font-bold text-slate-900">Up to {pkg.maxGroupSize} Travelers</span>
-          </div>
-        </div>
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-700 sm:h-10 sm:w-10">
+                <Utensils className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Food Format</span>
+                <span className="text-sm font-bold text-slate-900 truncate">
+                  {meta.foodFormat || meta.foodBusinessType || 'Culinary Experience'}
+                </span>
+              </div>
+            </div>
 
-        <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 sm:h-10 sm:w-10">
-            <ShieldCheck className="w-5 h-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="text-xs text-slate-400 block">Cancellation</span>
-            <span className="text-sm font-semibold text-emerald-700">{pkg.cancellationPolicy.freeCancellationDays} Days Free Cancellation</span>
-          </div>
-        </div>
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 sm:h-10 sm:w-10">
+                <Users className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Table Capacity</span>
+                <span className="text-sm font-bold text-slate-900 truncate">
+                  Seats {meta.foodTableCapacity || pkg.maxGroupSize || 4} Guests
+                </span>
+              </div>
+            </div>
 
-        <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700 sm:h-10 sm:w-10">
-            <Building2 className="w-5 h-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <span className="text-xs text-slate-400 block">Tour Provider</span>
-            <span className="block wrap-break-word text-sm font-bold text-slate-900">{pkg.providerName}</span>
-          </div>
-        </div>
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 sm:h-10 sm:w-10">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Cancellation</span>
+                <span className="text-sm font-semibold text-emerald-700 truncate">
+                  {pkg.cancellationPolicy.freeCancellationDays > 0
+                    ? `${pkg.cancellationPolicy.freeCancellationDays} Days Free Cancel`
+                    : 'Standard Policy'}
+                </span>
+              </div>
+            </div>
+          </>
+        ) : cat === 'adventure' ? (
+          <>
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700 sm:h-10 sm:w-10">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Duration</span>
+                <span className="text-sm font-bold text-slate-900 truncate">
+                  {meta.advDurationHours
+                    ? `${meta.advDurationHours} Hours`
+                    : pkg.durationDays > 0
+                    ? `${pkg.durationDays} Days`
+                    : 'Half Day Slot'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700 sm:h-10 sm:w-10">
+                <Mountain className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Difficulty</span>
+                <span className="text-sm font-bold text-slate-900 uppercase truncate">
+                  {meta.advDifficulty || 'Moderate'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 sm:h-10 sm:w-10">
+                <Users className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Max Batch Size</span>
+                <span className="text-sm font-bold text-slate-900 truncate">
+                  Up to {meta.advMaxParticipants || pkg.maxGroupSize || 12} Adventurers
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 sm:h-10 sm:w-10">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Weather & Safety</span>
+                <span className="text-sm font-semibold text-emerald-700 truncate">
+                  {meta.advBadWeatherPolicy ? 'Weather Protected' : `${pkg.cancellationPolicy.freeCancellationDays}d Free Cancel`}
+                </span>
+              </div>
+            </div>
+          </>
+        ) : cat === 'guide' ? (
+          <>
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700 sm:h-10 sm:w-10">
+                <Award className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Experience</span>
+                <span className="text-sm font-bold text-slate-900 truncate">
+                  {meta.guideExperienceYears ? `${meta.guideExperienceYears} Years Experience` : 'Certified Local Guide'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-700 sm:h-10 sm:w-10">
+                <Languages className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Languages</span>
+                <span className="text-sm font-bold text-slate-900 truncate">
+                  {Array.isArray(meta.guideLanguages) && meta.guideLanguages.length > 0
+                    ? meta.guideLanguages.slice(0, 2).join(', ')
+                    : 'English, Local'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 sm:h-10 sm:w-10">
+                <Users className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Tour Format</span>
+                <span className="text-sm font-bold text-slate-900 truncate">
+                  {meta.guideTourFormat || 'Private & Group'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 sm:h-10 sm:w-10">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Cancellation</span>
+                <span className="text-sm font-semibold text-emerald-700 truncate">
+                  {pkg.cancellationPolicy.freeCancellationDays} Days Free Cancel
+                </span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 sm:h-10 sm:w-10">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Duration</span>
+                <span className="text-sm font-bold text-slate-900">{pkg.durationDays} Days / {pkg.durationNights} Nights</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700 sm:h-10 sm:w-10">
+                <Users className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Group Size</span>
+                <span className="text-sm font-bold text-slate-900">Up to {pkg.maxGroupSize} Travelers</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 sm:h-10 sm:w-10">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Cancellation</span>
+                <span className="text-sm font-semibold text-emerald-700">{pkg.cancellationPolicy.freeCancellationDays} Days Free Cancellation</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-3 sm:pt-0 sm:pl-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700 sm:h-10 sm:w-10">
+                <Building2 className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-slate-400 block">Tour Provider</span>
+                <span className="block wrap-break-word text-sm font-bold text-slate-900">{pkg.providerName}</span>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* MAIN CONTENT GRID (LEFT DETAILS + RIGHT BOOKING WIDGET) */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Left Column - Details */}
         <div className="lg:col-span-2 space-y-10">
-          {/* Overview */}
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3 sm:p-6">
-            <h2 className="text-xl font-bold text-slate-900">Trip Overview</h2>
-            <p className="text-slate-600 leading-relaxed text-sm whitespace-pre-line">
-              {pkg.description}
-            </p>
-          </section>
+          {cat === 'food' ? (
+            <FoodDetailSections pkg={pkg} meta={meta} />
+          ) : cat === 'adventure' ? (
+            <AdventureDetailSections pkg={pkg} meta={meta} />
+          ) : cat === 'guide' ? (
+            <GuideDetailSections pkg={pkg} meta={meta} />
+          ) : (
+            <>
+              {/* Overview */}
+              <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3 sm:p-6">
+                <h2 className="text-xl font-bold text-slate-900">Trip Overview</h2>
+                <p className="text-slate-600 leading-relaxed text-sm whitespace-pre-line">
+                  {pkg.description}
+                </p>
+              </section>
 
-          {/* Day-by-Day Itinerary */}
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-5 sm:space-y-6 sm:p-6">
-            <h2 className="text-xl font-bold text-slate-900">Day-by-Day Itinerary</h2>
-            <div className="relative border-l-2 border-teal-600/30 pl-6 space-y-8 ml-3">
-              {pkg.itinerary.map((day) => (
-                <div key={day.day} className="relative group">
-                  {/* Dot */}
-                  <div className="absolute -left-7.75 top-0 flex h-6 w-6 items-center justify-center rounded-full bg-teal-700 text-white text-xs font-bold shadow-md">
-                    {day.day}
-                  </div>
-                  <div className="space-y-1">
-                    <h3 className="text-base font-bold text-slate-900">
-                      Day {day.day}: {day.title}
-                    </h3>
-                    <p className="text-sm text-slate-600 leading-relaxed">{day.description}</p>
-                    {day.meals && day.meals.length > 0 && (
-                      <div className="pt-2 flex items-center gap-2 text-xs font-medium text-teal-800">
-                        <span>Included Meals:</span>
-                        <span className="rounded-full bg-teal-50 px-2.5 py-0.5 border border-teal-200">
-                          {day.meals.join(', ')}
-                        </span>
+              {/* Day-by-Day Itinerary */}
+              {pkg.itinerary && pkg.itinerary.length > 0 && (
+                <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-5 sm:space-y-6 sm:p-6">
+                  <h2 className="text-xl font-bold text-slate-900">Day-by-Day Itinerary</h2>
+                  <div className="relative border-l-2 border-teal-600/30 pl-6 space-y-8 ml-3">
+                    {pkg.itinerary.map((day) => (
+                      <div key={day.day} className="relative group">
+                        {/* Dot */}
+                        <div className="absolute -left-7.75 top-0 flex h-6 w-6 items-center justify-center rounded-full bg-teal-700 text-white text-xs font-bold shadow-md">
+                          {day.day}
+                        </div>
+                        <div className="space-y-1">
+                          <h3 className="text-base font-bold text-slate-900">
+                            Day {day.day}: {day.title}
+                          </h3>
+                          <p className="text-sm text-slate-600 leading-relaxed">{day.description}</p>
+                          {day.meals && day.meals.length > 0 && (
+                            <div className="pt-2 flex items-center gap-2 text-xs font-medium text-teal-800">
+                              <span>Included Meals:</span>
+                              <span className="rounded-full bg-teal-50 px-2.5 py-0.5 border border-teal-200">
+                                {day.meals.join(', ')}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    )}
+                    ))}
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
+                </section>
+              )}
+            </>
+          )}
 
           {/* Inclusions & Exclusions */}
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-5 sm:space-y-6 sm:p-6">
-            <h2 className="text-xl font-bold text-slate-900">Package Inclusions & Exclusions</h2>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div className="space-y-3">
-                <h3 className="font-bold text-sm text-emerald-800 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" /> What is Included
-                </h3>
-                <ul className="space-y-2 text-sm text-slate-600">
-                  {pkg.inclusions.map((inc, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-emerald-500 font-bold">✓</span>
-                      <span>{inc}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+          {(pkg.inclusions.length > 0 || pkg.exclusions.length > 0) && (
+            <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-5 sm:space-y-6 sm:p-6">
+              <h2 className="text-xl font-bold text-slate-900">Package Inclusions & Exclusions</h2>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                {pkg.inclusions.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="font-bold text-sm text-emerald-800 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" /> What is Included
+                    </h3>
+                    <ul className="space-y-2 text-sm text-slate-600">
+                      {pkg.inclusions.map((inc, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="text-emerald-500 font-bold">✓</span>
+                          <span>{inc}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-              <div className="space-y-3">
-                <h3 className="font-bold text-sm text-rose-800 flex items-center gap-1.5">
-                  <XCircle className="w-4 h-4 text-rose-600" /> What is Excluded
-                </h3>
-                <ul className="space-y-2 text-sm text-slate-600">
-                  {pkg.exclusions.map((exc, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-rose-500 font-bold">✕</span>
-                      <span>{exc}</span>
-                    </li>
-                  ))}
-                </ul>
+                {pkg.exclusions.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="font-bold text-sm text-rose-800 flex items-center gap-1.5">
+                      <XCircle className="w-4 h-4 text-rose-600" /> What is Excluded
+                    </h3>
+                    <ul className="space-y-2 text-sm text-slate-600">
+                      {pkg.exclusions.map((exc, i) => (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="text-rose-500 font-bold">✕</span>
+                          <span>{exc}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
-            </div>
-          </section>
+            </section>
+          )}
 
           {/* Provider Box */}
           <section className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-900 p-4 text-white shadow-md sm:flex-row sm:items-center sm:justify-between sm:p-6">

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Compass, Sparkles, Mountain, Waves, Wind } from 'lucide-react';
+import { Compass, Sparkles, Mountain, Waves, Wind, Search, MapPin, X, Filter } from 'lucide-react';
 import { getPublishedPackages } from '@/server/db/packages';
 import { PackageCard } from '@/components/cards/PackageCard';
 import { ROUTES } from '@/constants';
@@ -12,20 +12,74 @@ export const metadata = {
   description: 'Book certified scuba diving, Himalayan treks, paragliding, river rafting, and camping adventures across India.',
 };
 
+const ADVENTURE_TYPES = [
+  'All Types',
+  'Trekking & Hiking',
+  'Scuba Diving & Snorkeling',
+  'Paragliding & Sky Sports',
+  'White Water Rafting',
+  'Desert & Jungle Safaris',
+];
+
+const DIFFICULTY_LEVELS = [
+  { label: 'All Levels', value: '' },
+  { label: 'Easy / Beginner', value: 'Easy' },
+  { label: 'Moderate', value: 'Moderate' },
+  { label: 'Strenuous', value: 'Strenuous' },
+  { label: 'Extreme / Technical', value: 'Extreme' },
+];
+
 export default async function AdventuresPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ q?: string; destination?: string }>;
+  searchParams?: Promise<{
+    q?: string;
+    destination?: string;
+    type?: string;
+    difficulty?: string;
+  }>;
 }) {
   const params = searchParams ? await searchParams : {};
   const query = params.q?.trim() || '';
   const destination = params.destination?.trim() || '';
+  const selectedType = params.type?.trim() || '';
+  const selectedDifficulty = params.difficulty?.trim() || '';
 
   const packages = await getPublishedPackages({
     category: 'adventure',
     q: query || undefined,
     destination: destination || undefined,
   });
+
+  let displayedPackages = packages;
+
+  if (selectedType && selectedType !== 'All Types') {
+    const tLow = selectedType.toLowerCase();
+    displayedPackages = displayedPackages.filter((p) => {
+      const meta = (p.metadata || {}) as Record<string, any>;
+      const catType = (meta.advCategory || '').toLowerCase();
+      return (
+        catType.includes(tLow) ||
+        p.tags?.some((t) => t.toLowerCase().includes(tLow)) ||
+        p.name.toLowerCase().includes(tLow)
+      );
+    });
+  }
+
+  if (selectedDifficulty) {
+    const diffLow = selectedDifficulty.toLowerCase();
+    displayedPackages = displayedPackages.filter((p) => {
+      const meta = (p.metadata || {}) as Record<string, any>;
+      const difficulty = (meta.advDifficulty || '').toLowerCase();
+      return (
+        difficulty.includes(diffLow) ||
+        p.tags?.some((t) => t.toLowerCase().includes(diffLow)) ||
+        p.description.toLowerCase().includes(diffLow)
+      );
+    });
+  }
+
+  const hasActiveFilters = Boolean(query || destination || (selectedType && selectedType !== 'All Types') || selectedDifficulty);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
@@ -50,14 +104,95 @@ export default async function AdventuresPage({
             { label: 'Paragliding & Sky Sports', icon: Wind },
             { label: 'White Water Rafting', icon: Waves },
             { label: 'Desert & Jungle Safaris', icon: Compass },
-          ].map((item) => (
-            <span
-              key={item.label}
-              className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur-md px-3 py-1 text-xs font-medium text-teal-200 border border-white/10"
+          ].map((item) => {
+            const isActive = selectedType.toLowerCase() === item.label.toLowerCase();
+            return (
+              <Link
+                key={item.label}
+                href={`/adventures?type=${encodeURIComponent(item.label)}${destination ? `&destination=${encodeURIComponent(destination)}` : ''}`}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all ${
+                  isActive
+                    ? 'bg-teal-400 text-teal-950 font-bold shadow-md'
+                    : 'bg-white/10 backdrop-blur-md text-teal-200 border border-white/10 hover:bg-white/20'
+                }`}
+              >
+                <item.icon className="w-3.5 h-3.5 text-teal-300" /> {item.label}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Filter & Search Bar */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-4">
+        <form method="GET" action="/adventures" className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+            <input
+              type="text"
+              name="q"
+              defaultValue={query}
+              placeholder="Search trek, dive, rafting, paragliding..."
+              className="w-full rounded-xl border border-slate-200 pl-9 pr-3 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-teal-600 focus:outline-none"
+            />
+          </div>
+
+          <div className="relative">
+            <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+            <input
+              type="text"
+              name="destination"
+              defaultValue={destination}
+              placeholder="Filter by destination (e.g. Manali, Rishikesh)..."
+              className="w-full rounded-xl border border-slate-200 pl-9 pr-3 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-teal-600 focus:outline-none"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="submit"
+              className="flex-1 rounded-xl bg-teal-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-teal-800 transition-colors"
             >
-              <item.icon className="w-3.5 h-3.5 text-teal-400" /> {item.label}
-            </span>
-          ))}
+              Filter Adventures
+            </button>
+            {hasActiveFilters && (
+              <Link
+                href="/adventures"
+                className="rounded-xl border border-slate-200 p-2.5 text-slate-500 hover:bg-slate-50 transition-colors"
+                title="Reset Filters"
+              >
+                <X className="w-4 h-4" />
+              </Link>
+            )}
+          </div>
+        </form>
+
+        {/* Difficulty Filter Pills */}
+        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100 text-xs">
+          <span className="font-semibold text-slate-500 flex items-center gap-1">
+            <Filter className="w-3.5 h-3.5 text-slate-400" /> Difficulty:
+          </span>
+          {DIFFICULTY_LEVELS.map((opt) => {
+            const isSelected = selectedDifficulty === opt.value || (!selectedDifficulty && !opt.value);
+            return (
+              <Link
+                key={opt.label}
+                href={`/adventures?${new URLSearchParams({
+                  ...(query ? { q: query } : {}),
+                  ...(destination ? { destination } : {}),
+                  ...(selectedType ? { type: selectedType } : {}),
+                  ...(opt.value ? { difficulty: opt.value } : {}),
+                }).toString()}`}
+                className={`rounded-lg px-2.5 py-1 font-medium transition-colors ${
+                  isSelected
+                    ? 'bg-teal-100 text-teal-900 border border-teal-300 font-bold'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-transparent'
+                }`}
+              >
+                {opt.label}
+              </Link>
+            );
+          })}
         </div>
       </div>
 
@@ -69,7 +204,8 @@ export default async function AdventuresPage({
               {destination ? `Adventures in ${destination}` : 'All Outdoor Adventures & Activities'}
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Showing {packages.length} verified adventure {packages.length === 1 ? 'listing' : 'listings'}
+              Showing {displayedPackages.length} verified adventure {displayedPackages.length === 1 ? 'listing' : 'listings'}
+              {hasActiveFilters && ' (filtered)'}
             </p>
           </div>
           <Link
@@ -80,9 +216,9 @@ export default async function AdventuresPage({
           </Link>
         </div>
 
-        {packages.length > 0 ? (
+        {displayedPackages.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {packages.map((pkg) => (
+            {displayedPackages.map((pkg) => (
               <PackageCard key={pkg.id} packageData={pkg} />
             ))}
           </div>
@@ -92,17 +228,17 @@ export default async function AdventuresPage({
               <Compass className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-bold text-slate-900">
-              No adventure activities found {destination ? `in ${destination}` : ''}
+              No adventure activities match your filters {destination ? `in ${destination}` : ''}
             </h3>
             <p className="text-xs text-slate-500 max-w-md mx-auto">
-              Our adventure organizers are adding new trekking expeditions, dive slots, and thrill packages. Explore our marketplace or try a different destination.
+              Our adventure organizers are adding new trekking expeditions, dive slots, and thrill packages. Try resetting your filters.
             </p>
             <div className="pt-2">
               <Link
-                href={ROUTES.EXPLORE}
+                href="/adventures"
                 className="inline-flex items-center gap-2 rounded-xl bg-teal-700 px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-teal-800 transition-colors"
               >
-                Browse Marketplace <Sparkles className="w-4 h-4" />
+                Reset Filters <Sparkles className="w-4 h-4" />
               </Link>
             </div>
           </div>

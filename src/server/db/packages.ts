@@ -425,6 +425,9 @@ export function invalidatePackageCache(slugOrId?: string, secondaryKey?: string)
         nextCache.revalidatePath('/packages');
         nextCache.revalidatePath('/devotional-trips');
         nextCache.revalidatePath('/foreign-trips');
+        nextCache.revalidatePath('/food');
+        nextCache.revalidatePath('/adventures');
+        nextCache.revalidatePath('/guides');
         if (slugOrId) {
           nextCache.revalidatePath(`/packages/${slugOrId}`);
         }
